@@ -52,14 +52,18 @@ test_bare_render() {
   assert_eq "nothing to measure means no second row, not even a blank one" "1" "$(count_rows "{\"cwd\":\"$WORK\"}")"
 }
 
-test_context_bar() {
+test_context_meter() {
   line=$(render "$(build_status_json 42)")
-  assert_contains "context bar at 42%" "━━━━╌╌╌╌╌╌ 42%" "$line"
   assert_contains "model name" "Fable 5.1" "$line"
   assert_eq "the top row says where you are" "➜ $PROJECT  │ Fable 5.1" "$(row 1 "$line")"
-  assert_eq "the meters row opens with the bar and no separator" "━━━━╌╌╌╌╌╌ 42%" "$(row 2 "$line")"
-  line=$(render "$(build_status_json 100)")
-  assert_contains "context bar at 100% is full and never negative" "━━━━━━━━━━ 100%" "$line"
+  assert_eq "the meters row opens with the labelled context and no separator" "ctx:42%" "$(row 2 "$line")"
+  assert_missing "no bar is drawn" "━" "$line"
+  line=$(render "$(build_status_json 99.6)")
+  assert_eq "the context percentage is rounded" "ctx:100%" "$(row 2 "$line")"
+  raw=$(printf '%s' "$(build_status_json 60)" | bash "$SCRIPT")
+  assert_contains "the context is coloured like the usage, yellow from 50%" $'ctx:\e[0m\e[0;33m60%' "$raw"
+  line=$(render "$(build_status_json '"most"')")
+  assert_missing "a context percentage that is not a number is left out" "ctx:" "$line"
 }
 
 test_ledger_position() {
@@ -97,7 +101,7 @@ test_usage_windows() {
   assert_eq "a window sent on its own is shown" "7d:80%" "$(row 2 "$line")"
   assert_missing "and the one left out is not" "5h:" "$line"
   raw=$(printf '%s' "$(build_usage_json '"five_hour":{"used_percentage":80}')" | bash "$SCRIPT")
-  assert_contains "a window at 75% or more is red, like the context bar" $'5h:\e[0m\e[0;31m80%' "$raw"
+  assert_contains "a window at 75% or more is red" $'5h:\e[0m\e[0;31m80%' "$raw"
   line=$(render "$(build_usage_json '"five_hour":{"used_percentage":"soon"}')")
   assert_missing "a percentage that is not a number is left out" "5h:" "$line"
 }
@@ -147,12 +151,12 @@ test_two_rows() {
   line=$(render "$json")
   assert_eq "exactly two rows" "2" "$(count_rows "$json")"
   assert_eq "the top row holds the folder, the model and the phase" "➜ $PROJECT  │ Fable 5.1  │ (5 of 6, Phase 6)" "$(row 1 "$line")"
-  assert_contains "the meters row opens with the bar, then the uptime" "━━━━╌╌╌╌╌╌ 42%  │ up " "$(row 2 "$line")"
+  assert_contains "the meters row opens with the context, then the uptime" "ctx:42%  │ up " "$(row 2 "$line")"
   assert_contains "and ends with the usage and the compactions" "  │ 5h:23%  │ compacted 1x (1 auto)" "$(row 2 "$line")"
 }
 
 test_bare_render
-test_context_bar
+test_context_meter
 test_ledger_position
 test_replaced_transcript
 test_malformed_input

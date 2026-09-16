@@ -29,7 +29,8 @@ one published page of complete pseudocode, every helper expanded and cited, with
 why each line is the way it is and a closing analysis, and it triggers on its own
 description or by `/engineering-rules:generate-pseudocode`. Version 2.16.0 splits the status
 line into two rows, where you are and the meters, and adds the claude.ai plan usage and a
-count of the conversation's compactions to the meters.
+count of the conversation's compactions to the meters; 2.16.1 turns the context bar into a
+labelled percentage like the usage.
 
 ## What loads when
 
@@ -215,11 +216,11 @@ helper | stop | general-purpose | first line of the return
 
   It prints two rows. The first says where you are: the directory, git branch and dirty
   state, model, and the last ledger position Claude printed, e.g. `(3 of 6, Phase 4)`. The
-  second holds the meters: a context bar, session uptime, the claude.ai plan usage
-  (`5h:24% 7d:61%`, the rolling five-hour and weekly windows Claude Code sends for Pro and
-  Max once the first response is in) and how often the conversation was compacted
-  (`compacted 2x (1 auto)`, hidden until the first). While all four are empty the second
-  row is left out.
+  second holds the meters: the context in use (`ctx:42%`), session uptime, the claude.ai
+  plan usage (`5h:24% 7d:61%`, the rolling five-hour and weekly windows Claude Code sends
+  for Pro and Max once the first response is in) and how often the conversation was
+  compacted (`compacted 2x (1 auto)`, hidden until the first). The percentages turn yellow
+  from 50% and red from 75%. While all four are empty the second row is left out.
 
 Desktop notifications use `osascript` on macOS and `notify-send` on Linux. On macOS a turn
 that ends on a ledger re-print is announced twice, once by Claude's notification tool (the
@@ -381,9 +382,9 @@ Eight checks run against the plugin itself, all on `tests/harness.sh`:
 `bash hooks/tests/<name>.test.sh` covers each hook script with fixtures: the edit guard's
 nine rules, the law's exemptions, the test-file rows, the grew-versus-kept decision and the
 missing-law path; the file cap; the re-anchor on compact and resume; the notifier's five
-events; the status line's two rows, its usage windows and its compaction count (appends, a
-quoted marker, a half-written line, a replaced transcript, a broken cursor file). Every one
-of them can be pointed at a mutated copy of its script
+events; the status line's two rows, its context and usage percentages and its compaction
+count (appends, a quoted marker, a half-written line, a replaced transcript, a broken cursor
+file). Every one of them can be pointed at a mutated copy of its script
 through an environment variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `RE_ANCHOR_SH`,
 `PROGRESS_NOTIFY_SH`, `STATUSLINE_SH`; `HOOKS_JSON`, `CAP_DIR`, `SKILLS_DIR` and `ASSETS_DIR`
 for the four repo checks), so a run that watches the failure is one line.

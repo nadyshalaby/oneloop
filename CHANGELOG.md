@@ -2,6 +2,11 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.16.1**: the context bar becomes a labelled percentage, `ctx:42%`, written and coloured
+  like the usage windows (green, yellow from 50, red from 75), so the meters row reads as
+  one set of labelled numbers. The context meter and both usage windows share one
+  formatter, `format_meter`. `hooks/tests/statusline.test.sh` checks the label, the
+  rounding, the colour, a value that is not a number, and that no bar is drawn.
 - **2.16.0**: the status line prints two rows and gains two meters. The first row says where
   you are (directory, git, model, ledger position); the second holds the meters (context
   bar, uptime and the two new ones) and is left out while all are empty. `5h:24% 7d:61%` is

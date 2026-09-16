@@ -1,8 +1,8 @@
 #!/bin/bash
 # engineering-rules status line, two rows. The first says where you are: directory, git
 # branch and dirty state, model, and the last phase-ledger position Claude printed this
-# session. The second holds the meters: context bar, session uptime, the claude.ai plan
-# usage and how often the conversation was compacted; it is left out while all are empty.
+# session. The second holds the meters: the context in use, session uptime, the claude.ai
+# plan usage and how often the conversation was compacted; it is left out while all are empty.
 # Receives Claude Code's status-line JSON on stdin. Plugins cannot set statusLine, so
 # the README carries the one-line settings snippet that points here.
 # It is re-rendered continuously, so the ledger and compaction scans each keep a cursor per
@@ -62,17 +62,19 @@ level_color() {
   fi
 }
 
-# Ten blocks filled in proportion to the context used, coloured by level_color.
+# format_meter <label> <percent>: " ctx:42%", the label dim and the percentage coloured by
+# level_color; nothing when Claude Code sent no percentage or one that is not a number.
+format_meter() {
+  [ -n "$2" ] || return 0
+  pct=$(printf '%.0f' "$2" 2>/dev/null) || return 0
+  printf ' %s%s:%s%s%s%%%s' "$dim" "$1" "$reset" "$(level_color "$pct")" "$pct" "$reset"
+}
+
+# The share of the context window in use, "ctx:42%".
 render_context_segment() {
-  [ -n "$used_pct" ] || return 0
-  used_int=$(printf '%.0f' "$used_pct" 2>/dev/null) || return 0
-  bar_color=$(level_color "$used_int")
-  filled=$(( used_int * 10 / 100 ))
-  [ "$filled" -gt 10 ] && filled=10
-  [ "$filled" -lt 0 ] && filled=0
-  filled_str=$(printf '%*s' "$filled" '' | sed 's/ /━/g')
-  empty_str=$(printf '%*s' $(( 10 - filled )) '' | sed 's/ /╌/g')
-  printf '  %s│%s %s%s%s%s%s %s%s%%%s' "$gray" "$reset" "$bar_color" "$filled_str" "$gray" "$empty_str" "$reset" "$dim" "$used_int" "$reset"
+  meter=$(format_meter ctx "$used_pct")
+  [ -n "$meter" ] || return 0
+  printf '  %s│%s%s' "$gray" "$reset" "$meter"
 }
 
 # BSD date first (macOS), GNU date second (Linux); empty when neither can parse it.
@@ -143,18 +145,10 @@ render_phase_segment() {
   return 0
 }
 
-# format_usage <label> <percent>: " 5h:24%", coloured by level_color; nothing when Claude Code
-# sent no percentage or one that is not a number.
-format_usage() {
-  [ -n "$2" ] || return 0
-  pct=$(printf '%.0f' "$2" 2>/dev/null) || return 0
-  printf ' %s%s:%s%s%s%%%s' "$dim" "$1" "$reset" "$(level_color "$pct")" "$pct" "$reset"
-}
-
 # The claude.ai plan's rolling five-hour window and its weekly one. Claude Code sends them for
 # Pro and Max once the first response is in, and may send either window without the other.
 render_usage_segment() {
-  usage="$(format_usage 5h "$five_hour_pct")$(format_usage 7d "$seven_day_pct")"
+  usage="$(format_meter 5h "$five_hour_pct")$(format_meter 7d "$seven_day_pct")"
   [ -n "$usage" ] || return 0
   printf '  %s│%s%s' "$gray" "$reset" "$usage"
 }
