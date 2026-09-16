@@ -2,6 +2,20 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.16.0**: the status line prints two rows and gains two meters. The first row says where
+  you are (directory, git, model, ledger position); the second holds the meters (context
+  bar, uptime and the two new ones) and is left out while all are empty. `5h:24% 7d:61%` is
+  the claude.ai plan's rolling five-hour and weekly windows from `rate_limits` in the
+  status-line JSON, each shown only when Claude Code sends it and coloured like the context
+  bar. `compacted 2x (1 auto)` counts the `compact_boundary` lines Claude Code writes into
+  the transcript and stays hidden until the first; it keeps its own cursor beside the
+  ledger's, reads only the whole lines added since the last render and waits while a line is
+  still being written, so no compaction is counted twice. Both scans now reach their offset
+  through `dd`, because `tail -c +N` took close to two seconds on a 70 MB transcript on
+  macOS; the first render of that transcript went from 1.9 s to 0.8 s with the new scan
+  included. `hooks/tests/statusline.test.sh` covers the rows, the two windows, one window
+  alone, the colour, the count across appends, a quoted marker, a half-written line, a
+  replaced transcript and a broken cursor file, on macOS and on Debian.
 - **2.15.0**: a second skill ships beside the law. `skills/generate-pseudocode/` turns
   "explain how this code flow works" into one published page of complete pseudocode: every
   routine read from source in the session and every helper expanded down to the SQL or the

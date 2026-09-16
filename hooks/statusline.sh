@@ -1,10 +1,13 @@
 #!/bin/bash
-# engineering-rules status line: directory, git branch and dirty state, model, context
-# bar, session uptime, and the last phase-ledger position Claude printed this session.
+# engineering-rules status line, two rows. The first says where you are: directory, git
+# branch and dirty state, model, and the last phase-ledger position Claude printed this
+# session. The second holds the meters: context bar, session uptime, the claude.ai plan
+# usage and how often the conversation was compacted; it is left out while all are empty.
 # Receives Claude Code's status-line JSON on stdin. Plugins cannot set statusLine, so
 # the README carries the one-line settings snippet that points here.
-# It is re-rendered continuously, so the ledger scan keeps a cursor per transcript and
-# greps only the bytes added since the last render. Runs on the bash macOS ships (3.2).
+# It is re-rendered continuously, so the ledger and compaction scans each keep a cursor per
+# transcript and read only the bytes added since the last render. Runs on the bash macOS
+# ships (3.2).
 
 here=${BASH_SOURCE[0]%/*}
 [ "$here" = "${BASH_SOURCE[0]}" ] && here=.
@@ -25,10 +28,16 @@ bold="${ESC}[1m"
 gray="${ESC}[0;90m"
 CACHE_DIR="${TMPDIR:-/tmp}"
 SCAN_OVERLAP=64
+# Claude Code writes one transcript line carrying COMPACT_MARKER per compaction. A copy quoted
+# inside a message or a tool result has its quotes escaped, so it never matches.
+COMPACT_MARKER='"subtype":"compact_boundary"'
+AUTO_TRIGGER='"trigger":"auto"'
 
 # One jq call for every field, one field per line, so an empty field keeps its place.
 read_status_fields() {
-  printf '%s' "$1" | jq -r '.cwd // .workspace.current_dir // "", .transcript_path // "", .model.display_name // "", (.context_window.used_percentage // "" | tostring)' 2>/dev/null
+  printf '%s' "$1" | jq -r '.cwd // .workspace.current_dir // "", .transcript_path // "", .model.display_name // "",
+    (.context_window.used_percentage, .rate_limits.five_hour.used_percentage, .rate_limits.seven_day.used_percentage
+      | . // "" | tostring)' 2>/dev/null
 }
 
 render_git_segment() {
@@ -45,19 +54,25 @@ render_model_segment() {
   printf '  %s│%s %s%s%s' "$gray" "$reset" "$bold_magenta" "$model_name" "$reset"
 }
 
-# Ten blocks filled in proportion to the context used: green, yellow from 50%, red from 75%.
+# level_color <percent>: green, yellow from 50, red from 75.
+level_color() {
+  if [ "$1" -ge 75 ]; then printf '%s' "$red"
+  elif [ "$1" -ge 50 ]; then printf '%s' "$yellow"
+  else printf '%s' "$green"
+  fi
+}
+
+# Ten blocks filled in proportion to the context used, coloured by level_color.
 render_context_segment() {
   [ -n "$used_pct" ] || return 0
   used_int=$(printf '%.0f' "$used_pct" 2>/dev/null) || return 0
-  bar_color="$green"
-  [ "$used_int" -ge 50 ] && bar_color="$yellow"
-  [ "$used_int" -ge 75 ] && bar_color="$red"
+  bar_color=$(level_color "$used_int")
   filled=$(( used_int * 10 / 100 ))
   [ "$filled" -gt 10 ] && filled=10
   [ "$filled" -lt 0 ] && filled=0
   filled_str=$(printf '%*s' "$filled" '' | sed 's/ /━/g')
   empty_str=$(printf '%*s' $(( 10 - filled )) '' | sed 's/ /╌/g')
-  printf '  %s|%s %s%s%s%s%s %s%s%%%s' "$gray" "$reset" "$bar_color" "$filled_str" "$gray" "$empty_str" "$reset" "$dim" "$used_int" "$reset"
+  printf '  %s│%s %s%s%s%s%s %s%s%%%s' "$gray" "$reset" "$bar_color" "$filled_str" "$gray" "$empty_str" "$reset" "$dim" "$used_int" "$reset"
 }
 
 # BSD date first (macOS), GNU date second (Linux); empty when neither can parse it.
@@ -90,12 +105,28 @@ render_session_segment() {
   printf '  %s│%s %sup %s%s' "$gray" "$reset" "$dim" "$(format_duration $(( $(date -u +%s) - start_epoch )))" "$reset"
 }
 
+# transcript_cache <scan>: the cursor file one scan keeps for this transcript.
+transcript_cache() {
+  printf '%s/engineering-rules-%s-%s' "$CACHE_DIR" "$1" "$(printf '%s' "$transcript_path" | cksum | cut -d ' ' -f 1)"
+}
+
+# read_bytes <offset> <count>: that slice of the transcript. dd moves the shared descriptor to
+# the offset without reading, where tail -c +N crawls through a large file on macOS.
+read_bytes() {
+  { dd bs=1 skip="$1" count=0 2>/dev/null; head -c "$2"; } < "$transcript_path"
+}
+
+# ends_on_a_line <size>: the transcript's byte before <size> is a newline, so no line is half written.
+ends_on_a_line() {
+  [ -z "$(read_bytes $(( $1 - 1 )) 1)" ]
+}
+
 # The last ledger heading Claude printed. The cursor file holds "<bytes scanned> <position>";
 # each render greps only the bytes added since, with an overlap so a heading that straddles
 # the cursor is still seen. A transcript that shrank was replaced, so the cursor resets.
 render_phase_segment() {
   [ -n "$transcript_path" ] && [ -f "$transcript_path" ] || return 0
-  cache="$CACHE_DIR/engineering-rules-statusline-$(printf '%s' "$transcript_path" | cksum | cut -d ' ' -f 1)"
+  cache=$(transcript_cache statusline)
   size=$(wc -c < "$transcript_path" | tr -d ' ')
   offset=0
   position=""
@@ -103,8 +134,8 @@ render_phase_segment() {
   case "$offset" in ''|*[!0-9]*) offset=0 ;; esac
   [ "$size" -lt "$offset" ] && { offset=0; position=""; }
   if [ "$size" -gt "$offset" ]; then
-    from=$(( offset > SCAN_OVERLAP ? offset - SCAN_OVERLAP + 1 : 1 ))
-    found=$(tail -c "+$from" "$transcript_path" 2>/dev/null | read_ledger_position)
+    from=$(( offset > SCAN_OVERLAP ? offset - SCAN_OVERLAP : 0 ))
+    found=$(read_bytes "$from" $(( size - from )) | read_ledger_position)
     [ -n "$found" ] && position="$found"
     printf '%s %s\n' "$size" "$position" > "$cache" 2>/dev/null
   fi
@@ -112,8 +143,65 @@ render_phase_segment() {
   return 0
 }
 
+# format_usage <label> <percent>: " 5h:24%", coloured by level_color; nothing when Claude Code
+# sent no percentage or one that is not a number.
+format_usage() {
+  [ -n "$2" ] || return 0
+  pct=$(printf '%.0f' "$2" 2>/dev/null) || return 0
+  printf ' %s%s:%s%s%s%%%s' "$dim" "$1" "$reset" "$(level_color "$pct")" "$pct" "$reset"
+}
+
+# The claude.ai plan's rolling five-hour window and its weekly one. Claude Code sends them for
+# Pro and Max once the first response is in, and may send either window without the other.
+render_usage_segment() {
+  usage="$(format_usage 5h "$five_hour_pct")$(format_usage 7d "$seven_day_pct")"
+  [ -n "$usage" ] || return 0
+  printf '  %s│%s%s' "$gray" "$reset" "$usage"
+}
+
+# is_count <value>...: every value is a whole number.
+is_count() {
+  for value in "$@"; do
+    case "$value" in ''|*[!0-9]*) return 1 ;; esac
+  done
+}
+
+# tally_compactions: transcript lines on stdin, "<compactions> <automatic ones>" on stdout.
+tally_compactions() {
+  LC_ALL=C grep -F "$COMPACT_MARKER" | awk -v mark="$AUTO_TRIGGER" 'index($0, mark) { n++ } END { printf "%d %d", NR, n }'
+}
+
+# How often this conversation was compacted, "compacted 3x (2 auto)", hidden until the first.
+# The cursor file holds "<bytes counted> <compactions> <automatic ones>". A render counts only
+# the bytes added since and waits while the last line is still being written, so no
+# compaction is counted twice or split between two renders.
+render_compact_segment() {
+  [ -n "$transcript_path" ] && [ -f "$transcript_path" ] || return 0
+  cache=$(transcript_cache compactions)
+  size=$(wc -c < "$transcript_path" | tr -d ' ')
+  offset=0 total=0 auto=0
+  [ -f "$cache" ] && read -r offset total auto < "$cache"
+  if ! is_count "$offset" "$total" "$auto" || [ "$size" -lt "$offset" ]; then offset=0 total=0 auto=0; fi
+  if [ "$size" -gt "$offset" ] && ends_on_a_line "$size"; then
+    read -r added added_auto <<< "$(read_bytes "$offset" $(( size - offset )) | tally_compactions)"
+    total=$(( total + added )) auto=$(( auto + added_auto ))
+    printf '%s %s %s\n' "$size" "$total" "$auto" > "$cache" 2>/dev/null
+  fi
+  [ "$total" -gt 0 ] || return 0
+  note=""
+  [ "$auto" -gt 0 ] && note=" ($auto auto)"
+  printf '  %s│%s %scompacted %sx%s%s' "$gray" "$reset" "$dim" "$total" "$note" "$reset"
+}
+
 input=$(cat)
-{ IFS= read -r cwd; IFS= read -r transcript_path; IFS= read -r model_name; IFS= read -r used_pct; } <<< "$(read_status_fields "$input")"
+{
+  IFS= read -r cwd; IFS= read -r transcript_path; IFS= read -r model_name
+  IFS= read -r used_pct; IFS= read -r five_hour_pct; IFS= read -r seven_day_pct
+} <<< "$(read_status_fields "$input")"
 [ -n "$cwd" ] || cwd=$(pwd)
 project_name=${cwd##*/}
-printf '%s➜%s %s%s%s%s%s%s%s%s\n' "$bold_green" "$reset" "$bold_cyan" "$project_name" "$reset" "$(render_git_segment)" "$(render_model_segment)" "$(render_context_segment)" "$(render_session_segment)" "$(render_phase_segment)"
+printf '%s➜%s %s%s%s%s%s%s\n' "$bold_green" "$reset" "$bold_cyan" "$project_name" "$reset" \
+  "$(render_git_segment)" "$(render_model_segment)" "$(render_phase_segment)"
+# Every meter opens with "  │ "; the row drops the one in front of its first meter.
+meters="$(render_context_segment)$(render_session_segment)$(render_usage_segment)$(render_compact_segment)"
+if [ -n "$meters" ]; then printf '%s\n' "${meters#"  $gray"*"$reset "}"; fi

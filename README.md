@@ -27,7 +27,9 @@ Node, from the project's own test or a request the user fires. Version 2.15.0 sh
 skill beside the law, `generate-pseudocode`: it turns "explain how this code flow works" into
 one published page of complete pseudocode, every helper expanded and cited, with a note on
 why each line is the way it is and a closing analysis, and it triggers on its own
-description or by `/engineering-rules:generate-pseudocode`.
+description or by `/engineering-rules:generate-pseudocode`. Version 2.16.0 splits the status
+line into two rows, where you are and the meters, and adds the claude.ai plan usage and a
+count of the conversation's compactions to the meters.
 
 ## What loads when
 
@@ -211,8 +213,13 @@ helper | stop | general-purpose | first line of the return
   "statusLine": { "type": "command", "command": "f=$(ls -t \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/engineering-rules-marketplace/engineering-rules/*/hooks/statusline.sh 2>/dev/null | head -n 1); [ -n \"$f\" ] && exec bash \"$f\"; echo 'engineering-rules status line: plugin not installed'" }
   ```
 
-  It shows the directory, git branch and dirty state, model, a context bar, session uptime,
-  and the last ledger position Claude printed, e.g. `(3 of 6, Phase 4)`.
+  It prints two rows. The first says where you are: the directory, git branch and dirty
+  state, model, and the last ledger position Claude printed, e.g. `(3 of 6, Phase 4)`. The
+  second holds the meters: a context bar, session uptime, the claude.ai plan usage
+  (`5h:24% 7d:61%`, the rolling five-hour and weekly windows Claude Code sends for Pro and
+  Max once the first response is in) and how often the conversation was compacted
+  (`compacted 2x (1 auto)`, hidden until the first). While all four are empty the second
+  row is left out.
 
 Desktop notifications use `osascript` on macOS and `notify-send` on Linux. On macOS a turn
 that ends on a ledger re-print is announced twice, once by Claude's notification tool (the
@@ -272,7 +279,7 @@ engineering-rules-plugin/
 │   ├── file-cap.sh                      PostToolUse on the edit tools: the 500-line cap
 │   ├── re-anchor.sh                     SessionStart after a compaction or a resume
 │   ├── progress-notify.sh               one log line per event, desktop notification on a boundary or a wait
-│   ├── statusline.sh                    status line with the ledger position, opt-in by one settings line
+│   ├── statusline.sh                    two-row status line (ledger, usage, compactions), opt-in by one settings line
 │   ├── hook-input.sh                    reads and validates the event JSON, shared
 │   ├── progress-log.sh                  the log file and the one line shape, shared
 │   ├── path-kind.sh                     code, test, prose or generated, by the law's definitions, shared
@@ -374,7 +381,9 @@ Eight checks run against the plugin itself, all on `tests/harness.sh`:
 `bash hooks/tests/<name>.test.sh` covers each hook script with fixtures: the edit guard's
 nine rules, the law's exemptions, the test-file rows, the grew-versus-kept decision and the
 missing-law path; the file cap; the re-anchor on compact and resume; the notifier's five
-events; the status line. Every one of them can be pointed at a mutated copy of its script
+events; the status line's two rows, its usage windows and its compaction count (appends, a
+quoted marker, a half-written line, a replaced transcript, a broken cursor file). Every one
+of them can be pointed at a mutated copy of its script
 through an environment variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `RE_ANCHOR_SH`,
 `PROGRESS_NOTIFY_SH`, `STATUSLINE_SH`; `HOOKS_JSON`, `CAP_DIR`, `SKILLS_DIR` and `ASSETS_DIR`
 for the four repo checks), so a run that watches the failure is one line.
