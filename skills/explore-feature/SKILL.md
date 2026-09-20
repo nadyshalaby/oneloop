@@ -22,9 +22,9 @@ In this order, before anything else:
    through the wizard tool (4.4), one question; 16.9 stops on an ambiguous entry point
    anyway, so it is settled before anything is read.
 3. **Say the route and the mode in one line** (1.7, step 2): *"Explore feature."*, then
-   *"Agentless."* with the cost line 4.4 names, agentless being the default, unless helpers
-   were switched on by `/engineering-rules:agents` earlier in this conversation or named in
-   the request, then *"Agents on, because you asked for it."*.
+   *"Agents on, the default."*, unless they were switched off by
+   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
+   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
 4. **Read 16.9 from disk and run it**, with 16.10 and 16.11 as it names them. The page
    template, the three scripts it runs and the capture's loaders live beside this file,
    under `assets/`, `scripts/` and `capture/`. The always-on law binds throughout, the

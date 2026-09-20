@@ -10,8 +10,8 @@
     {
       "name": "engineering-rules",
       "source": "./",
-      "description": "The engineering law and working method as one skill, ten sub-commands and a standalone generate-pseudocode skill. The always-on law, the run discipline and the delegation authorization load with the skill; the remaining sections are read only when the phase calls for them. Invoke it bare to be walked through the routes, or pick one outright with /engineering-rules:quick, :full, :shape, :explore-feature, :audit, :triage, :skill, :design or :log; agentless and full mode are the defaults; /engineering-rules:agents switches the helper shapes on for the task, or the whole conversation. Hooks enforce the bans at the tool boundary; the helper shapes run on Claude Code's own agent types, briefed by the skill, all on the session's model. The explore-feature page can carry what one real run did at every function, masked, from the project's own test or a live request, on Bun and Node. generate-pseudocode turns 'explain how this code flow works' into one page of complete pseudocode, every helper expanded and cited, with notes and a closing analysis.",
-      "version": "2.16.1",
+      "description": "The engineering law and working method as one skill, ten sub-commands and a standalone generate-pseudocode skill. The always-on law, the run discipline and the agent authorization load with the skill; the remaining sections are read only when the phase calls for them. Every phase runs as an agent on a named model by default, sonnet where it writes code or runs commands and opus where it plans, judges or decides, with the session keeping the ledger, the questions, the gate and every claim; /engineering-rules:agents off keeps it all in one conversation. A task has one goal and everything else found on the way becomes a follow-up, not an unasked-for edit; the law is quick, never lazy, never approximate; releases ship small and verified, with a six-row proof before any deploy; and a ten-minute check-in keeps the work-doc and the drift check current. Invoke it bare to be walked through the routes, or pick one outright with /engineering-rules:quick, :full, :shape, :explore-feature, :audit, :triage, :skill, :design or :log; full mode is the default. Hooks enforce the bans at the tool boundary. The explore-feature page can carry what one real run did at every function, masked, from the project's own test or a live request, on Bun and Node. generate-pseudocode turns 'explain how this code flow works' into one page of complete pseudocode, every helper expanded and cited, with notes and a closing analysis.",
+      "version": "2.17.0",
       "category": "workflow",
       "keywords": [
         "engineering-law",
@@ -23,7 +23,7 @@
         "design-system",
         "ship-gate",
         "progressive-disclosure",
-        "delegation"
+        "model-routing"
       ],
       "license": "MIT"
     }

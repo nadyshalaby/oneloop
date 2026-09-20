@@ -2,6 +2,32 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.17.0**: every phase becomes an agent on a named model, and that is the default. `1.8`
+  is now a map, one row per run point: the question batch and the scouts to a `fork`, which
+  runs on the session's own model; a wide search to an `Explore` agent on `sonnet`; the draft
+  plan (`7.1`) and the root cause (`10.1`) to a `Plan` agent on `opus`; the spec review to a
+  `Plan` agent on `opus`; each implementation stage and every fix pass to a `general-purpose`
+  agent on `sonnet`; the counts, proofs and sweep scans to a `general-purpose` agent on
+  `sonnet`; the five review checks to a `general-purpose` agent on `opus`. The model is named
+  on every send but a fork, which cannot take one, reversing 2.7.1's "no send names a model".
+  `5.5` grows from four shapes to six, with a new planner prompt for the plan and the root
+  cause, and its brief now pastes `1.9` and `1.10` under every shape's prompt. Agentless
+  becomes the opt-out: `/engineering-rules:agents off` for the conversation, bare to switch
+  back, with the cost said once. Three always-on laws arrive. `1.9`, one goal: a task ends
+  when its goal is delivered and verified, and every pre-existing defect or law break found on
+  the way is written down as a follow-up with its `file:line` and fixed in a task of its own,
+  never in this one; the four carve-outs are your own diff's leftovers, dead code in a touched
+  file, a defect that genuinely blocks the goal and a Critical finding against this diff. The
+  follow-ups get a `## Follow-ups` section in the work-doc (`7.2`) and a "What I left for
+  later" block in the update log (`16.13`). `1.10`, quick, never lazy, never approximate:
+  independent calls in one message, whole files read, every detail of the ask a requirement,
+  no fact guessed that a command would settle, and it binds every agent through the brief.
+  `1.11`, shipping: small verified releases behind their own switch, six proof rows before any
+  deploy and a live verify after. `5.6` adds the ten-minute check-in, work-doc first, then a
+  three-line brief and the drift check. The self-audit grows to eighteen rows. A ninth suite,
+  `tests/agent-map.test.sh`, keeps the map honest across `SKILL.md` and `5.5` and proves it
+  fails on a planted drift; the `agentless-default` eval becomes `agents-default`, and a new
+  `agentless-switch` case covers the other direction.
 - **2.16.1**: the context bar becomes a labelled percentage, `ctx:42%`, written and coloured
   like the usage windows (green, yellow from 50, red from 75), so the meters row reads as
   one set of labelled numbers. The context meter and both usage windows share one

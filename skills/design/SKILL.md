@@ -21,9 +21,9 @@ In this order, before anything else:
    from the library (15.4) when the user named one. It is the whole invocation. Empty means
    15.19 detects the mode from the repository; nothing is asked before it has looked.
 3. **Say the route and the mode in one line** (1.7, step 2): *"Design spec."*, then
-   *"Agentless."* with the cost line 4.4 names, agentless being the default, unless helpers
-   were switched on by `/engineering-rules:agents` earlier in this conversation or named in
-   the request, then *"Agents on, because you asked for it."*.
+   *"Agents on, the default."*, unless they were switched off by
+   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
+   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
 4. **Read 15.19 from disk and run it**, with 15.1 to 15.6 as it names them. Writing or
    changing the spec is a substantive task: the task start in 1.7 runs first.
 

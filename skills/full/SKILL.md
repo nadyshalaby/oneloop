@@ -22,11 +22,11 @@ In this order, before anything else:
    ask in this conversation, in the user's own words; when there is none either, ask for it
    through the wizard tool as 4.4 says, and ask nothing else.
 3. **Say the route and the mode in one line** (1.7, step 2): *"Full mode, because you asked for it."*, then
-   *"Agentless."* with the cost line 4.4 names, agentless being the default, unless helpers
-   were switched on by `/engineering-rules:agents` earlier in this conversation or named in
-   the request, then *"Agents on, because you asked for it."*.
+   *"Agents on, the default."*, unless they were switched off by
+   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
+   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
 4. **Run the task start** (1.7, from step 3): the base commit, the ledger with full mode's
-   ten items (5.1), the helper line as 1.8 records it, then 6.1 read from disk. The plan is
+   ten items (5.1), the agent line as 1.8 records it, then 6.1 read from disk. The plan is
    the gate; nothing is built before the user's go through the wizard tool (7.1).
 
 Everything after that is the law, unchanged. A sub-command picks the row; it never waives a

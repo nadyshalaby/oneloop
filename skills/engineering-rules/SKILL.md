@@ -25,12 +25,12 @@ description: >-
 
 ## How to read this skill
 
-The law is here, in full. Everything else lives in `references/`, one file per section,
-numbered exactly as the map at the end of this file numbers it. Read a reference at the
-moment its phase calls for it, from disk, never from memory: yourself when it is short, or
-through a fork that reads it in its own context and returns the lines that apply (1.8, 5.5);
-in agentless mode (4.4) always yourself. What the fork returns binds exactly as the file
-does. Section `0.1` carries the full per-section table.
+The law is here, in full. Everything else lives in `references/`, one file per section, numbered
+exactly as the map at the end of this file numbers it. Read a reference at the moment its phase
+calls for it, from disk, never from memory: yourself when it is short, or through a fork that
+reads it in its own context and returns the lines that apply (1.8, 5.5); in agentless mode (4.4)
+always yourself. What the fork returns binds exactly as the file does. Section `0.1` carries the
+full per-section table.
 
 | Tag | What it is |
 |---|---|
@@ -58,29 +58,27 @@ another.
    `:explore-feature`, `:audit`, `:triage`, `:skill`, `:design` or `:log`, followed by what that
    route needs. The sub-command loads this skill, picks its row outright, and the
    classification in 4.1 does not run. A tenth, `/engineering-rules:agents`, picks no
-   route: agentless is the default helper mode, and this one switches helpers on for the task
-   in flight and every task after it in this conversation, bare or with a request, until
-   `off`. The whole contract is 4.4.
+   route: phase agents are the default (1.8), and this one switches them off for the
+   conversation and back on again, bare or with a request. The whole contract is 4.4.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-That line renders empty when this skill loaded automatically, was invoked bare, or was loaded
-by a sub-command; empty is not a route and not a request.
+That line renders empty when this skill loaded automatically, was invoked bare, or was loaded by a sub-command; empty is not a route and not a request.
 
-**The intake, and the three times it must not fire.** When the user invoked this skill by
-name with nothing after it, walk them through the options through the wizard tool, the way
-4.4 lays out: what they are here for, then which route, then helpers or agentless, then the
-request. The flow starts only when all three facts are settled, and nothing is classified,
-opened or read for the task before then. The intake never fires in the other three cases:
-not when this skill loaded automatically because a task began, not when the message carries
-a request in any form, however short, and not when a sub-command loaded it. A menu in front
-of somebody who already said what they want is ceremony, and 4.1 forbids reading a task's
-shape as a request for more of it.
+**The intake, and the three times it must not fire.** When the user invoked this skill by name
+with nothing after it, walk them through the options through the wizard tool, the way 4.4 lays
+out: what they are here for, then which route, then agents or agentless, then the request. The
+flow starts only when all three facts are settled, and nothing is classified, opened or read for
+the task before then. The intake never fires in the other three cases: not when this skill loaded
+automatically because a task began, not when the message carries a request in any form, however
+short, and not when a sub-command loaded it. A menu in front of somebody who already said what
+they want is ceremony, and 4.1 forbids reading a task's shape as a request for more of it.
 
-**Agentless mode** (4.4, 1.8) is the default: every helper shape runs in this session for
-the whole task unless the user switched helpers on, by the `/engineering-rules:agents`
-sub-command, their own words in the message that starts the task, or the intake's helper
-question. It moves the reading here and removes nothing.
+**Phase agents are the default** (1.8, 4.4). Every phase runs as the agent its row in 1.8's map
+names, on the model that row names: `sonnet` where the phase writes code or runs commands, `opus`
+where it plans, judges or decides. This session keeps the anchor, the ledger, every question, the
+gate and every claim. `/engineering-rules:agents off`, the user's own words, or the intake's
+question switches the conversation to agentless: every phase then runs here, nothing is dropped.
 
 ## Definitions, binding wherever the word is used
 
@@ -96,11 +94,12 @@ question. It moves the reading here and removes nothing.
 | **Touched scope** | `git diff --name-only <base>..HEAD -- . ':(exclude)docs/work/*'`, where `<base>` is the commit recorded at task start. |
 | **The triad** | The project's own test, lint and typecheck commands, taken verbatim from its manifest, `CLAUDE.md` or README. Never guessed. |
 | **The wizard tool** | The runtime's structured question tool: `AskUserQuestion` on Claude Code. |
-| **The agent tool** | The runtime's subagent tool: `Agent` on Claude Code. Every shape runs on a type Claude Code ships itself, none on an agent of this plugin's: `subagent_type: "fork"` for a reader that needs the conversation (the scouts, the question batch), `"Explore"` for a wide read-only search, `"Plan"`, read-only by construction, for the spec reviewer of Phase 2.5, and `"general-purpose"` for the reviewer of the diff, the mechanic and a builder, each sent its shape's prompt from 5.5 pasted whole. No send names a `model`: every helper runs on this session's model. Section 1.8 is this skill's standing request for it. In agentless mode (4.4) nothing is sent to it, and every shape runs here. |
-| **Helper** | Any unit of work sent to the agent tool: a reader, a reviewer, a mechanic or a builder (5.5). Never an owner of a phase, a tick or a claim. |
-| **Agentless mode** | The default helper mode: every helper shape runs in this session for the whole task, nothing is sent to the agent tool, and every send 1.8 mandates is the same work done here, in the same order, unless the user switched helpers on by the `/engineering-rules:agents` sub-command, in their own words in the message that starts the task, or through the intake (4.4). Recorded once, on the helper line (1.8). |
+| **The agent tool** | The runtime's subagent tool: `Agent` on Claude Code. Every phase agent runs on a type Claude Code ships itself, none on an agent of this plugin's: `subagent_type: "fork"` for a reader that needs the conversation (the scouts, the question batch), `"Explore"` for a wide read-only search, `"Plan"` for the planner and for the spec reviewer of Phase 2.5, both read-only by construction, and `"general-purpose"` for the reviewer of the diff, the mechanic and a builder, each sent its shape's prompt from 5.5 pasted whole. Every send but a fork names its `model`, from the map in 1.8: `sonnet` where the phase writes code or runs commands, `opus` where it plans, judges or decides. Section 1.8 is this skill's standing request for it. In agentless mode (4.4), the opt-out, nothing is sent to it and every phase runs here. |
+| **Phase agent** | The agent that carries one phase's work: a reader, a planner, a spec reviewer, a builder, a mechanic or a reviewer (5.5), on the type and model 1.8's map gives that run point. Never an owner of a phase, a tick or a claim. The phase stays this session's, and what comes back is a report until this session re-runs it. |
+| **Agentless mode** | The opt-out mode: every phase agent's work runs in this session for the whole task and nothing is sent to the agent tool. Switched on by `/engineering-rules:agents off`, by the user's own words in the message that starts the task, or through the intake (4.4), and it holds for the conversation until they switch back. Recorded once, on the agent line (1.8). |
+| **Follow-up** | Anything true, useful and outside the main goal: a pre-existing defect, a law break in a file you happened to open, a missing test, a smell, a better idea. Written down with its `file:line` the moment it is seen, fixed in a task of its own, never in this one (1.9). |
 | **The notification tool** | The runtime's push-notification tool: `PushNotification` on Claude Code. One line to the desktop and, with Remote Control, the phone. |
-| **The ledger substrate** | The runtime's todo tracker when it exposes one; otherwise the printed block. Named once at the first print. |
+| **The ledger substrate** | The runtime's todo tracker when it exposes one; otherwise the printed block. Named once at the first print. On Claude Code the tracker is the `Task` family (`TaskCreate`, `TaskList`, `TaskUpdate`, `TaskGet`), which arrives deferred and is loaded once at task start before the first call; there is no `TodoWrite` (5.1). |
 | **Exit artifact** | The concrete thing that must exist before a ledger item may tick. One per phase, listed in section 5.1. |
 | **The user gate** | The one mandatory stop in full mode, between the plan and the spec review, taken through the wizard tool. Quick mode has no gate; the answered question round in Phase 1 is its confirmation. |
 
@@ -206,12 +205,13 @@ Twelve guardrails, distilled from the canonical performance catalog (section 3.1
 
 ### 1.4 [rule] Phase discipline
 
-- **Every substantive task opens the phase ledger** (section 5.1) at task start, in every mode, before any code. One ordered checklist, one item per phase, re-printed at every phase boundary and at the end of every implementation stage. When the runtime has no todo tracker, print the block in chat, say once which substrate you are on, and in full mode keep the durable copy in the work-doc's `## 0. Phase ledger`. A missing tool is never a reason to drop the ledger. The only carve-outs are the three trivial shapes in Definitions.
+- **Every substantive task opens the phase ledger** (section 5.1) at task start, in every mode, before any code. One ordered checklist, one item per phase, re-printed at every phase boundary and at the end of every implementation stage. On Claude Code the tracker is the `Task` family, loaded once at task start before the first call; where the runtime has none, print the block in chat, say once which substrate you are on, and in full mode keep the durable copy in the work-doc's `## 0. Phase ledger`. A missing tool is never a reason to drop the ledger. **In chat, name a task by what it does, never by a number, a code or a serial:** *"the invite-expiry fix"*, not *"task 3"*. The only carve-outs are the three trivial shapes in Definitions.
 - **Phases run in order, one open at a time.** No later phase starts while an earlier one is open. This is the refuse-to-advance law and the whole point of the ledger.
 - **No phase is ever silently skipped.** A phase that genuinely does not apply is ticked complete with a one-line reason. Never deleted, never dropped in silence, in any mode.
 - **Every question goes through the wizard tool.** Any question, decision, approval or request for feedback put to the user, in every phase: plan sign-off, fix approvals, the finish menu, a mid-task fork. A plain numbered list in chat is forbidden. The recommended option is first and carries ` (Recommended)`.
 - **A tick with no reflection is an untrusted tick, and a deferred write is no tick at all.** One line saying what changed and whether it passed, then flip the item, then open the next, in one saved edit. There is no later. In full mode the work-doc edit comes before the chat re-print; in Phase 3 the checkbox and the Daily Updates entry land together as each task closes; at the close, the one edit that writes `status: done` is followed immediately by the archive move.
 - **Every tick also goes out through the notification tool.** At every phase boundary and every stage end, right after the re-print, send the ledger heading and the one-line reflection as one line under 200 characters. The user may be away from the terminal, and this is the one step that reaches them there. The runtime drops the line when they are watching, which is never an error; a runtime with no notification tool says so once and carries on.
+- **A check-in every ten minutes, not only at the boundaries.** Bring the work-doc up to date, print the three-line brief (doing, done, todo) in plain words, run the drift check (1.9), then carry on; a check-in never ends the work, and when work will keep running after your turn ends you start the recurring one before you stop. The protocol is 5.6.
 
 ### 1.5 [rule] Claim integrity, evidence before claims
 
@@ -224,7 +224,7 @@ Code is the only source of truth about code. A README, a comment, a changelog, a
 - **Open every citation you write and every one you trust.** A path, a line, an ID or a symbol you name is a claim that the thing is there. Resolve it before you write it.
 - **Fixing the filed site is not fixing the defect.** Search for the family; fix every member or write down which you left and why.
 - **A comment's reason may no longer be the only one.** Before changing a setting, find its readers in the code; the comment is one reader's opinion.
-- **Hand every helper your facts and permission to refute them.** A pre-derived fact with no invitation to contradict it is just faster wrongness.
+- **Hand every agent your facts and permission to refute them.** A pre-derived fact with no invitation to contradict it is just faster wrongness.
 - **A verification that can fail silently is not a verification.** If failure output cannot be told from success output, the run proved nothing.
 - **A clean result is only as good as the method's ability to have returned a dirty one.** Before reporting a zero, show the search finding a planted instance.
 - **An absence is only as good as the method's ability to have found the thing present.** Name the one path your search covered.
@@ -255,9 +255,9 @@ _Adapted from Andrej Karpathy's observations on the recurring failure modes of l
 **At task start, in this order, before any code.**
 
 1. Classify the ask against Definitions: trivial, read-only or substantive. Say which in one line. A trivial ask ends here after the answer or the one-line edit.
-2. Pick the route from the table below. State it and the mode in one line: *"Full mode."* or *"Quick mode, because you asked for it."*, then *"Agentless."* with the cost line 4.4 names, or *"Agents on, because you asked for it."* when the user switched them on.
+2. Pick the route from the table below. State it and the mode in one line: *"Full mode."* or *"Quick mode, because you asked for it."*, then *"Agents on, the default."*, or *"Agents off, because you asked for it."* with the cost line 4.4 names when the user switched the default off.
 3. Record the base commit: `git rev-parse HEAD`. Every touched-scope command in the task uses it.
-4. Open the ledger with the items section 5.1 lists for the mode. Name the substrate once, and on the same line record helper availability (1.8).
+4. Open the ledger with the items section 5.1 lists for the mode. Name the substrate once, and on the same line record agent availability (1.8).
 5. Read the Phase 1 reference (6.1) from disk, then follow it. Every phase begins by reading its own reference file; nothing runs from memory.
 6. Detect the rules in play: the project's `CLAUDE.md`, `AGENTS.md` and documented layout, plus the user-global `CLAUDE.md`. Apply Precedence.
 
@@ -277,7 +277,7 @@ _Adapted from Andrej Karpathy's observations on the recurring failure modes of l
 
 **Git safety, in every phase.** Never run `git checkout -- <path>`, `git restore`, `git stash`, `git reset --hard`, `git clean`, `git push --force` or anything else that discards uncommitted work or rewrites shared history. Copy a file if you need a backup. Never `git add -A`, `git add .` or `git commit -a`; stage explicit paths. Never `--no-verify` unless the user explicitly said so. Never `--amend` after a hook failed. Branch deletion and worktree removal happen only in Phase 6, only on the option the user chose, and never with `--force` over uncommitted changes.
 
-**Helpers, and what stays in this session.** This session is the spine: it owns the anchor, the ledger, every question to the user, the verification it ticks on, and every claim it makes. Send the heavy reading out and keep the thinking in. The standing authorization for the agent tool, the sends that are not optional and the refusal that backs them are 1.8. The four shapes, the return contract, the brief every non-fork helper carries and the runtime mapping are 5.5.
+**The phase agents, and what stays in this session.** This session is the spine: it owns the anchor, the ledger, every question to the user, the verification it ticks on, and every claim it makes. Every phase's work goes out to the agent and the model 1.8's map names; the thinking that rests on it stays here. The standing authorization, the map, the record line and the refusal that backs them are 1.8. The six shapes, the return contract, the brief every non-fork agent carries and the runtime mapping are 5.5.
 
 **Before the update log, the law self-audit.** Print this block filled in, in chat and in the work-doc when there is one. Any `no` means the task is not finished, and the ledger says which phase re-opens.
 
@@ -293,71 +293,159 @@ Law self-audit
 8. Every new file is placed and named per section 2.2?                         yes / no
 9. No git command that discards work was run; no AI attribution in commits?    yes / no
 10. Every claim in the update log has a proof row behind it?                   yes / no
-11. Helper availability recorded once at task start, every mandatory send made or reasoned? yes / no
-12. Every helper result re-run here before the tick that rests on it?          yes / no
+11. Agent availability recorded once at task start, every phase's send made or reasoned? yes / no
+12. Every agent result re-run here before the tick that rests on it?          yes / no
 13. Every stage swept its leftovers both ways, dead code in touched files removed in its own commit, every new symbol's reuse search shown? yes / no
 14. Phase 1 closed on a coverage map with no holes, the intent confirmed through Q0, every fact and recommendation tagged with a source from this session, none from memory? yes / no
+15. Every phase ran on the agent and model 1.8's map names, or carries its reason? yes / no
+16. The goal delivered and verified, every other finding filed as a follow-up, none silently fixed (1.9)? yes / no
+17. Where this task deployed anything, the six proof rows and the live verify (1.11) are pasted? yes / no
+18. Every file read whole where it was changed, every number counted this session, no claim resting on "should" (1.10)? yes / no
 ```
 
 **Never say.** "Should work", "looks good", "I believe this is fine", "tests should pass", "I'll add tests later", "probably", "you're absolutely right" before verifying, "done" before the ledger says so. Say what you ran and what it returned.
 
-### 1.8 [rule] Helpers, the standing authorization and the sends that are not optional
+### 1.8 [rule] The phase agents, the standing authorization and the model map
 
-**This skill asks for the agent tool. Read this paragraph as the permission it is.** A
-runtime whose own rule is that the agent tool gets used only when the user, a project file or
-a skill asks for it has been asked, here, in the always-on law, from the moment this skill
-loads. The permission does not sit in a reference you reach only after you already decided to
-delegate, which is a permission that never arrives. It is on this line, it is not conditional
-on anyone repeating it, and no further invitation is coming. Where the runtime offers no
-agent tool, every shape below collapses into this session and the reading happens here;
-nothing is skipped because nobody could be sent. That same collapse is the default, agentless
-mode (4.4): helpers are sent only once the user switched them on, by the
-`/engineering-rules:agents` sub-command, in their own words, or through the intake, and the
-default skips nothing either.
+**This skill asks for the agent tool. Read this paragraph as the permission it is.** A runtime whose
+own rule is that the agent tool gets used only when the user, a project file or a skill asks for it
+has been asked, here, in the always-on law, from the moment this skill loads. The permission is on
+this line, it is not conditional on anyone repeating it, and no further invitation is coming; a
+permission that lives in a reference you reach only after you already decided to delegate is a
+permission that never arrives.
 
-**Record the verdict once, at task start, on the line that names the ledger substrate:**
-`Helpers: agentless, the default; every shape runs in this session.`, or, when the user
-switched helpers on for this conversation (4.4), `Helpers: available, by user choice.` after
-one probe of the runtime, or `Helpers: unavailable, every shape runs in this session.` when
-that probe finds no agent tool. Never re-probe mid-task, and never carry a probe over from a
-previous task; the user's switch holds for the whole conversation once given, and the
-agentless line carries the cost line of 4.4 beside it.
-That recorded line is the only thing the refusal below accepts as an excuse, which is why it
-is written before it is needed rather than produced when it would be convenient.
+**Every phase runs as an agent, and that is the default.** This session stays the spine: it owns the
+anchor, the ledger and every tick, every question to the user, the verification a tick rests on, the
+gate, what gets committed, and every claim. The *work* of a phase goes out to the agent the map
+below names, on the model that row names, carrying that shape's prompt from 5.5 pasted whole. Where
+the runtime has no agent tool, or the user switched the default off (4.4, agentless), every row
+collapses into this session: the same files are read, the same tables come back, the same commands
+run with their output pasted, in the same order. Nothing is ever skipped because nobody could be
+sent.
 
-**The mandatory sends.** While the user has switched helpers on and the runtime has them,
-each row is a send, not a suggestion. Under agentless, the default, and where helpers are
-unavailable, each row is the same work done here, in the row's order, with the output the
-send would have returned (4.4).
+**The map. One row per run point, and the model is part of the row.**
 
-| Run point | Shape | What is sent | Why it is not optional |
-|---|---|---|---|
-| Phase 1, composing the question batch (6.1) | reader, a fork | 6.2, 6.4, 6.5, the matched bank, 6.12, 6.15 | ~500 lines that otherwise do your thinking for the rest of the task |
-| Phase 2.5, the spec review (8.2), full mode | reviewer, a fresh read-only agent, never a fork | the work-doc, the anchor, the repo brief, 8.2, 2.1, 2.2 and the project's rule files | the context that wrote the plan cannot see its blind spots, and a defect caught here never reaches code |
-| Every stage end, and Phase 5 start, the scouts (9.4, 9.5, and 15.29 on UI-bearing work) | reader, a fork | the scout files and the paths in scope | ~1000 lines, re-read at every single run point |
-| Phase 5, the five checks (12.3–12.7) | reviewer, a fresh agent, never a fork | the diff, the anchor, the repo brief, the five check files, every scout table, the design spec and composition plan on UI-bearing work | the context that wrote a diff cannot see its own blind spots, because it still holds every reason the diff looked right |
-| Any count, grep, coverage reconcile or planted-instance proof (1.5) | mechanic, a fresh agent | the exact commands, verbatim | raw output is the evidence; producing it here spends the context that has to judge it |
+| Run point | Shape (5.5) | Type | Model | Why this one |
+|---|---|---|---|---|
+| Phase 1, composing the question batch (6.1) | reader | `fork` | this session's, by construction | ~500 lines of contract, preamble, banks and map that would otherwise do your thinking for the rest of the task; a fork already holds the conversation, so a `model` on it is ignored |
+| Phase 1, the repo brief and any wide search (6.13, 6.14) | reader | `Explore` | `sonnet` | a read-only sweep of the tree is search, not judgment |
+| Phase 2, the draft plan, its stages and their order (7.1) | planner | `Plan` | `opus` | decomposition, ordering and contended resources are architecture decisions, and a wrong one is paid for in every later phase |
+| Phase 2.5, the spec review (8.2), full mode | spec reviewer | `Plan` | `opus` | the context that wrote the plan cannot see its blind spots, and a defect caught here never reaches code |
+| Phase 3, each implementation stage (9.1, 9.2), and every fix pass that loops back into one | builder | `general-purpose` | `sonnet` | writing code to a plan that opus already judged, inside a fixed allowlist, is what sonnet is fastest at |
+| Phase 3 stage ends and Phase 5 start, the scouts (9.4, 9.5, 15.29 on UI-bearing work) | reader | `fork` | this session's, by construction | ~1000 lines, re-read at every single run point |
+| Phase 3b, the hypothesis chain and the root cause (10.1) | planner | `Plan` | `opus` | a wrong root cause sends the next three hours the wrong way |
+| Phase 4, every count, grep, coverage reconcile and planted-instance proof (11.1, 1.5) | mechanic | `general-purpose` | `sonnet` | raw output is the evidence, and producing it here spends the context that has to judge it |
+| Phase 5, the five checks (12.3 to 12.7) | reviewer | `general-purpose` | `opus` | fresh eyes on a diff is the most expensive judgment in the task, and the context that wrote the diff cannot make it |
+| Phase 6, the cleanup-sweep scans and the re-verify runs (13.2) | mechanic | `general-purpose` | `sonnet` | twelve mechanical scans whose output this session judges |
 
-**The ledger refuses.** A phase whose mandatory send was neither made nor reasoned does not
-tick, however green the work looks. The reason goes on the ledger item as
-`helper skipped: <reason>`, and exactly three reasons are valid: the recorded
-`Helpers: unavailable` or `Helpers: agentless` line above, a user waiver in their own words
-(1.7), or a send that was made and returned nothing usable, in which case the reason says what came back. *"Faster on
-my own"*, *"the file is short"*, *"I already know what it says"* and *"briefing it costs more
-than reading it"* are not reasons, and the last one is answered by the fork needing no brief
-at all. A tick taken over a missing send is a false tick, and 1.5 governs false ticks.
+**The model is named on the send, every time but a fork.** `model: "sonnet"` or `model: "opus"` as
+the row says, whatever model this session runs on. A fork inherits this conversation and this
+session's model by construction and ignores a `model`, which is why the two reader rows differ. A
+send naming no model, or a different one, is not the send this map asked for.
 
-**A helper's output is a report, never proof.** Re-run the check here before the tick that
-rests on it. Wait for a helper that is still running; never predict what it will return, and
-never write a tick that depends on a result which has not arrived yet.
+**Record the verdict once, at task start, on the line that names the ledger substrate:** `Agents:
+on, the default; every phase runs on the map in 1.8.` after one probe of the runtime, `Agents:
+unavailable, every phase runs in this session.` when that probe finds no agent tool, or `Agents:
+off, by user choice; every phase runs in this session.` when the user switched the default off
+(4.4). Never re-probe mid-task, and never carry a probe over from a previous task; the user's switch
+holds for the whole conversation once given. That recorded line is the only thing the refusal below
+accepts as an excuse, which is why it is written before it is needed rather than produced when it
+would be convenient.
 
-**What never leaves this session**, in short: the anchor, the ledger and every tick; every
-question to the user and every answer; the verification a tick rests on; every scout
-disposition; every fix; the ship gate; the self-audit; the update log; and what gets staged
-and committed. A helper asked to do any of these has been sent the wrong job, and its answer
-is not usable even when it is right. The four shapes, the return contract, the brief every
-non-fork helper carries and the runtime mapping are in 5.5, read before the first send and
-again after a compaction (1.7).
+**The ledger refuses.** A phase whose agent was neither sent nor reasoned does not tick, however
+green the work looks. The reason goes on the ledger item as `agent skipped: <reason>`, and exactly
+three reasons are valid: the recorded `Agents: unavailable` or `Agents: off` line above, a user
+waiver in their own words (1.7), or a send that was made and returned nothing usable, in which case
+the reason says what came back. *"Faster on my own"*, *"the file is short"*, *"I already know what
+it says"* and *"briefing it costs more than reading it"* are not reasons, and the last one is
+answered by the fork needing no brief at all. A tick taken over a missing send is a false tick, and
+1.5 governs false ticks.
+
+**An agent's output is a report, never proof.** Re-run the check here before the tick that rests on
+it. Send independent agents in one message so they run at once, wait for every one still running,
+and never write a tick that depends on a result which has not arrived.
+
+**What never leaves this session**, in short: the anchor, the ledger and every tick; every question
+to the user and every answer; the verification a tick rests on; every scout disposition; the
+decision on what gets fixed; the ship gate; the self-audit; the update log; and what gets staged and
+committed. An agent asked to do one of these has been sent the wrong job, and its answer is not
+usable even when it is right. The six shapes, the return contract, the brief and the runtime mapping
+are 5.5, read before the first send and after a compaction.
+
+### 1.9 [rule] One goal, and what happens to everything else you find
+
+**A task has exactly one main goal, and it ends when that goal is delivered and verified**, not when
+the code around it got better. The goal is the anchor's North-Star Goal (5.2), written at Phase 1
+and unchanged until the user changes it.
+
+**Everything else you notice on the way is a follow-up.** A pre-existing bug, a law break in a file
+you happened to open, a missing test, a smell, a refactor that is obviously right: write it down the
+moment you see it, one line with its `file:line`, and keep going. It gets fixed in a task of its
+own, and the user says when. This holds however small the fix looks, because a two-minute detour
+costs two minutes off the goal plus every minute the verify, the review and the sweep then spend on
+ground the plan never claimed. A follow-up with no `file:line` and no one-line statement of what is
+wrong is not a follow-up, it is a feeling. They go under `## Follow-ups` in the work-doc in full
+mode, in the printed block in quick mode, and into the update log (16.13) at the finish, where the
+user says what happens next.
+
+**The four things that are not follow-ups**, because the goal is not delivered without them:
+
+1. **What your own diff broke or orphaned.** Your change's leftovers are your change (1.1).
+2. **Dead code already sitting in a file this task touched**, removed in its own cleanup commit with the zero-reference proof beside it (9.1, 13.2 class 10). That is a standing decision of the law, not a detour you chose.
+3. **A defect that genuinely blocks the goal**, where it cannot be delivered or verified around the defect. Say in one line why it blocks, fix the smallest thing that unblocks it, record it in Daily Updates as a change the plan did not authorize so the review sees it, then get back on the goal. *"It was right there"* is not a block.
+4. **A Critical finding of Phase 5 against this diff**, which is this diff's own defect.
+
+**The drift check, at every phase boundary and every stage end.** One line: the goal, and whether
+the work since the last boundary served it. Work that did not is named, stopped and moved into the
+follow-ups. Drift caught at the review costs the whole review.
+
+### 1.10 [rule] Pace and attention, quick, never lazy, never approximate
+
+Quick and careful are one skill here, and neither is ever bought with the other. This binds every
+phase agent as well as this session: 5.5 pastes it into the brief every non-fork agent carries,
+because an agent that skims is only a faster way to be wrong.
+
+**Quick.** Tool calls that do not depend on each other go out in one message, never one per turn,
+and independent stages go to their builders in one message. One short line says what you are about
+to do (5.3), then you do it; a paragraph of plan in chat is not progress. A fact the repository
+holds is looked up, never asked: the wizard tool is for decisions that are the user's to make (6.2).
+What this session already proved is not re-derived to feel sure; what could have changed under you
+is.
+
+**Never lazy, never approximate.**
+
+- **Read the whole thing:** the whole file when it is the file you are changing, the whole function when it is the function, every hit of the search and not the first one. A first hit answered is a question half asked.
+- **Finish the whole task**, the boring part and the part you would have scoped out included. A part that is genuinely blocked is delivered as far as it goes and named in one line as blocked, with what is missing. No half-landing to keep a tick: a task that cannot close stays open (9.1).
+- **Never hand back a decision the law already made.** Ask the user what is theirs; decide what is yours.
+- **A fact one command would settle is never guessed:** not a path, not a flag, not a version, not a line number, not what a function returns. Memory is a hypothesis (1.5), and a number is counted this session, printed rather than maintained.
+- **Every input gets its edges read:** empty, one, many, absent, malformed, duplicate, unauthorized, the error path (9.3).
+- **"Should" is not evidence.** *"Should work"*, *"looks right"*, *"probably fine"* and *"tests should pass"* are banned (1.7). Say what you ran and what it printed.
+- **Every detail the user gave is a requirement.** A number, a name, a format, an order or an example in their message is part of the goal, not colour. Meet it exactly, or say plainly which one you did not meet and why.
+
+
+
+### 1.11 [rule] Shipping in small verified releases, and the proof before a deploy
+
+**Ship in small, stable, verified pieces.** A piece that works and is proven lands as soon as it is
+proven; it never waits for the rest of the task so everything can go at once. Each piece lands
+behind its own switch, or as its own config change, defaulting to the behaviour already live, so
+every release leaves the live system better or unchanged, never worse.
+
+**Before any deployment, prove it will not break what is live, and show the proof.** A deployment is
+a push or merge that deploys, a flag flip, or any config change on a live environment. Six rows,
+each with its own output pasted, before the deploy and never after:
+
+1. **Green on the exact commit being shipped:** the triad and the build, run on that commit and not on a neighbour.
+2. **That commit's build artifact booted against a production-like copy**, with production's settings, smoke-tested on the key endpoints.
+3. **New behaviour behind switches that default off**, so nothing changes until a switch is flipped.
+4. **Migrations applied and rolled back cleanly** on that copy.
+5. **Quality checks showing no regression with the switch off**, and the measured gain with it on.
+6. **No other deploy in flight, and the rollback named:** the previous image or commit.
+
+**After deploying, verify live before calling it done** or flipping anything else: real requests,
+against the deployed version, with clean logs, pasted. A deploy nobody verified is a deploy nobody
+can defend, and 1.5 governs the claim that it worked. The ship gate of Phase 4 (11.3) is the
+in-repository half of this rule; this half binds the moment the change leaves the repository.
 
 ## Picking the route
 
@@ -384,7 +472,7 @@ Every substantive prompt takes exactly one route. Pick it from what the user ask
 - **When two routes fit, say so and pick one.** State which and why in one line, then go.
 - **A route that is not quick or full still obeys the always-on law**, including the wizard tool, claim integrity and git safety.
 - **A sub-command outranks the classifier, never the law** (4.4). It picks the row and skips the classification in 4.1; it does not waive a phase, a check or a gate. Quick mode named by `/engineering-rules:quick` is named by the user, which is the one way quick mode ever starts.
-- **`/engineering-rules:agents` is not a route.** It switches helpers on (4.4), agentless being the default, for the task in flight and every task after it in this conversation, `off` switches back, and it combines with every row above.
+- **`/engineering-rules:agents` is not a route.** Phase agents are the default (1.8); this sub-command is the switch that turns them off for the conversation (`off`) and back on again (4.4), and it combines with every row above.
 
 ## The map
 
@@ -393,11 +481,11 @@ Every section is a file in `references/`. The number is the section id; "section
 | Group | What is in it | When you read it |
 |---|---|---|
 | **0** | Orientation and the full section table | When the group table below is not enough. |
-| **1** | Always-on law | Inlined above. The reference files are stubs, except 1.5, which carries the claim-integrity procedures. |
+| **1** | Always-on law, 1.1 to 1.11 | Inlined above. The reference files are stubs, except 1.5, which carries the claim-integrity procedures. |
 | **2** | Doctrine: code quality (2.1), file and folder law (2.2) | Before writing code, and before creating any file or folder. |
 | **3** | Catalogs: performance (3.1), security (3.2), test scenarios (3.3), clean code (3.4) | Look up an ID or a fix direction; never read end to end. |
-| **4** | Routes: how one is picked (4.1), quick mode (4.2), full mode (4.3), the sub-commands, the intake and agentless mode (4.4) | At task start; 4.4 the moment the skill is invoked bare, a sub-command loads it, or the user switches helpers on or off. |
-| **5** | Working references: the ledger (5.1), the goal anchor (5.2), voice (5.3), full mindset (5.4), delegation (5.5) | 5.1 and 5.2 at task start; 5.3 governs every chat line; 5.4 at Phase 1; 5.5 before the first helper is sent, and again after a compaction. |
+| **4** | Routes: how one is picked (4.1), quick mode (4.2), full mode (4.3), the sub-commands, the intake and the agent modes (4.4) | At task start; 4.4 the moment the skill is invoked bare, a sub-command loads it, or the user switches the agents off or on. |
+| **5** | Working references: the ledger (5.1), the goal anchor (5.2), voice (5.3), full mindset (5.4), the phase agents (5.5), the check-in (5.6) | 5.1, 5.2 and 5.6 at task start; 5.3 governs every chat line; 5.4 at Phase 1; 5.5 before the first send, and again after a compaction. |
 | **6** | Phase 1, Clarify: the phase (6.1), the question contract (6.2), the banks (6.3–6.11), domain mechanisms (6.12), the repo brief (6.13), investigating code (6.14), the coverage map (6.15) | When a task opens. |
 | **7** | Phase 2, Plan and gate: the phase (7.1), the work-doc template (7.2), work-doc rules (7.3) | Full mode, when writing the plan. |
 | **8** | Phase 2.5, Spec review (8.1, 8.2) | Full mode, after the gate. |

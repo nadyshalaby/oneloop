@@ -2,7 +2,7 @@
 
 The engineering law and working method, packaged as one Claude Code plugin: a skill that
 carries the law, hooks that enforce the parts of it a hook can see, the prompts that bind
-Claude Code's own agent types to the helper shapes the law sends work to, and eval cases
+Claude Code's own agent types to the six shapes the law runs its phases as, and eval cases
 that state what the plugin promises.
 
 It began as a single 1 MB `CLAUDE.md`, split one section per file behind progressive
@@ -30,20 +30,24 @@ why each line is the way it is and a closing analysis, and it triggers on its ow
 description or by `/engineering-rules:generate-pseudocode`. Version 2.16.0 splits the status
 line into two rows, where you are and the meters, and adds the claude.ai plan usage and a
 count of the conversation's compactions to the meters; 2.16.1 turns the context bar into a
-labelled percentage like the usage.
+labelled percentage like the usage. Version 2.17.0 turns every phase into an agent on a named
+model, `sonnet` where the phase writes code or runs commands and `opus` where it plans,
+judges or decides, and makes that the default; it adds three always-on laws, one goal with
+everything else filed as a follow-up, quick-never-lazy-never-approximate, and shipping in
+small verified releases with a six-row proof before any deploy, plus a ten-minute check-in.
 
 ## What loads when
 
 | Level | What | Cost |
 |---|---|---|
 | 1 | `name` + `description` | Always in context, about 100 words |
-| 2 | `SKILL.md`: definitions, precedence, the always-on law (`1.1` to `1.8`), the route table, the group map | Loads when the skill triggers, about 400 lines |
+| 2 | `SKILL.md`: definitions, precedence, the always-on law (`1.1` to `1.11`), the route table, the group map | Loads when the skill triggers, 500 lines |
 | 2 | `skills/<name>/SKILL.md`: the ten sub-commands, nine routes and the agents switch, about 35 lines each | Only when the user types one; the model cannot invoke them, so they cost it nothing |
 | 2 | `skills/generate-pseudocode/SKILL.md`: the standalone pseudocode skill, with its page kit and check script beside it | Its description is always in context, about 100 words; the body loads when it triggers or the user types it, about 360 lines |
-| 3 | `references/**`: all 122 sections, one file each | Only when a phase names one |
+| 3 | `references/**`: all 126 sections, one file each | Only when a phase names one |
 | hooks | `hooks/hooks.json`: eight events, three guard and anchor scripts plus the notifier | Live from install, no prompt cost; up to half a second per edit of a code file |
 
-The eight always-on sections live in `SKILL.md` because they bind from the moment the skill
+The eleven always-on sections live in `SKILL.md` because they bind from the moment the skill
 loads, and a reference you have to go fetch is a reference you might not fetch. The files
 under `references/01-always-on-law/` are short stubs that point back to `SKILL.md`, except
 `1.5`, which carries the claim-integrity procedures the laws call for (proving a zero, the
@@ -69,15 +73,22 @@ boundary, so a session that lost its context can pick the work up from the ledge
 Every question to the user goes through the `AskUserQuestion` tool. Every claim of "done",
 "passes" or "clean" has a proof row behind it. Every stage sweeps its own leftovers both
 ways before it commits, removes the dead code already in the files it touched in a commit of
-its own, and shows the search behind every new symbol (`1.1`, `9.1`). Work the law sends out of the session (a
-reader, the stage-end scouts, the fresh reviewer, a mechanic, a builder; `5.5`) goes through
-the `Agent` tool on the agent types Claude Code ships itself (`fork`, `Explore`, `Plan`,
-`general-purpose`); `5.5` carries the prompt each shape is sent, pasted whole on every send.
-Agentless mode (`4.4`) is the default: nothing is sent unless the user switched helpers on,
-by `/engineering-rules:agents` or in their own words; the same work runs in the main
-conversation, in the same order, and the ledger records that instead of a send.
+its own, and shows the search behind every new symbol (`1.1`, `9.1`). Anything else it finds
+along the way is a follow-up with a `file:line`, never an unasked-for edit (`1.9`), and the
+user gets the list at the finish.
 
-## The sub-commands, the intake and agentless mode
+**Each phase runs as an agent, and that is the default** (`1.8`). The map is one row per run
+point, and the model is part of the row: the question batch and the scouts go to a `fork`,
+which runs on the session's own model; a wide search to an `Explore` agent on `sonnet`; the
+draft plan and the root cause to a `Plan` agent on `opus`; the spec review to a `Plan` agent
+on `opus`; each implementation stage to a `general-purpose` agent on `sonnet`; the counts,
+proofs and sweep scans to a `general-purpose` agent on `sonnet`; and the five review checks
+to a `general-purpose` agent on `opus`. `5.5` carries the prompt each shape is sent, pasted
+whole on every send, with `1.9` and `1.10` under it so nothing an agent finds turns into a
+diff nobody planned. The session keeps the anchor, the ledger, every question, the gate, the
+commits and every claim, and re-runs anything a report rests on before it ticks.
+
+## The sub-commands, the intake and the agent modes
 
 The route used to be a parameter of the one skill. Since 2.11.0 every route is a sub-command
 of its own: a skill under `skills/<route>/` that only the user can invoke, so the model can
@@ -98,25 +109,23 @@ request:
 
 `/engineering-rules:engineering-rules <request>` still works and classifies the request as
 prose; it carries no route token any more. Typed bare, it runs the intake through the wizard
-tool: what you are here for, then which route, then helpers or agentless, then the request,
+tool: what you are here for, then which route, then agents or agentless, then the request,
 and the flow starts only when all three are settled (`4.4`). The old picker asked for nine
 options in one question, which the wizard tool cannot hold; the intake reaches them in two.
 
-**Agentless mode is the default**: every helper shape (`5.5`) runs in the main conversation.
-Helpers are switched on by the tenth sub-command, `/engineering-rules:agents`: bare, it
-holds for the task in flight and every task that starts in this conversation until
-`/engineering-rules:agents off`; with a request after it, that request classifies as prose
-(full mode unless the words name another route) and starts with helpers. The same words in
-your own message, or the intake's helper question, switch them on too; the size of the task
-never does. Under the default every send the law mandates (`1.8`) is the same work done in
-the session, in the same order: the question batch, the scouts at every stage end, the spec
-review, the five review checks, every count. The ledger records
-`Helpers: agentless, the default` once, each affected item carries
-`helper skipped: agentless, the default`, and the one-line cost is said at task start: the
-review loses its fresh eyes, and the reading lands in the session's context. Nothing else
-moves. `/engineering-rules:agents off`, or saying so, switches back to the default: the
-session prints the agentless line and the cost again. Nothing at the tool
-boundary enforces the mode; the law text does.
+**Phase agents are the default**: every phase runs as the agent and model `1.8`'s map names.
+The tenth sub-command, `/engineering-rules:agents`, is the switch. `/engineering-rules:agents
+off` runs every phase in the main conversation instead, for the task in flight and every task
+that starts in this conversation, until it is switched back; bare, it switches agents back
+on; with a request after it, that request classifies as prose (full mode unless the words
+name another route). The same words in your own message, or the intake's question, switch the
+mode too; the size of the task never does. With agents off, every row of the map (`1.8`) is
+the same work done in the session, in the same order: the question batch, the plan, the
+scouts at every stage end, the spec review, the five review checks, every count. The ledger
+records `Agents: off, by user choice` once, each affected item carries `agent skipped: agents
+off, by user choice`, and the one-line cost is said at task start: the review loses its fresh
+eyes, the reading lands in the session's context, and one model does every job. Nothing else
+moves. Nothing at the tool boundary enforces the mode; the law text does.
 
 ## Explore a feature, with one real run
 
@@ -228,34 +237,42 @@ rule in `1.4`) and once by the Stop hook; the hook is the one that cannot be for
 load, so silence the tool's desktop alerts in Claude Code's settings if you want one alert,
 or comment out the `notify_desktop` call in `on_stop` for the other.
 
-## The helper shapes
+## The six shapes, and the model each one runs on
 
-The plugin ships no agents. The four shapes the delegation rule (`5.5`) sends work to run on
-the agent types Claude Code ships itself, and `5.5` carries the prompt each shape is sent,
-pasted whole on every send: a built-in type holds none of the law, so the prompt is the only
-thing between it and drift. Every shape runs on the session's model; no send names one. In agentless mode (`4.4`) none
-is sent: the same work runs in the session, in the same order.
+The plugin ships no agents. The six shapes the law runs its phases as (`5.5`) run on the
+agent types Claude Code ships itself, and `5.5` carries the prompt each shape is sent, pasted
+whole on every send: a built-in type holds none of the law, so the prompt is the only thing
+between it and drift. Every send but a fork names its model, because a fork cannot take one.
+With agents off (`4.4`) none is sent: the same work runs in the session, in the same order.
 
-| Shape | Agent type | What it may do |
-|---|---|---|
-| the reader | `fork` for the scouts, the question batch and a catalog lookup (it inherits the conversation and needs no prompt); `Explore` with the reader prompt for a wide read-only search | Returns only the rows that apply, each with `file:line`, and a coverage line. Never edits. |
-| the fresh reviewer of Phase 5 | `general-purpose` with the reviewer prompt, never a fork | Reads the five review checks (`12.3` to `12.7`) at the paths the brief names, runs them over the diff, returns findings in the review's shape. Never edits, never asks, never spawns. |
-| the spec reviewer of Phase 2.5 (full mode) | `Plan` with the spec-reviewer prompt, read-only by construction, never a fork | Reads `8.2`, `5.2`, `2.1`, `2.2` and the plan, returns the execution order and findings by lens with severities. Never edits the work-doc, never asks, never spawns. |
-| the mechanic | `general-purpose` with the mechanic prompt | Runs the command it was given and returns the raw output, nothing summarized. |
-| a builder | `general-purpose` with the builder prompt, or a fork for a single stage | Loads the skill, builds one stage inside the file allowlist it was handed, never commits, never spawns. Isolation is chosen on the send. |
+| Shape | Agent type | Model | What it may do |
+|---|---|---|---|
+| the reader | `fork` for the scouts, the question batch and a catalog lookup (it inherits the conversation and needs no prompt); `Explore` with the reader prompt for a wide read-only search | the session's on a fork, `sonnet` on `Explore` | Returns only the rows that apply, each with `file:line`, and a coverage line. Never edits. |
+| the planner, Phase 2 and the root cause of Phase 3b | `Plan` with the planner prompt, read-only by construction | `opus` | Returns the approach with its rejected alternatives, the stages in execution order with their allowlists and test modes, the acceptance criteria and the risks. Never writes the work-doc, never asks, never spawns. |
+| the spec reviewer of Phase 2.5 (full mode) | `Plan` with the spec-reviewer prompt, read-only by construction, never a fork | `opus` | Reads `8.2`, `5.2`, `2.1`, `2.2` and the plan, returns the execution order and findings by lens with severities. Never edits the work-doc, never asks, never spawns. |
+| a builder | `general-purpose` with the builder prompt | `sonnet` | Loads the skill, builds one stage inside the file allowlist it was handed, never commits, never spawns, and files what it finds elsewhere as a follow-up rather than fixing it. Isolation is chosen on the send. |
+| the mechanic | `general-purpose` with the mechanic prompt | `sonnet` | Runs the commands it was given and returns the raw output with exit statuses, nothing summarized. |
+| the fresh reviewer of Phase 5 | `general-purpose` with the reviewer prompt, never a fork | `opus` | Reads the five review checks (`12.3` to `12.7`) at the paths the brief names, runs them over the diff, returns findings in the review's shape. Never edits, never asks, never spawns. |
+
+The split is the point: the model that judges a plan or a diff is not the model that types to
+a plan somebody already judged. `tests/agent-map.test.sh` keeps the map honest in all three
+places that state it, so a model cannot be changed in one file alone.
 
 Every hook fires inside an agent too, so a builder is under the same guards as the session.
 
 ## The evals
 
-`evals/` holds five cases in the plugin-eval shape (`prompt.md` plus graders): `git-safety`
+`evals/` holds six cases in the plugin-eval shape (`prompt.md` plus graders): `git-safety`
 (a prompt that invites a destructive git command; the run must refuse and name the law),
 `ledger-opens` (a small code task; the skill must fire, the ledger must be printed, every
 question must go through the wizard tool, no banned token may land), `route-picker` (the
 bare slash invocation; the intake must open through the wizard tool and nothing may start),
 `sub-command-full` (`/engineering-rules:full` with a task; full mode by the user's word, a
-ten-item ledger, no route menu) and `agentless-default` (`/engineering-rules:quick` with a
-task; the Agent tool is never called while the ledger, the scouts and the review still run).
+ten-item ledger, no route menu), `agents-default` (`/engineering-rules:quick` with a task;
+each phase goes to its agent with its model named, while the ledger, the scout dispositions
+and every tick stay in the conversation) and `agentless-switch`
+(`/engineering-rules:agents off` first; the Agent tool is then never called while the ledger,
+the scouts and the review still run).
 The runner,
 `claude plugin eval`, is in early access at the time of writing; until it runs here, the cases
 are the written statement of what the plugin promises, and the headless boots below are the
@@ -273,7 +290,8 @@ engineering-rules-plugin/
 │   ├── ledger-opens/
 │   ├── route-picker/
 │   ├── sub-command-full/
-│   └── agentless-default/
+│   ├── agents-default/
+│   └── agentless-switch/
 ├── hooks/
 │   ├── hooks.json                       eight events, live the moment the plugin is installed
 │   ├── edit-guard.sh                    PreToolUse on the edit tools: 9.5's block over the edit
@@ -306,11 +324,11 @@ engineering-rules-plugin/
 │       ├── SKILL.md                     the canonical always-on law, routes, map
 │       └── references/
 │           ├── 00-orientation/          how the sections are organised, the full section map
-│           ├── 01-always-on-law/        stubs for 1.1 to 1.8 (canonical text is in SKILL.md), 1.5 procedures
+│           ├── 01-always-on-law/        stubs for 1.1 to 1.11 (canonical text is in SKILL.md), 1.5 procedures
 │           ├── 02-doctrine/             code quality, file and folder law
 │           ├── 03-catalogs/             performance, security, test scenarios, clean code
-│           ├── 04-routes/               how one is picked, quick, full, the sub-commands, the intake, agentless
-│           ├── 05-working-references/   phase ledger, goal anchor, voice, mindset, delegation
+│           ├── 04-routes/               how one is picked, quick, full, the sub-commands, the intake, the modes
+│           ├── 05-working-references/   phase ledger, goal anchor, voice, mindset, the phase agents, the check-in
 │           ├── 06-phase-1-clarify/      question contract, six banks, repo brief, coverage map
 │           ├── 07-phase-2-plan/         gate, worktree, work-doc template and rules
 │           ├── 08-phase-2-5-spec-review/
@@ -348,7 +366,7 @@ every function in its shell files stays under 40 lines; `tests/hook-caps.test.sh
 both and proves it can fail with a planted breach. Section 17's specs are the largest
 files at about 470 lines. If a section ever needs more, it is split, not grown.
 
-Eight checks run against the plugin itself, all on `tests/harness.sh`:
+Nine checks run against the plugin itself, all on `tests/harness.sh`:
 
 - `bash tests/no-control-bytes.test.sh` fails on any raw control byte in a tracked file: a
   `\0`, `\b` or `\e` that lost its backslash on the way in reads fine and runs wrong, which is
@@ -366,6 +384,11 @@ Eight checks run against the plugin itself, all on `tests/harness.sh`:
   `CLAUDE_PLUGIN_ROOT`, when one of the eight events is missing, or when a hook reaches the
   `Bash` tool.
 - `bash tests/hook-caps.test.sh` is the size cap above.
+- `bash tests/agent-map.test.sh` fails when the map of run point to agent to model in `1.8`
+  names a shape, an agent type or a model the law does not define, when a fork carries a
+  model or a fresh type carries none, when a shape a row names has no prompt block in `5.5`,
+  or when the runtime table of `5.5` and the map disagree on a type-and-model pair, and
+  proves it can fail by planting each.
 - `bash tests/sub-commands.test.sh` fails when a route row of `SKILL.md` has no
   `skills/<route>/SKILL.md`, when a skill directory is neither a route row, the agents
   switch nor a listed standalone skill (`generate-pseudocode`), when a standalone skill

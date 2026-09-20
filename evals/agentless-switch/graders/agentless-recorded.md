@@ -2,4 +2,4 @@
 type: regex
 target: trace
 ---
-Helpers: agentless
+Agents: off
