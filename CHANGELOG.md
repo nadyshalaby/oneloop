@@ -2,6 +2,22 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.18.0**: the work-doc becomes a hard gate. In full mode the doc is the only map: the
+  phase its ledger shows open is the phase you are in, the task its Sprint Backlog lists next
+  is the task you take, a reorder is an edit to the doc with its reason, and every tick is
+  written as it lands. `hooks/work-doc-gate.sh` holds that at the tool boundary. While a live
+  work-doc sits under `docs/work/`, a `PreToolUse` on the edit tools refuses an edit to a code
+  or test file when the doc disagrees: no phase in progress, two phases in progress, an open
+  phase that does not write code (code lands in Phase 3, 3b, the Phase 5 fix pass and the
+  Phase 6 cleanup), a task started while an earlier one still waits, a task ticked with no
+  `###` entry under Daily Updates, a doc with no phase ledger or no backlog, or two live
+  work-docs at once. Parallel stages still pass, because several tasks may run at once as
+  long as they are the ones at the front (5.5). Prose and generated files are never gated, so
+  the work-doc, the README and every document stay editable at any moment, and the way
+  through the gate is to bring the doc up to date. A task with no live work-doc, which is
+  quick mode or a trivial ask, is not gated at all. `SKILL.md` 1.4 carries the map sentence,
+  `7.3` the rules and the gate's contract, and `9.1` opens each task in the doc before its
+  first edit. `hooks/tests/work-doc-gate.test.sh` covers nine cases on fixtures.
 - **2.17.0**: every phase becomes an agent on a named model, and that is the default. `1.8`
   is now a map, one row per run point: the question batch and the scouts to a `fork`, which
   runs on the session's own model; a wide search to an `Explore` agent on `sonnet`; the draft

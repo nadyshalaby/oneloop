@@ -1,40 +1,38 @@
 # engineering-rules
 
-The engineering law and working method, packaged as one Claude Code plugin: a skill that
-carries the law, hooks that enforce the parts of it a hook can see, the prompts that bind
-Claude Code's own agent types to the six shapes the law runs its phases as, and eval cases
-that state what the plugin promises.
+The engineering law and working method, packaged as one Claude Code plugin: a skill that carries the
+law, hooks that enforce the parts of it a hook can see, the prompts that bind Claude Code's own
+agent types to the six shapes the law runs its phases as, and eval cases that state what the plugin
+promises.
 
-It began as a single 1 MB `CLAUDE.md`, split one section per file behind progressive
-disclosure. Version 2.0.0 was a hardening pass over that split: one canonical copy of the
-always-on law, inlined in `SKILL.md`; the seams the split left behind closed; a run discipline
-so the law is applied the same way in every session, with a phase ledger that refuses to
-advance without its exit artifact, loop-back rules, a fixed list of what a user may waive and
-what nobody may, git safety, and a law self-audit before any task is called done. Version
-2.5.0 moves the enforceable part of that law from the prompt into the runtime: a git command
-the law bans is refused before it runs, an edit that adds a banned token is refused before it
-lands, a file that crosses the line cap is reported the moment it is written, and a session
-that lost its context is re-anchored on the law and the ledger before its next step. Version
-2.6.0 takes the git guard back out: the shell is no longer judged at the tool boundary, and
-the git safety law binds through the skill alone. Version 2.11.0 splits the route parameter
-into nine sub-commands, turns the bare invocation into a guided intake, and adds an agentless
-mode that keeps every helper shape in the main conversation; 2.12.0 makes that mode a
-sub-command of its own; 2.13.0 makes it the default, with full mode, and 2.13.1 renames the
-switch to `/engineering-rules:agents`. Version 2.14.0 lets the explore-feature page carry
-one real run of the traced code: the arguments, results, errors, timings and branch
-outcomes at every function inside the excerpts, masked before they reach disk, on Bun and
-Node, from the project's own test or a request the user fires. Version 2.15.0 ships a second
-skill beside the law, `generate-pseudocode`: it turns "explain how this code flow works" into
-one published page of complete pseudocode, every helper expanded and cited, with a note on
-why each line is the way it is and a closing analysis, and it triggers on its own
-description or by `/engineering-rules:generate-pseudocode`. Version 2.16.0 splits the status
-line into two rows, where you are and the meters, and adds the claude.ai plan usage and a
-count of the conversation's compactions to the meters; 2.16.1 turns the context bar into a
-labelled percentage like the usage. Version 2.17.0 turns every phase into an agent on a named
-model, `sonnet` where the phase writes code or runs commands and `opus` where it plans,
-judges or decides, and makes that the default; it adds three always-on laws, one goal with
-everything else filed as a follow-up, quick-never-lazy-never-approximate, and shipping in
-small verified releases with a six-row proof before any deploy, plus a ten-minute check-in.
+It began as a single 1 MB `CLAUDE.md`, split one section per file behind progressive disclosure.
+Version 2.0.0 was a hardening pass over that split: one canonical copy of the always-on law, inlined
+in `SKILL.md`; the seams the split left behind closed; a run discipline so the law is applied the
+same way in every session, with a phase ledger that refuses to advance without its exit artifact,
+loop-back rules, a fixed list of what a user may waive and what nobody may, git safety, and a law
+self-audit before any task is called done. Version 2.5.0 moves the enforceable part of that law from
+the prompt into the runtime: a git command the law bans is refused before it runs, an edit that adds
+a banned token is refused before it lands, a file that crosses the line cap is reported the moment
+it is written, and a session that lost its context is re-anchored on the law and the ledger before
+its next step. Version 2.6.0 takes the git guard back out: the shell is no longer judged at the tool
+boundary, and the git safety law binds through the skill alone. Version 2.11.0 splits the route
+parameter into nine sub-commands, turns the bare invocation into a guided intake, and adds an
+agentless mode that keeps every helper shape in the main conversation; 2.12.0 makes that mode a
+sub-command of its own; 2.13.0 makes it the default, with full mode, and 2.13.1 renames the switch
+to `/engineering-rules:agents`. Version 2.14.0 lets the explore-feature page carry one real run of
+the traced code: the arguments, results, errors, timings and branch outcomes at every function
+inside the excerpts, masked before they reach disk, on Bun and Node, from the project's own test or
+a request the user fires. Version 2.15.0 ships a second skill beside the law, `generate-pseudocode`:
+it turns "explain how this code flow works" into one published page of complete pseudocode, every
+helper expanded and cited, with a note on why each line is the way it is and a closing analysis, and
+it triggers on its own description or by `/engineering-rules:generate-pseudocode`. Version 2.16.0
+splits the status line into two rows, where you are and the meters, and adds the claude.ai plan
+usage and a count of the conversation's compactions to the meters; 2.16.1 turns the context bar into
+a labelled percentage like the usage. Version 2.17.0 turns every phase into an agent on a named
+model, `sonnet` where the phase writes code or runs commands and `opus` where it plans, judges or
+decides, and makes that the default; it adds three always-on laws, one goal with everything else
+filed as a follow-up, quick-never-lazy-never-approximate, and shipping in small verified releases
+with a six-row proof before any deploy, plus a ten-minute check-in.
 
 ## What loads when
 
@@ -45,7 +43,7 @@ small verified releases with a six-row proof before any deploy, plus a ten-minut
 | 2 | `skills/<name>/SKILL.md`: the ten sub-commands, nine routes and the agents switch, about 35 lines each | Only when the user types one; the model cannot invoke them, so they cost it nothing |
 | 2 | `skills/generate-pseudocode/SKILL.md`: the standalone pseudocode skill, with its page kit and check script beside it | Its description is always in context, about 100 words; the body loads when it triggers or the user types it, about 360 lines |
 | 3 | `references/**`: all 126 sections, one file each | Only when a phase names one |
-| hooks | `hooks/hooks.json`: eight events, three guard and anchor scripts plus the notifier | Live from install, no prompt cost; up to half a second per edit of a code file |
+| hooks | `hooks/hooks.json`: eight events, four guard and anchor scripts plus the notifier | Live from install, no prompt cost; up to half a second per edit of a code file |
 
 The eleven always-on sections live in `SKILL.md` because they bind from the moment the skill
 loads, and a reference you have to go fetch is a reference you might not fetch. The files
@@ -56,44 +54,41 @@ wins.
 
 ## How a task runs
 
-Every substantive ask goes through the same phases:
-1 Clarify, 2 Plan and gate, 2.5 Spec review, 3 Implement (3b Debug when stuck), 4 Verify,
-5 Review, 6 Finish. Full mode, the default, adds a written plan the user approves first, a
-spec review and a durable work-doc; quick mode, when the user names it, drops exactly those
-and the landing menu, and nothing else: every check, every scout, all three verify layers,
-the five review checks and the ship gate still run. The other
-routes (shaping, walking one execution path, auditing a whole codebase, review triage,
-authoring a skill, authoring a design spec, printing the update log) are picked by the rules
-in `4.1`. Every route also has a sub-command that picks it by the user's word, and the bare
-invocation walks the user through the options before anything starts (`4.4`, below).
+Every substantive ask goes through the same phases: 1 Clarify, 2 Plan and gate, 2.5 Spec review, 3
+Implement (3b Debug when stuck), 4 Verify, 5 Review, 6 Finish. Full mode, the default, adds a
+written plan the user approves first, a spec review and a durable work-doc; quick mode, when the
+user names it, drops exactly those and the landing menu, and nothing else: every check, every scout,
+all three verify layers, the five review checks and the ship gate still run. The other routes
+(shaping, walking one execution path, auditing a whole codebase, review triage, authoring a skill,
+authoring a design spec, printing the update log) are picked by the rules in `4.1`. Every route also
+has a sub-command that picks it by the user's word, and the bare invocation walks the user through
+the options before anything starts (`4.4`, below).
 
-The phase ledger (`5.1`) is the order-enforcer. Every phase is an item with an exit artifact,
-a phase is ticked only when that artifact exists, and the ledger is re-printed at every
-boundary, so a session that lost its context can pick the work up from the ledger alone.
-Every question to the user goes through the `AskUserQuestion` tool. Every claim of "done",
-"passes" or "clean" has a proof row behind it. Every stage sweeps its own leftovers both
-ways before it commits, removes the dead code already in the files it touched in a commit of
-its own, and shows the search behind every new symbol (`1.1`, `9.1`). Anything else it finds
-along the way is a follow-up with a `file:line`, never an unasked-for edit (`1.9`), and the
-user gets the list at the finish.
+The phase ledger (`5.1`) is the order-enforcer. Every phase is an item with an exit artifact, a
+phase is ticked only when that artifact exists, and the ledger is re-printed at every boundary, so a
+session that lost its context can pick the work up from the ledger alone. Every question to the user
+goes through the `AskUserQuestion` tool. Every claim of "done", "passes" or "clean" has a proof row
+behind it. Every stage sweeps its own leftovers both ways before it commits, removes the dead code
+already in the files it touched in a commit of its own, and shows the search behind every new symbol
+(`1.1`, `9.1`). Anything else it finds along the way is a follow-up with a `file:line`, never an
+unasked-for edit (`1.9`), and the user gets the list at the finish.
 
-**Each phase runs as an agent, and that is the default** (`1.8`). The map is one row per run
-point, and the model is part of the row: the question batch and the scouts go to a `fork`,
-which runs on the session's own model; a wide search to an `Explore` agent on `sonnet`; the
-draft plan and the root cause to a `Plan` agent on `opus`; the spec review to a `Plan` agent
-on `opus`; each implementation stage to a `general-purpose` agent on `sonnet`; the counts,
-proofs and sweep scans to a `general-purpose` agent on `sonnet`; and the five review checks
-to a `general-purpose` agent on `opus`. `5.5` carries the prompt each shape is sent, pasted
-whole on every send, with `1.9` and `1.10` under it so nothing an agent finds turns into a
-diff nobody planned. The session keeps the anchor, the ledger, every question, the gate, the
-commits and every claim, and re-runs anything a report rests on before it ticks.
+**Each phase runs as an agent, and that is the default** (`1.8`). The map is one row per run point,
+and the model is part of the row: the question batch and the scouts go to a `fork`, which runs on
+the session's own model; a wide search to an `Explore` agent on `sonnet`; the draft plan and the
+root cause to a `Plan` agent on `opus`; the spec review to a `Plan` agent on `opus`; each
+implementation stage to a `general-purpose` agent on `sonnet`; the counts, proofs and sweep scans to
+a `general-purpose` agent on `sonnet`; and the five review checks to a `general-purpose` agent on
+`opus`. `5.5` carries the prompt each shape is sent, pasted whole on every send, with `1.9` and
+`1.10` under it so nothing an agent finds turns into a diff nobody planned. The session keeps the
+anchor, the ledger, every question, the gate, the commits and every claim, and re-runs anything a
+report rests on before it ticks.
 
 ## The sub-commands, the intake and the agent modes
 
-The route used to be a parameter of the one skill. Since 2.11.0 every route is a sub-command
-of its own: a skill under `skills/<route>/` that only the user can invoke, so the model can
-never pick quick mode by itself. Each one loads the law, names its route and hands over the
-request:
+The route used to be a parameter of the one skill. Since 2.11.0 every route is a sub-command of its
+own: a skill under `skills/<route>/` that only the user can invoke, so the model can never pick
+quick mode by itself. Each one loads the law, names its route and hands over the request:
 
 | Sub-command | Route | What follows it |
 |---|---|---|
@@ -107,25 +102,24 @@ request:
 | `/engineering-rules:design` | Design spec (`15.19`) | the mode or a direction, or nothing to detect it |
 | `/engineering-rules:log` | Update log (`16.13`) | nothing |
 
-`/engineering-rules:engineering-rules <request>` still works and classifies the request as
-prose; it carries no route token any more. Typed bare, it runs the intake through the wizard
-tool: what you are here for, then which route, then agents or agentless, then the request,
-and the flow starts only when all three are settled (`4.4`). The old picker asked for nine
-options in one question, which the wizard tool cannot hold; the intake reaches them in two.
+`/engineering-rules:engineering-rules <request>` still works and classifies the request as prose; it
+carries no route token any more. Typed bare, it runs the intake through the wizard tool: what you
+are here for, then which route, then agents or agentless, then the request, and the flow starts only
+when all three are settled (`4.4`). The old picker asked for nine options in one question, which the
+wizard tool cannot hold; the intake reaches them in two.
 
-**Phase agents are the default**: every phase runs as the agent and model `1.8`'s map names.
-The tenth sub-command, `/engineering-rules:agents`, is the switch. `/engineering-rules:agents
-off` runs every phase in the main conversation instead, for the task in flight and every task
-that starts in this conversation, until it is switched back; bare, it switches agents back
-on; with a request after it, that request classifies as prose (full mode unless the words
-name another route). The same words in your own message, or the intake's question, switch the
-mode too; the size of the task never does. With agents off, every row of the map (`1.8`) is
-the same work done in the session, in the same order: the question batch, the plan, the
-scouts at every stage end, the spec review, the five review checks, every count. The ledger
-records `Agents: off, by user choice` once, each affected item carries `agent skipped: agents
-off, by user choice`, and the one-line cost is said at task start: the review loses its fresh
-eyes, the reading lands in the session's context, and one model does every job. Nothing else
-moves. Nothing at the tool boundary enforces the mode; the law text does.
+**Phase agents are the default**: every phase runs as the agent and model `1.8`'s map names. The
+tenth sub-command, `/engineering-rules:agents`, is the switch. `/engineering-rules:agents off` runs
+every phase in the main conversation instead, for the task in flight and every task that starts in
+this conversation, until it is switched back; bare, it switches agents back on; with a request after
+it, that request classifies as prose (full mode unless the words name another route). The same words
+in your own message, or the intake's question, switch the mode too; the size of the task never does.
+With agents off, every row of the map (`1.8`) is the same work done in the session, in the same
+order: the question batch, the plan, the scouts at every stage end, the spec review, the five review
+checks, every count. The ledger records `Agents: off, by user choice` once, each affected item
+carries `agent skipped: agents off, by user choice`, and the one-line cost is said at task start:
+the review loses its fresh eyes, the reading lands in the session's context, and one model does
+every job. Nothing else moves. Nothing at the tool boundary enforces the mode; the law text does.
 
 ## Explore a feature, with one real run
 
@@ -158,6 +152,7 @@ fails a turn. Nothing here calls a model.
 | Event | Script | What it does |
 |---|---|---|
 | `PreToolUse` on `Edit`, `Write`, `MultiEdit`, `NotebookEdit` | `edit-guard.sh` | Runs the law scout's own block (`9.5`) over the edit and refuses it when it adds a banned token. |
+| `PreToolUse` on `Edit`, `Write`, `MultiEdit`, `NotebookEdit` | `work-doc-gate.sh` | Refuses a code edit while the live work-doc disagrees with it: no phase open, a phase that does not write code, a task taken while an earlier one waits, or a ticked task with nothing written under Daily Updates. Prose is never gated, so the doc itself always stays editable. |
 | `PostToolUse` on the same four | `file-cap.sh` | Tells Claude when the file it just wrote is over 500 lines (`1.1`). |
 | `SessionStart` on `compact` or `resume` | `re-anchor.sh` | Puts the re-read instruction (`1.7`, step 7) and the last ledger position into the new context. |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | One log line per event, a desktop notification on a boundary, a wait or an error. |
@@ -295,6 +290,7 @@ engineering-rules-plugin/
 ├── hooks/
 │   ├── hooks.json                       eight events, live the moment the plugin is installed
 │   ├── edit-guard.sh                    PreToolUse on the edit tools: 9.5's block over the edit
+│   ├── work-doc-gate.sh                 PreToolUse on the edit tools: the live work-doc's phase and task order
 │   ├── file-cap.sh                      PostToolUse on the edit tools: the 500-line cap
 │   ├── re-anchor.sh                     SessionStart after a compaction or a resume
 │   ├── progress-notify.sh               one log line per event, desktop notification on a boundary or a wait
@@ -402,15 +398,19 @@ Nine checks run against the plugin itself, all on `tests/harness.sh`:
   write, loses one of the three theme blocks or the body's own ground, or crosses 500
   lines, and proves it can fail by planting each.
 
-`bash hooks/tests/<name>.test.sh` covers each hook script with fixtures: the edit guard's
-nine rules, the law's exemptions, the test-file rows, the grew-versus-kept decision and the
-missing-law path; the file cap; the re-anchor on compact and resume; the notifier's five
-events; the status line's two rows, its context and usage percentages and its compaction
-count (appends, a quoted marker, a half-written line, a replaced transcript, a broken cursor
-file). Every one of them can be pointed at a mutated copy of its script
-through an environment variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `RE_ANCHOR_SH`,
-`PROGRESS_NOTIFY_SH`, `STATUSLINE_SH`; `HOOKS_JSON`, `CAP_DIR`, `SKILLS_DIR` and `ASSETS_DIR`
-for the four repo checks), so a run that watches the failure is one line.
+`bash hooks/tests/<name>.test.sh` covers each hook script with fixtures: the edit guard's nine
+rules, the law's exemptions, the test-file rows, the grew-versus-kept decision and the
+missing-law path; the file cap; the work-doc gate (a doc that agrees lets the edit through, no
+live doc and prose are never gated, a phase that does not write code, a task taken while an
+earlier one waits, parallel tasks at the front allowed, a tick with nothing written, a ledger
+that says nothing, two live docs); the re-anchor on compact and resume; the notifier's five
+events; the status line's two rows, its context and usage percentages and its compaction count
+(appends, a quoted marker, a half-written line, a replaced transcript, a broken cursor file).
+Every one of them can be pointed at a mutated copy of its script through an environment
+variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `WORK_DOC_GATE_SH`, `RE_ANCHOR_SH`,
+`PROGRESS_NOTIFY_SH`, `STATUSLINE_SH`; `HOOKS_JSON`, `CAP_DIR`, `SKILLS_DIR`, `SKILL_MD`,
+`DELEGATION_MD` and `ASSETS_DIR` for the repo checks), so a run that watches the failure is one
+line.
 `bash skills/explore-feature/scripts/tests/<name>.test.sh` covers the three explore-feature
 scripts on fixtures: `verify-trace` (the sample trace passes; one mutation per check is
 refused with its own line and nothing written; excerpts are copied from disk; an
