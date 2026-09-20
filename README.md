@@ -75,8 +75,10 @@ unasked-for edit (`1.9`), and the user gets the list at the finish.
 
 **Each phase runs as an agent, and that is the default** (`1.8`). The map is one row per run point,
 and the model is part of the row: the question batch and the scouts go to a `fork`, which runs on
-the session's own model; a wide search to an `Explore` agent on `sonnet`; the draft plan and the
-root cause to a `Plan` agent on `opus`; the spec review to a `Plan` agent on `opus`; each
+the session's own model; a wide search to an `Explore` agent on `sonnet`; the plan to a
+`general-purpose` agent on `opus`, which writes the work-doc itself and touches nothing else in
+the tree; the root cause and the spec review to a `Plan` agent on `opus`, read-only by
+construction; each
 implementation stage to a `general-purpose` agent on `sonnet`; the counts, proofs and sweep scans to
 a `general-purpose` agent on `sonnet`; and the five review checks to a `general-purpose` agent on
 `opus`. `5.5` carries the prompt each shape is sent, pasted whole on every send, with `1.9` and
@@ -243,7 +245,8 @@ With agents off (`4.4`) none is sent: the same work runs in the session, in the 
 | Shape | Agent type | Model | What it may do |
 |---|---|---|---|
 | the reader | `fork` for the scouts, the question batch and a catalog lookup (it inherits the conversation and needs no prompt); `Explore` with the reader prompt for a wide read-only search | the session's on a fork, `sonnet` on `Explore` | Returns only the rows that apply, each with `file:line`, and a coverage line. Never edits. |
-| the planner, Phase 2 and the root cause of Phase 3b | `Plan` with the planner prompt, read-only by construction | `opus` | Returns the approach with its rejected alternatives, the stages in execution order with their allowlists and test modes, the acceptance criteria and the risks. Never writes the work-doc, never asks, never spawns. |
+| the planner of Phase 2 | `general-purpose` with the planner prompt, never a fork, holding an edit tool for exactly one path | `opus` | **Writes the work-doc itself** at the path the brief names: the approach with its rejected alternatives, the stages in execution order with their allowlists and test modes, the acceptance criteria and the risks. Touches nothing else in the tree, never publishes, never asks, never spawns. |
+| the planner of a root cause (Phase 3b) | `Plan` with the same planner prompt, read-only by construction | `opus` | Returns the hypothesis chain ranked, each with the experiment that would kill it. Writes nothing: implementation is open and the work-doc is the session's. |
 | the spec reviewer of Phase 2.5 (full mode) | `Plan` with the spec-reviewer prompt, read-only by construction, never a fork | `opus` | Reads `8.2`, `5.2`, `2.1`, `2.2` and the plan, returns the execution order and findings by lens with severities. Never edits the work-doc, never asks, never spawns. |
 | a builder | `general-purpose` with the builder prompt | `sonnet` | Loads the skill, builds one stage inside the file allowlist it was handed, never commits, never spawns, and files what it finds elsewhere as a follow-up rather than fixing it. Isolation is chosen on the send. |
 | the mechanic | `general-purpose` with the mechanic prompt | `sonnet` | Runs the commands it was given and returns the raw output with exit statuses, nothing summarized. |
@@ -338,6 +341,7 @@ engineering-rules-plugin/
 │           ├── 16-other-routes/         shaping, triage, audit, explore-feature, skill authoring, update log
 │           └── 17-ready-made-specs/     twelve complete DESIGN.md files
 ├── tests/
+│   ├── agent-map.test.sh                run point to agent to model says the same thing in `1.8` and `5.5`
 │   ├── catalog-ids.test.sh              every catalog id, tell id and coarse rule id cited anywhere has a row
 │   ├── design-scout.test.sh             runs the design scout's block against planted AI tells and their allowed forms
 │   ├── explore-feature-page.test.sh     the page template: six markers once, no host at all, no debug artifact, the theme blocks, the cap
@@ -346,6 +350,7 @@ engineering-rules-plugin/
 │   ├── hooks-wiring.test.sh             every wired script exists, every event script is wired, eight events, no hook on Bash
 │   ├── law-scout.test.sh                runs the law scout's block against planted bans and their equivalents
 │   ├── no-control-bytes.test.sh         fails on any raw control byte in a tracked file
+│   ├── planner-writes.test.sh           the Phase 2 planner writes the work-doc, and every file says so in one voice
 │   └── sub-commands.test.sh             the route table and the sub-command skills agree, each with the shape 4.4 promises
 ├── README.md
 └── CHANGELOG.md                         one entry per version, newest first
@@ -362,7 +367,7 @@ every function in its shell files stays under 40 lines; `tests/hook-caps.test.sh
 both and proves it can fail with a planted breach. Section 17's specs are the largest
 files at about 470 lines. If a section ever needs more, it is split, not grown.
 
-Nine checks run against the plugin itself, all on `tests/harness.sh`:
+Ten checks run against the plugin itself, all on `tests/harness.sh`:
 
 - `bash tests/no-control-bytes.test.sh` fails on any raw control byte in a tracked file: a
   `\0`, `\b` or `\e` that lost its backslash on the way in reads fine and runs wrong, which is
@@ -385,6 +390,11 @@ Nine checks run against the plugin itself, all on `tests/harness.sh`:
   model or a fresh type carries none, when a shape a row names has no prompt block in `5.5`,
   or when the runtime table of `5.5` and the map disagree on a type-and-model pair, and
   proves it can fail by planting each.
+- `bash tests/planner-writes.test.sh` fails when the Phase 2 plan goes back to an agent type
+  that cannot write, when the root cause of Phase 3b stops being read-only, when the planner
+  prompt loses the one path it may write or the ban on every other write, when `7.1` loses
+  the read-back that replaced the session's transcription, or when any file still tells the
+  reader that a planner never writes the work-doc, and proves it can fail by planting each.
 - `bash tests/sub-commands.test.sh` fails when a route row of `SKILL.md` has no
   `skills/<route>/SKILL.md`, when a skill directory is neither a route row, the agents
   switch nor a listed standalone skill (`generate-pseudocode`), when a standalone skill

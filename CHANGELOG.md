@@ -2,6 +2,26 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.19.0**: the plan phase's agent writes the work-doc itself. Phase 2 used to send a
+  read-only `Plan` agent, take its plan back as a report and re-type it here; the context that
+  had just run the clarify round was the one writing the plan down, and the agent's fresh eyes
+  reached the page only through it. The planner is now a fresh `general-purpose` agent on
+  `opus` that creates `docs/work/<YYYY-MM-DD>-<slug>.md` from the template (`7.2`) and fills
+  it: the ask, the anchor and the Q&A copied verbatim out of its brief, then the acceptance
+  criteria, the approach with its rejected alternatives and the sprint backlog. It may write
+  that one path and nothing else, it never publishes, and when shaping (`16.1`) already made
+  the file it edits it in place, leaving the frontmatter, the phase ledger and the Shaping
+  Provenance block untouched. The root cause of Phase 3b stays a `Plan` agent on `opus`,
+  read-only by construction, because implementation is open and the tree is full of
+  half-finished work. `7.1` is rebuilt around the change: step 1 sends the planner, step 2 is
+  the read-back that replaces the transcription (one changed path in `git status --porcelain`
+  and it is the work-doc; the template's shape; the ask, anchor and Q&A verbatim; every
+  citation opened; every criterion covered by a task that names its files and its verify line;
+  nothing serving a Non-Goal), step 3 publishes, and the gate follows. The publish, the ledger,
+  the gate and every later edit stay in this session. `1.8`'s map, `5.5`'s shapes table,
+  runtime table and planner prompt, `7.2`, `7.3`, `8.1`, `10.1`, `16.1` and the README all say
+  it in one voice, and `tests/planner-writes.test.sh` (17 checks) fails if any of them drifts
+  back.
 - **2.18.0**: the work-doc becomes a hard gate. In full mode the doc is the only map: the
   phase its ledger shows open is the phase you are in, the task its Sprint Backlog lists next
   is the task you take, a reorder is an edit to the doc with its reason, and every tick is
