@@ -12,7 +12,7 @@ ROOT=$(repo_root) || exit 1
 REF=$ROOT/skills/engineering-rules/references
 SKILL=$ROOT/skills/engineering-rules/SKILL.md
 DELEGATION=$REF/05-working-references/5.5-the-phase-agents-what-this-session-keeps.md
-PLAN=$REF/07-phase-2-plan/7.1-phase-2-plan-and-gate.md
+PLAN=$REF/07-phase-2-plan/7.1-phase-2-plan.md
 
 TICK=$(printf '\140')
 
@@ -52,6 +52,20 @@ test_the_prompt_names_the_one_path_and_bans_the_rest() {
   assert_contains "the prompt bans every other write" 'Write that one path and nothing else' "$prompt"
   assert_contains "the prompt keeps the root-cause send writing nothing" 'you hold no edit tool at all, and you write nothing' "$prompt"
   assert_contains "the prompt leaves the publish with the session" 'the publish is the session' "$prompt"
+  assert_contains "the prompt makes the planner check its own file" 'Check your own file before you return' "$prompt"
+  assert_contains "the self-check covers the plan against itself" 'The plan against itself' "$prompt"
+  assert_contains "the self-check covers ledger and task state" 'Ledger and task state' "$prompt"
+}
+
+test_no_plan_gate_survives() {
+  plan=$(cat "$PLAN")
+  assert_missing "7.1 no longer stops for a sign-off" 'Shall I go ahead' "$plan"
+  assert_contains "7.1 says the plan out loud instead" '## Step 5. Say what you are about to build' "$plan"
+  assert_contains "7.1 states the stop is gone" 'no longer stops for a sign-off' "$plan"
+  found=""
+  for f in "$ROOT"/hooks/*work-doc*; do [ -e "$f" ] && found=$f; done
+  assert_eq "no hook gates an edit against the work-doc" "" "$found"
+  assert_missing "hooks.json wires no work-doc gate" 'work-doc-gate' "$(cat "$ROOT/hooks/hooks.json")"
 }
 
 test_the_read_back_survives() {
@@ -83,7 +97,7 @@ test_planted_breaches_are_named() {
   printf '# 7.1\n\n## Step 1. Send the planner\n\n## Step 2. The gate\n' > "$WORK/7.1.md"
   PLAN=$WORK/7.1.md
   assert_missing "a 7.1 with no read-back is named" '## Step 2. Read what came back' "$(cat "$PLAN")"
-  PLAN=$REF/07-phase-2-plan/7.1-phase-2-plan-and-gate.md
+  PLAN=$REF/07-phase-2-plan/7.1-phase-2-plan.md
 
   mkdir -p "$WORK/skills"
   printf 'the planner: Never writes the work-doc, never asks.\n' > "$WORK/skills/x.md"
@@ -95,5 +109,6 @@ test_the_root_cause_row_stays_read_only
 test_the_prompt_names_the_one_path_and_bans_the_rest
 test_the_read_back_survives
 test_no_file_still_says_the_planner_never_writes
+test_no_plan_gate_survives
 test_planted_breaches_are_named
 report

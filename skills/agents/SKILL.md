@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 The user typed `/engineering-rules:agents`. Phase agents are the default (1.8,
 4.4): every phase runs as the agent and model 1.8's map names, and this session keeps the
-anchor, the ledger, every question, the gate and every claim. This switch turns that off, or
+anchor, the ledger, every question, the ship gate and every claim. This switch turns that off, or
 back on, for the task in flight and for every task that starts in this conversation. It picks
 no route; the routes have sub-commands of their own, and this one combines with any of them.
 

@@ -2,6 +2,34 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.20.0**: both work-doc gates come out, and the planner checks its own file. Full mode no
+  longer stops for a plan sign-off: `7.1` step 5 is now *say what you are about to build*, a
+  statement in chat with the path, the link and what is deliberately not being done, and the
+  work starts on it. What still reaches the user is a real fork, asked as one question the
+  moment it appears: a decision the planner brought back, or a spec-review finding that moves
+  the anchor (`8.1`). `hooks/work-doc-gate.sh` is deleted, unwired and its fixture test with
+  it; nothing at the tool boundary reads the work-doc any more. The doc stays the map the work
+  follows (`1.4`, `7.3`), held by the session keeping it current at every tick and every
+  check-in rather than by a refusal. The ledger's second item, the exit artifact in `5.1`, the
+  template's ledger block and its `### Gate` entry, `0.1`, `4.2`, `4.3`, `4.4`, `6.1`, `6.2`,
+  `5.5`, the `full` sub-command, the README and both manifests all follow; `7.1` is renamed
+  `7.1-phase-2-plan.md`.
+  **The planner now audits what it wrote.** Before it returns, it re-reads the file from disk
+  and fixes what it finds, in three passes: the shape (every template heading present, spelled
+  and ordered the template's way, nothing renumbered), the plan against itself (a criterion no
+  task covers, a task no criterion needs, a task serving a Non-Goal, two tasks writing one
+  file, a stage needing what a later stage builds, a `→ verify:` line that cannot fail, a
+  citation it never opened, an answer from the Q&A contradicted), and ledger and task state
+  (ten items, Phase 2 the only one open, every task unticked and unstarted, `current_task`
+  null, `status: planning`). It reports `doc check: clean` or says what the second pass
+  changed.
+  **And the contradiction that made all this necessary:** `7.1` told the planner to write
+  `Primary Goal & Guardrails` as section 2 and to end at a section 9, while the template in
+  `7.2` leaves that heading unnumbered and ends at 8, so every number after it was one too
+  high and `6.13`, `5.2` and `7.2`'s own conformance list cited the other scheme. `7.1` now
+  carries a table of the template's real headings, the planner prompt names headings instead
+  of counting, and `tests/work-doc-sections.test.sh` compares all three heading by heading, so
+  the law can no longer disagree with itself about its own document.
 - **2.19.0**: the plan phase's agent writes the work-doc itself. Phase 2 used to send a
   read-only `Plan` agent, take its plan back as a report and re-type it here; the context that
   had just run the clarify round was the one writing the plan down, and the agent's fresh eyes

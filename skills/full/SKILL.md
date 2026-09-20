@@ -1,6 +1,6 @@
 ---
 name: full
-description: "Full mode of the engineering-rules law, picked by your word: quick mode plus a written plan you approve first, a spec review and a durable work-doc. Usage: /engineering-rules:full <what you want done>"
+description: "Full mode of the engineering-rules law, picked by your word: quick mode plus a written plan, a spec review and a durable work-doc. Usage: /engineering-rules:full <what you want done>"
 argument-hint: "[what you want done]"
 disable-model-invocation: true
 ---
@@ -27,7 +27,7 @@ In this order, before anything else:
    chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
 4. **Run the task start** (1.7, from step 3): the base commit, the ledger with full mode's
    ten items (5.1), the agent line as 1.8 records it, then 6.1 read from disk. The plan is
-   the gate; nothing is built before the user's go through the wizard tool (7.1).
+   written by the planner, read back here and said in chat; nothing waits on a sign-off (7.1).
 
 Everything after that is the law, unchanged. A sub-command picks the row; it never waives a
 phase, a check or a gate.

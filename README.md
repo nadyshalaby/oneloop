@@ -54,9 +54,9 @@ wins.
 
 ## How a task runs
 
-Every substantive ask goes through the same phases: 1 Clarify, 2 Plan and gate, 2.5 Spec review, 3
+Every substantive ask goes through the same phases: 1 Clarify, 2 Plan, 2.5 Spec review, 3
 Implement (3b Debug when stuck), 4 Verify, 5 Review, 6 Finish. Full mode, the default, adds a
-written plan the user approves first, a spec review and a durable work-doc; quick mode, when the
+written plan, a spec review and a durable work-doc; quick mode, when the
 user names it, drops exactly those and the landing menu, and nothing else: every check, every scout,
 all three verify layers, the five review checks and the ship gate still run. The other routes
 (shaping, walking one execution path, auditing a whole codebase, review triage, authoring a skill,
@@ -83,7 +83,7 @@ implementation stage to a `general-purpose` agent on `sonnet`; the counts, proof
 a `general-purpose` agent on `sonnet`; and the five review checks to a `general-purpose` agent on
 `opus`. `5.5` carries the prompt each shape is sent, pasted whole on every send, with `1.9` and
 `1.10` under it so nothing an agent finds turns into a diff nobody planned. The session keeps the
-anchor, the ledger, every question, the gate, the commits and every claim, and re-runs anything a
+anchor, the ledger, every question, the ship gate, the commits and every claim, and re-runs anything a
 report rests on before it ticks.
 
 ## The sub-commands, the intake and the agent modes
@@ -154,7 +154,6 @@ fails a turn. Nothing here calls a model.
 | Event | Script | What it does |
 |---|---|---|
 | `PreToolUse` on `Edit`, `Write`, `MultiEdit`, `NotebookEdit` | `edit-guard.sh` | Runs the law scout's own block (`9.5`) over the edit and refuses it when it adds a banned token. |
-| `PreToolUse` on `Edit`, `Write`, `MultiEdit`, `NotebookEdit` | `work-doc-gate.sh` | Refuses a code edit while the live work-doc disagrees with it: no phase open, a phase that does not write code, a task taken while an earlier one waits, or a ticked task with nothing written under Daily Updates. Prose is never gated, so the doc itself always stays editable. |
 | `PostToolUse` on the same four | `file-cap.sh` | Tells Claude when the file it just wrote is over 500 lines (`1.1`). |
 | `SessionStart` on `compact` or `resume` | `re-anchor.sh` | Puts the re-read instruction (`1.7`, step 7) and the last ledger position into the new context. |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | One log line per event, a desktop notification on a boundary, a wait or an error. |
@@ -293,7 +292,6 @@ engineering-rules-plugin/
 ├── hooks/
 │   ├── hooks.json                       eight events, live the moment the plugin is installed
 │   ├── edit-guard.sh                    PreToolUse on the edit tools: 9.5's block over the edit
-│   ├── work-doc-gate.sh                 PreToolUse on the edit tools: the live work-doc's phase and task order
 │   ├── file-cap.sh                      PostToolUse on the edit tools: the 500-line cap
 │   ├── re-anchor.sh                     SessionStart after a compaction or a resume
 │   ├── progress-notify.sh               one log line per event, desktop notification on a boundary or a wait
@@ -329,7 +327,7 @@ engineering-rules-plugin/
 │           ├── 04-routes/               how one is picked, quick, full, the sub-commands, the intake, the modes
 │           ├── 05-working-references/   phase ledger, goal anchor, voice, mindset, the phase agents, the check-in
 │           ├── 06-phase-1-clarify/      question contract, six banks, repo brief, coverage map
-│           ├── 07-phase-2-plan/         gate, worktree, work-doc template and rules
+│           ├── 07-phase-2-plan/         the plan, the worktree, the work-doc template and its rules
 │           ├── 08-phase-2-5-spec-review/
 │           ├── 09-phase-3-implement/    stage protocol, checklist, perf and law scouts
 │           ├── 10-phase-3b-debug/
@@ -351,7 +349,8 @@ engineering-rules-plugin/
 │   ├── law-scout.test.sh                runs the law scout's block against planted bans and their equivalents
 │   ├── no-control-bytes.test.sh         fails on any raw control byte in a tracked file
 │   ├── planner-writes.test.sh           the Phase 2 planner writes the work-doc, and every file says so in one voice
-│   └── sub-commands.test.sh             the route table and the sub-command skills agree, each with the shape 4.4 promises
+│   ├── sub-commands.test.sh             the route table and the sub-command skills agree, each with the shape 4.4 promises
+│   └── work-doc-sections.test.sh        7.1, 5.5 and the template in 7.2 agree on the doc's headings
 ├── README.md
 └── CHANGELOG.md                         one entry per version, newest first
 ```
@@ -367,7 +366,7 @@ every function in its shell files stays under 40 lines; `tests/hook-caps.test.sh
 both and proves it can fail with a planted breach. Section 17's specs are the largest
 files at about 470 lines. If a section ever needs more, it is split, not grown.
 
-Ten checks run against the plugin itself, all on `tests/harness.sh`:
+Eleven checks run against the plugin itself, all on `tests/harness.sh`:
 
 - `bash tests/no-control-bytes.test.sh` fails on any raw control byte in a tracked file: a
   `\0`, `\b` or `\e` that lost its backslash on the way in reads fine and runs wrong, which is
@@ -393,8 +392,15 @@ Ten checks run against the plugin itself, all on `tests/harness.sh`:
 - `bash tests/planner-writes.test.sh` fails when the Phase 2 plan goes back to an agent type
   that cannot write, when the root cause of Phase 3b stops being read-only, when the planner
   prompt loses the one path it may write or the ban on every other write, when `7.1` loses
-  the read-back that replaced the session's transcription, or when any file still tells the
-  reader that a planner never writes the work-doc, and proves it can fail by planting each.
+  the read-back that replaced the session's transcription, when the plan phase grows a stop
+  for a sign-off again or a hook starts gating edits against the work-doc, or when any file
+  still tells the reader that a planner never writes the work-doc, and proves it can fail by
+  planting each.
+- `bash tests/work-doc-sections.test.sh` fails when `7.1`'s table of headings or the planner
+  prompt's shape pass in `5.5` drifts from the template in `7.2`, heading by heading and in
+  order: it is the check that was missing when `7.1` numbered `Primary Goal & Guardrails` as
+  section 2 and ended at a section 9 the template never had. It proves it can fail by
+  renumbering a heading, dropping one and hiding one from the prompt.
 - `bash tests/sub-commands.test.sh` fails when a route row of `SKILL.md` has no
   `skills/<route>/SKILL.md`, when a skill directory is neither a route row, the agents
   switch nor a listed standalone skill (`generate-pseudocode`), when a standalone skill
@@ -410,14 +416,11 @@ Ten checks run against the plugin itself, all on `tests/harness.sh`:
 
 `bash hooks/tests/<name>.test.sh` covers each hook script with fixtures: the edit guard's nine
 rules, the law's exemptions, the test-file rows, the grew-versus-kept decision and the
-missing-law path; the file cap; the work-doc gate (a doc that agrees lets the edit through, no
-live doc and prose are never gated, a phase that does not write code, a task taken while an
-earlier one waits, parallel tasks at the front allowed, a tick with nothing written, a ledger
-that says nothing, two live docs); the re-anchor on compact and resume; the notifier's five
+missing-law path; the file cap; the re-anchor on compact and resume; the notifier's five
 events; the status line's two rows, its context and usage percentages and its compaction count
 (appends, a quoted marker, a half-written line, a replaced transcript, a broken cursor file).
 Every one of them can be pointed at a mutated copy of its script through an environment
-variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `WORK_DOC_GATE_SH`, `RE_ANCHOR_SH`,
+variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `RE_ANCHOR_SH`,
 `PROGRESS_NOTIFY_SH`, `STATUSLINE_SH`; `HOOKS_JSON`, `CAP_DIR`, `SKILLS_DIR`, `SKILL_MD`,
 `DELEGATION_MD` and `ASSETS_DIR` for the repo checks), so a run that watches the failure is one
 line.
