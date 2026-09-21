@@ -2,8 +2,9 @@
 # Guard: every hook hooks.json runs is a script that exists beside it, every command reaches
 # it through CLAUDE_PLUGIN_ROOT, every hook script that reads Claude Code's event input
 # is wired to an event (the status line is wired from settings.json, by design, so it does
-# not read events), and no hook reaches the Bash tool: 2.6.0 took the git guard out, so the
-# shell is not judged at the tool boundary. Run: bash tests/hooks-wiring.test.sh
+# not read events), no hook reaches the Bash tool: 2.6.0 took the git guard out, so the
+# shell is not judged at the tool boundary, and the prompt hook carries no matcher, because
+# UserPromptSubmit takes none. Run: bash tests/hooks-wiring.test.sh
 # HOOKS_JSON points the test at another manifest, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -48,9 +49,16 @@ test_no_hook_reaches_bash() {
   assert_contains "no hook reaches Bash" "<none>" "${reaching:-<none>}"
 }
 
-test_the_eight_events_are_wired() {
+test_the_nine_events_are_wired() {
   events=$(jq -r '.hooks | keys[]' "$HOOKS_JSON" | sort | tr '\n' ' ')
-  assert_contains "the eight events" "Notification PostToolUse PreToolUse SessionStart Stop StopFailure SubagentStart SubagentStop " "$events"
+  assert_contains "the nine events" "Notification PostToolUse PreToolUse SessionStart Stop StopFailure SubagentStart SubagentStop UserPromptSubmit " "$events"
+}
+
+# UserPromptSubmit takes no matcher and fires on every prompt, so a matcher written there is
+# ignored by the runtime and misleads the next reader.
+test_the_prompt_hook_carries_no_matcher() {
+  stray=$(jq -r '.hooks.UserPromptSubmit[] | select(has("matcher")) | .matcher' "$HOOKS_JSON")
+  assert_contains "the prompt hook carries no matcher" "<none>" "${stray:-<none>}"
 }
 
 # The checks have to be able to fail: a missing script, an unwired script and a hook on Bash
@@ -71,6 +79,7 @@ test_every_wired_script_exists
 test_every_event_script_is_wired
 test_every_command_goes_through_the_plugin_root
 test_no_hook_reaches_bash
-test_the_eight_events_are_wired
+test_the_nine_events_are_wired
+test_the_prompt_hook_carries_no_matcher
 test_planted_breaches_are_named
 report

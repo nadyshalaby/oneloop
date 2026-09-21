@@ -99,6 +99,7 @@ question switches the conversation to agentless: every phase then runs here, not
 | **Agentless mode** | The opt-out mode: every phase agent's work runs in this session for the whole task and nothing is sent to the agent tool. Switched on by `/engineering-rules:agents off`, by the user's own words in the message that starts the task, or through the intake (4.4), and it holds for the conversation until they switch back. Recorded once, on the agent line (1.8). |
 | **Follow-up** | Anything true, useful and outside the main goal: a pre-existing defect, a law break in a file you happened to open, a missing test, a smell, a better idea. Written down with its `file:line` the moment it is seen, fixed in a task of its own, never in this one (1.9). |
 | **The notification tool** | The runtime's push-notification tool: `PushNotification` on Claude Code. One line to the desktop and, with Remote Control, the phone. |
+| **The advisor tool** | The runtime's second-opinion tool: `advisor` on Claude Code, a model the user chose, at least as capable as the one running, which takes no input, reads the whole conversation and returns guidance. It is in the tool list only where the user set one and the runtime accepts the pairing, in this session and in each agent separately, so its absence is a fact about that context, never an error (1.4, 5.7). |
 | **The ledger substrate** | The runtime's todo tracker when it exposes one; otherwise the printed block. Named once at the first print. On Claude Code the tracker is the `Task` family (`TaskCreate`, `TaskList`, `TaskUpdate`, `TaskGet`), which arrives deferred and is loaded once at task start before the first call; there is no `TodoWrite` (5.1). |
 | **Exit artifact** | The concrete thing that must exist before a ledger item may tick. One per phase, listed in section 5.1. |
 
@@ -208,6 +209,7 @@ Twelve guardrails, distilled from the canonical performance catalog (section 3.1
 - **Phases run in order, one open at a time.** No later phase starts while an earlier one is open. This is the refuse-to-advance law and the whole point of the ledger.
 - **No phase is ever silently skipped.** A phase that genuinely does not apply is ticked complete with a one-line reason. Never deleted, never dropped in silence, in any mode.
 - **Every question goes through the wizard tool.** Any question, decision, approval or request for feedback put to the user, in every phase: a fork the plan leaves open, fix approvals, the finish menu, a mid-task fork. A plain numbered list in chat is forbidden. The recommended option is first and carries ` (Recommended)`.
+- **Every decision goes past the advisor tool, whenever the tool list holds one.** Before an approach or a plan is committed to, before a recommendation is put to the user, before acting on a review or a root cause, before a change of direction, before anything hard to undo, and before verified or done is said: state the decision, the options and the evidence in a line or two, call the advisor, then decide. The test is the tool list, never the model this session or an agent runs on. Its answer is a report, never proof (1.5): the user's words, the anchor, this law and fresh evidence outrank it, and a clash is said in one line. No advisor tool is never an error: say so once, on the line that names the substrate, and decide alone with the same care. On Claude Code this plugin's advisor cue hook puts this rule into every prompt, so it binds a session that never loaded this skill; it judges nothing and refuses nothing, because the tool list belongs to the session. The run points, the record that rides the tick and the line the deciding agents carry are 5.7.
 - **A tick with no reflection is an untrusted tick, and a deferred write is no tick at all.** One line saying what changed and whether it passed, then flip the item, then open the next, in one saved edit. There is no later. In full mode the work-doc edit comes before the chat re-print; in Phase 3 the checkbox and the Daily Updates entry land together as each task closes; at the close, the one edit that writes `status: done` is followed immediately by the archive move. **In full mode the work-doc is the map and nothing overrides it:** the phase it shows open is the phase you are in, the task it lists next is the task you take, and a task is reordered by editing the doc first, with the reason written down. Nothing at the tool boundary enforces this; it holds because you hold it (7.3).
 - **Every tick also goes out through the notification tool.** At every phase boundary and every stage end, right after the re-print, send the ledger heading and the one-line reflection as one line under 200 characters. The user may be away from the terminal, and this is the one step that reaches them there. The runtime drops the line when they are watching, which is never an error; a runtime with no notification tool says so once and carries on.
 - **A check-in every ten minutes, not only at the boundaries.** Bring the work-doc up to date, print the three-line brief (doing, done, todo) in plain words, run the drift check (1.9), then carry on; a check-in never ends the work, and when work will keep running after your turn ends you start the recurring one before you stop. The protocol is 5.6.
@@ -256,7 +258,7 @@ _Adapted from Andrej Karpathy's observations on the recurring failure modes of l
 1. Classify the ask against Definitions: trivial, read-only or substantive. Say which in one line. A trivial ask ends here after the answer or the one-line edit.
 2. Pick the route from the table below. State it and the mode in one line: *"Full mode."* or *"Quick mode, because you asked for it."*, then *"Agents on, the default."*, or *"Agents off, because you asked for it."* with the cost line 4.4 names when the user switched the default off.
 3. Record the base commit: `git rev-parse HEAD`. Every touched-scope command in the task uses it.
-4. Open the ledger with the items section 5.1 lists for the mode. Name the substrate once, and on the same line record agent availability (1.8).
+4. Open the ledger with the items section 5.1 lists for the mode. Name the substrate once, and on the same line record agent availability (1.8) and whether the tool list holds an advisor (1.4, 5.7).
 5. Read the Phase 1 reference (6.1) from disk, then follow it. Every phase begins by reading its own reference file; nothing runs from memory.
 6. Detect the rules in play: the project's `CLAUDE.md`, `AGENTS.md` and documented layout, plus the user-global `CLAUDE.md`. Apply Precedence.
 
@@ -300,6 +302,7 @@ Law self-audit
 16. The goal delivered and verified, every other finding filed as a follow-up, none silently fixed (1.9)? yes / no
 17. Where this task deployed anything, the six proof rows and the live verify (1.11) are pasted? yes / no
 18. Every file read whole where it was changed, every number counted this session, no claim resting on "should" (1.10)? yes / no
+19. Every advisor run point (5.7) consulted where the tool list held one, or recorded as none, and no verdict written for a call never made? yes / no
 ```
 
 **Never say.** "Should work", "looks good", "I believe this is fine", "tests should pass", "I'll add tests later", "probably", "you're absolutely right" before verifying, "done" before the ledger says so. Say what you ran and what it returned.
@@ -421,8 +424,6 @@ is.
 - **"Should" is not evidence.** *"Should work"*, *"looks right"*, *"probably fine"* and *"tests should pass"* are banned (1.7). Say what you ran and what it printed.
 - **Every detail the user gave is a requirement.** A number, a name, a format, an order or an example in their message is part of the goal, not colour. Meet it exactly, or say plainly which one you did not meet and why.
 
-
-
 ### 1.11 [rule] Shipping in small verified releases, and the proof before a deploy
 
 **Ship in small, stable, verified pieces.** A piece that works and is proven lands as soon as it is
@@ -484,7 +485,7 @@ Every section is a file in `references/`. The number is the section id; "section
 | **2** | Doctrine: code quality (2.1), file and folder law (2.2) | Before writing code, and before creating any file or folder. |
 | **3** | Catalogs: performance (3.1), security (3.2), test scenarios (3.3), clean code (3.4) | Look up an ID or a fix direction; never read end to end. |
 | **4** | Routes: how one is picked (4.1), quick mode (4.2), full mode (4.3), the sub-commands, the intake and the agent modes (4.4) | At task start; 4.4 the moment the skill is invoked bare, a sub-command loads it, or the user switches the agents off or on. |
-| **5** | Working references: the ledger (5.1), the goal anchor (5.2), voice (5.3), full mindset (5.4), the phase agents (5.5), the check-in (5.6) | 5.1, 5.2 and 5.6 at task start; 5.3 governs every chat line; 5.4 at Phase 1; 5.5 before the first send, and again after a compaction. |
+| **5** | Working references: the ledger (5.1), the goal anchor (5.2), voice (5.3), full mindset (5.4), the phase agents (5.5), the check-in (5.6), the advisor (5.7) | 5.1, 5.2, 5.6 and 5.7 at task start; 5.3 governs every chat line; 5.4 at Phase 1; 5.5 before the first send, and again after a compaction. |
 | **6** | Phase 1, Clarify: the phase (6.1), the question contract (6.2), the banks (6.3–6.11), domain mechanisms (6.12), the repo brief (6.13), investigating code (6.14), the coverage map (6.15) | When a task opens. |
 | **7** | Phase 2, Plan: the phase (7.1), the work-doc template (7.2), work-doc rules (7.3) | Full mode, when writing the plan. |
 | **8** | Phase 2.5, Spec review (8.1, 8.2) | Full mode, after the plan is written. |

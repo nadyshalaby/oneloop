@@ -2,6 +2,41 @@
 
 One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
 
+- **2.21.0**: a second opinion at every decision. Claude Code's `advisor` tool is a model the
+  user pairs with the one that is running, at least as capable, which reads the whole
+  conversation and answers with guidance; until now nothing in this law mentioned it, so a
+  session that had one consulted it whenever it felt like it. `1.4` now carries the rule, a
+  bullet beside the wizard tool's: before an approach or a plan is committed to, before the
+  options put to the user are ranked, before a review or a root cause is acted on, before a
+  change of direction, before anything hard to undo, and before anything is called done, the
+  decision, the options and the evidence are stated and the advisor is called. **The test is
+  the tool list, never the model.** The strongest model gets a second opinion exactly as the
+  smallest one does, because the pairing is the user's decision and a context that wants its
+  own plan to be right is the same context whichever model runs it.
+  **What comes back is a report, never proof** (`1.5`). The user's words, the anchor, this law
+  and fresh evidence all outrank it, a clash is said in one line rather than followed, and it
+  never stands in for the reviewer or the spec reviewer, which are sent precisely because they
+  have not read this conversation. It never answers a question that is the user's, and it never
+  settles a fact one command would settle (`1.10`).
+  **A session with no advisor loses the call, not the step.** The decision is still stated with
+  its options and its evidence; the ledger line records `Advisor: none in this session`, and a
+  verdict written for a call that was not made is a false tick under `1.5`.
+  The new `5.7` carries the protocol: nine run points keyed to the phase files, the four moments
+  that bind on every route and outside any phase, how the call is set up (the tool takes no
+  input, so what is on the page before it is the question), what the answer is worth, the
+  `advisor:` verdict that rides each tick and the reflection in `5.1`, and eight
+  anti-rationalizations. `6.1`, `7.1`, `8.1`, `9.1`, `10.1`, `11.1`, `12.1` and `13.1` each
+  carry their run point; the four prompts in `5.5` whose shape decides something, the planner,
+  the spec reviewer, the reviewer and the builder, carry the same sentence word for word, and
+  the mechanic and the reader, which decide nothing, carry none. `1.7`'s self-audit grows a
+  nineteenth row.
+  **And the rule reaches a session that never loads the skill.** `hooks/advisor-cue.sh` is wired
+  to `UserPromptSubmit`, the event that fires on every prompt and takes no matcher, and prints
+  the rule in short into the turn. It judges nothing and refuses nothing: a hook cannot see a
+  tool list, so it can neither know whether an advisor is there nor tell a decision from a
+  greeting, and a refusal built on that guess would block work. `tests/advisor-wiring.test.sh`
+  holds all of it in place, both ways, and `tests/hooks-wiring.test.sh` now expects nine events
+  and no matcher on the prompt hook.
 - **2.20.0**: both work-doc gates come out, and the planner checks its own file. Full mode no
   longer stops for a plan sign-off: `7.1` step 5 is now *say what you are about to build*, a
   statement in chat with the path, the link and what is deliberately not being done, and the

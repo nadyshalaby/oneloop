@@ -32,7 +32,12 @@ a labelled percentage like the usage. Version 2.17.0 turns every phase into an a
 model, `sonnet` where the phase writes code or runs commands and `opus` where it plans, judges or
 decides, and makes that the default; it adds three always-on laws, one goal with everything else
 filed as a follow-up, quick-never-lazy-never-approximate, and shipping in small verified releases
-with a six-row proof before any deploy, plus a ten-minute check-in.
+with a six-row proof before any deploy, plus a ten-minute check-in. Version 2.21.0 adds a
+second opinion at every decision: where the session's tool list holds an advisor, it is
+consulted before an approach is committed to, before a recommendation is ranked for the
+user, before a review or a root cause is acted on, before a change of direction, before
+anything hard to undo and before anything is called done, and a `UserPromptSubmit` hook
+carries that rule into every prompt, including the ones that never load the skill.
 
 ## What loads when
 
@@ -42,8 +47,8 @@ with a six-row proof before any deploy, plus a ten-minute check-in.
 | 2 | `SKILL.md`: definitions, precedence, the always-on law (`1.1` to `1.11`), the route table, the group map | Loads when the skill triggers, 500 lines |
 | 2 | `skills/<name>/SKILL.md`: the ten sub-commands, nine routes and the agents switch, about 35 lines each | Only when the user types one; the model cannot invoke them, so they cost it nothing |
 | 2 | `skills/generate-pseudocode/SKILL.md`: the standalone pseudocode skill, with its page kit and check script beside it | Its description is always in context, about 100 words; the body loads when it triggers or the user types it, about 360 lines |
-| 3 | `references/**`: all 126 sections, one file each | Only when a phase names one |
-| hooks | `hooks/hooks.json`: eight events, four guard and anchor scripts plus the notifier | Live from install, no prompt cost; up to half a second per edit of a code file |
+| 3 | `references/**`: all 127 sections, one file each | Only when a phase names one |
+| hooks | `hooks/hooks.json`: nine events, five guard, cue and anchor scripts plus the notifier | Live from install; the advisor cue costs one short block per prompt, the rest nothing, and up to half a second per edit of a code file |
 
 The eleven always-on sections live in `SKILL.md` because they bind from the moment the skill
 loads, and a reference you have to go fetch is a reference you might not fetch. The files
@@ -72,6 +77,15 @@ behind it. Every stage sweeps its own leftovers both ways before it commits, rem
 already in the files it touched in a commit of its own, and shows the search behind every new symbol
 (`1.1`, `9.1`). Anything else it finds along the way is a follow-up with a `file:line`, never an
 unasked-for edit (`1.9`), and the user gets the list at the finish.
+
+**Every decision goes past the advisor first** (`1.4`, `5.7`), whenever the session's tool list
+holds one, whatever model is running: the clarify batch and its recommended options, the plan,
+the spec review's findings, a change of direction, a root cause, the Evidence Ledger, the
+decision table, the landing and the filled self-audit. The decision, the options and the
+evidence are stated first, then the call is made; what comes back is a report, never proof,
+and the user, the anchor, the law and fresh evidence all outrank it. A session whose tool list
+holds no advisor says so once on the ledger line and decides with the same care; nothing is
+skipped and no verdict is ever written for a call that was not made.
 
 **Each phase runs as an agent, and that is the default** (`1.8`). The map is one row per run point,
 and the model is part of the row: the question batch and the scouts go to a `fork`, which runs on
@@ -155,6 +169,7 @@ fails a turn. Nothing here calls a model.
 |---|---|---|
 | `PreToolUse` on `Edit`, `Write`, `MultiEdit`, `NotebookEdit` | `edit-guard.sh` | Runs the law scout's own block (`9.5`) over the edit and refuses it when it adds a banned token. |
 | `PostToolUse` on the same four | `file-cap.sh` | Tells Claude when the file it just wrote is over 500 lines (`1.1`). |
+| `UserPromptSubmit`, every prompt | `advisor-cue.sh` | Puts the advisor rule (`1.4`, `5.7`) into the turn: consult it before an approach, a recommendation, a change of direction, anything hard to undo or a claim of done. It judges nothing and refuses nothing. |
 | `SessionStart` on `compact` or `resume` | `re-anchor.sh` | Puts the re-read instruction (`1.7`, step 7) and the last ledger position into the new context. |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | One log line per event, a desktop notification on a boundary, a wait or an error. |
 
@@ -259,7 +274,7 @@ Every hook fires inside an agent too, so a builder is under the same guards as t
 
 ## The evals
 
-`evals/` holds six cases in the plugin-eval shape (`prompt.md` plus graders): `git-safety`
+`evals/` holds seven cases in the plugin-eval shape (`prompt.md` plus graders): `git-safety`
 (a prompt that invites a destructive git command; the run must refuse and name the law),
 `ledger-opens` (a small code task; the skill must fire, the ledger must be printed, every
 question must go through the wizard tool, no banned token may land), `route-picker` (the
@@ -267,9 +282,11 @@ bare slash invocation; the intake must open through the wizard tool and nothing 
 `sub-command-full` (`/engineering-rules:full` with a task; full mode by the user's word, a
 ten-item ledger, no route menu), `agents-default` (`/engineering-rules:quick` with a task;
 each phase goes to its agent with its model named, while the ledger, the scout dispositions
-and every tick stay in the conversation) and `agentless-switch`
+and every tick stay in the conversation) `agentless-switch`
 (`/engineering-rules:agents off` first; the Agent tool is then never called while the ledger,
-the scouts and the review still run).
+the scouts and the review still run) and `advisor-consulted` (a quick-mode task; the ledger
+line records the advisor either way, the cue reaches the turn, every decision is stated
+before the call, and no verdict is written for a call that was not made).
 The runner,
 `claude plugin eval`, is in early access at the time of writing; until it runs here, the cases
 are the written statement of what the plugin promises, and the headless boots below are the
@@ -290,9 +307,10 @@ engineering-rules-plugin/
 │   ├── agents-default/
 │   └── agentless-switch/
 ├── hooks/
-│   ├── hooks.json                       eight events, live the moment the plugin is installed
+│   ├── hooks.json                       nine events, live the moment the plugin is installed
 │   ├── edit-guard.sh                    PreToolUse on the edit tools: 9.5's block over the edit
 │   ├── file-cap.sh                      PostToolUse on the edit tools: the 500-line cap
+│   ├── advisor-cue.sh                   UserPromptSubmit, the advisor rule in every turn
 │   ├── re-anchor.sh                     SessionStart after a compaction or a resume
 │   ├── progress-notify.sh               one log line per event, desktop notification on a boundary or a wait
 │   ├── statusline.sh                    two-row status line (ledger, usage, compactions), opt-in by one settings line
@@ -325,7 +343,7 @@ engineering-rules-plugin/
 │           ├── 02-doctrine/             code quality, file and folder law
 │           ├── 03-catalogs/             performance, security, test scenarios, clean code
 │           ├── 04-routes/               how one is picked, quick, full, the sub-commands, the intake, the modes
-│           ├── 05-working-references/   phase ledger, goal anchor, voice, mindset, the phase agents, the check-in
+│           ├── 05-working-references/   phase ledger, goal anchor, voice, mindset, the phase agents, the check-in, the advisor
 │           ├── 06-phase-1-clarify/      question contract, six banks, repo brief, coverage map
 │           ├── 07-phase-2-plan/         the plan, the worktree, the work-doc template and its rules
 │           ├── 08-phase-2-5-spec-review/
@@ -345,7 +363,7 @@ engineering-rules-plugin/
 │   ├── explore-feature-page.test.sh     the page template: six markers once, no host at all, no debug artifact, the theme blocks, the cap
 │   ├── harness.sh                       shared by every test: repo root, scratch dir, the three assertions
 │   ├── hook-caps.test.sh                every shell file under 500 lines, every function under 40
-│   ├── hooks-wiring.test.sh             every wired script exists, every event script is wired, eight events, no hook on Bash
+│   ├── hooks-wiring.test.sh             every wired script exists, every event script is wired, nine events, no hook on Bash, no matcher on the prompt hook
 │   ├── law-scout.test.sh                runs the law scout's block against planted bans and their equivalents
 │   ├── no-control-bytes.test.sh         fails on any raw control byte in a tracked file
 │   ├── planner-writes.test.sh           the Phase 2 planner writes the work-doc, and every file says so in one voice
@@ -366,7 +384,7 @@ every function in its shell files stays under 40 lines; `tests/hook-caps.test.sh
 both and proves it can fail with a planted breach. Section 17's specs are the largest
 files at about 470 lines. If a section ever needs more, it is split, not grown.
 
-Eleven checks run against the plugin itself, all on `tests/harness.sh`:
+Twelve checks run against the plugin itself, all on `tests/harness.sh`:
 
 - `bash tests/no-control-bytes.test.sh` fails on any raw control byte in a tracked file: a
   `\0`, `\b` or `\e` that lost its backslash on the way in reads fine and runs wrong, which is
@@ -381,7 +399,7 @@ Eleven checks run against the plugin itself, all on `tests/harness.sh`:
   in `16.4`, and proves it can fail by planting one of each.
 - `bash tests/hooks-wiring.test.sh` fails when `hooks.json` names a script that is not there,
   when a script that reads an event is not wired, when a command does not go through
-  `CLAUDE_PLUGIN_ROOT`, when one of the eight events is missing, or when a hook reaches the
+  `CLAUDE_PLUGIN_ROOT`, when one of the nine events is missing, or when a hook reaches the
   `Bash` tool.
 - `bash tests/hook-caps.test.sh` is the size cap above.
 - `bash tests/agent-map.test.sh` fails when the map of run point to agent to model in `1.8`
@@ -389,6 +407,13 @@ Eleven checks run against the plugin itself, all on `tests/harness.sh`:
   model or a fresh type carries none, when a shape a row names has no prompt block in `5.5`,
   or when the runtime table of `5.5` and the map disagree on a type-and-model pair, and
   proves it can fail by planting each.
+- `bash tests/advisor-wiring.test.sh` fails when the law stops defining the advisor tool,
+  carrying the always-on bullet of `1.4` or asking about it in the self-audit; when `5.7` is
+  gone from the section table or stops keying on the tool list rather than on a model; when a
+  section a run point names does not cite `5.7` back, or a phase file cites it with no row in
+  the table; when one of the four deciding prompts in `5.5` loses the advisor line or the
+  reader or the mechanic grows one; when `5.1` stops recording it; or when the cue leaves
+  `UserPromptSubmit` or starts refusing something. It proves it can fail by planting each.
 - `bash tests/planner-writes.test.sh` fails when the Phase 2 plan goes back to an agent type
   that cannot write, when the root cause of Phase 3b stops being read-only, when the planner
   prompt loses the one path it may write or the ban on every other write, when `7.1` loses
@@ -416,13 +441,13 @@ Eleven checks run against the plugin itself, all on `tests/harness.sh`:
 
 `bash hooks/tests/<name>.test.sh` covers each hook script with fixtures: the edit guard's nine
 rules, the law's exemptions, the test-file rows, the grew-versus-kept decision and the
-missing-law path; the file cap; the re-anchor on compact and resume; the notifier's five
-events; the status line's two rows, its context and usage percentages and its compaction count
+missing-law path; the file cap; the advisor cue on a prompt, a one-word prompt, another
+event and unreadable input; the re-anchor on compact and resume; the notifier's five events; the status line's two rows, its context and usage percentages and its compaction count
 (appends, a quoted marker, a half-written line, a replaced transcript, a broken cursor file).
 Every one of them can be pointed at a mutated copy of its script through an environment
-variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `RE_ANCHOR_SH`,
+variable (`EDIT_GUARD_SH`, `FILE_CAP_SH`, `ADVISOR_CUE_SH`, `RE_ANCHOR_SH`,
 `PROGRESS_NOTIFY_SH`, `STATUSLINE_SH`; `HOOKS_JSON`, `CAP_DIR`, `SKILLS_DIR`, `SKILL_MD`,
-`DELEGATION_MD` and `ASSETS_DIR` for the repo checks), so a run that watches the failure is one
+`DELEGATION_MD`, `REFS_DIR` and `ASSETS_DIR` for the repo checks), so a run that watches the failure is one
 line.
 `bash skills/explore-feature/scripts/tests/<name>.test.sh` covers the three explore-feature
 scripts on fixtures: `verify-trace` (the sample trace passes; one mutation per check is
