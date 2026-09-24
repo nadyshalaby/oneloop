@@ -8,8 +8,9 @@
 # already true at the base, and a project ban list named by a relative path. It checks: new hits
 # are introduced in full and old ones summarised once with a count, a copy of an old line is
 # introduced, uncommitted work is scanned, a whole-file row is judged against the base file, the
-# design scout runs only when the touched scope has a UI file, a clean change finds nothing, and
-# the usage errors exit 2 with a one-line message.
+# design scout runs only when the touched scope has a UI file, a clean change finds nothing, every
+# scout proves itself on its planted hit first and one that misses stops the run, and the usage
+# errors exit 2 with a one-line message.
 # Run: bash tests/scout.test.sh
 # SCOUT_SH points the test at another copy of scripts/scout.sh, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
@@ -95,7 +96,7 @@ test_ui_file_triggers_the_design_scout() {
 
 test_no_ui_file_skips_design_and_a_clean_change_finds_nothing() {
   out=$(run_scout base3 base4)
-  assert_missing "the design scout did not run" "design" "$out"
+  assert_missing "the design scout did not run on the change" "ran: perf law design" "$out"
   tally=$(printf '%s\n' "$out" | grep '^scout:')
   assert_eq "a clean change introduces nothing" 'scout: 0 introduced, 0 present at base in 0 files; ran: perf law' "$tally"
   assert_contains "exit 0 when nothing is introduced" "exit=0" "$out"
@@ -156,6 +157,34 @@ test_a_moved_path_line_stops_the_run() {
   assert_contains "and exits 2" "exit=2" "$out"
 }
 
+test_the_self_check_leads_the_output() {
+  out=$(run_scout base3 base4)
+  assert_eq "the first line is the self-check" 'self-check: perf ok, law ok, design ok' "$(printf '%s\n' "$out" | head -n 1)"
+}
+
+# broken_home <name> <doc> <sed program>: a home with the three scout docs, <doc> (a path under
+# references/) edited by the sed program, as $WORK/<name>.
+broken_home() {
+  for d in 09-phase-3-implement/9.4-the-perf-scout.md 09-phase-3-implement/9.5-the-law-scout.md 15-design/15.29-the-design-scout.md; do
+    mkdir -p "$WORK/$1/references/${d%/*}"
+    cp "$ROOT/references/$d" "$WORK/$1/references/$d"
+  done
+  sed "$3" "$ROOT/references/$2" > "$WORK/$1/references/$2"
+}
+
+# A scout whose doc lost the row for its plant would report a clean change; the run stops instead.
+test_a_scout_that_misses_its_plant_stops_the_run() {
+  broken_home noperf 09-phase-3-implement/9.4-the-perf-scout.md '/perf\.memory\.json-deep-clone/d'
+  broken_home nolaw 09-phase-3-implement/9.5-the-law-scout.md "s/$TOK|//"
+  broken_home nodesign 15-design/15.29-the-design-scout.md '/tag tell\.layout\.h-screen$/d'
+  for pair in noperf=perf.memory.json-deep-clone nolaw=ban.suppression nodesign=tell.layout.h-screen; do
+    home=${pair%%=*} id=${pair#*=}
+    out=$(cd "$WORK/repo" && ENGINEERING_RULES_HOME="$WORK/$home" "$BASH" "$SCOUT" base1 2>&1; printf 'exit=%s\n' "$?")
+    assert_contains "a scout that misses its plant is named ($home)" "missed its planted $id" "$out"
+    assert_contains "and exits 2 ($home)" "exit=2" "$out"
+  done
+}
+
 build_fixture || { printf 'FAIL could not build the fixture repo\n'; exit 1; }
 build_uncommitted_fixture || { printf 'FAIL could not build the uncommitted fixture repo\n'; exit 1; }
 test_introduced_named_present_at_base_summarised
@@ -165,4 +194,6 @@ test_a_copy_of_an_old_line_is_introduced
 test_uncommitted_work_is_scanned_and_judged_against_the_base
 test_usage_errors_exit_2
 test_a_moved_path_line_stops_the_run
+test_the_self_check_leads_the_output
+test_a_scout_that_misses_its_plant_stops_the_run
 report

@@ -8,6 +8,10 @@
 # block, runs all three the same way and classifies their output; it never repeats a pattern,
 # and the design gate is assembled from 15.29's own block.
 #
+# Before it reads the change, every scout is run over planted files holding one hit each must
+# report (perf's JSON round-trip clone, law's suppression comment, design's h-screen); a scout
+# that misses its plant stops the run, so a broken scout can never pass for a clean change.
+#
 # The change is the working tree against the base, committed or not: every file that differs from
 # the base (a deleted one has nothing to read) and every untracked file git does not ignore,
 # docs/work/ left out of both. Each block's own path line is swapped whole for that list, and a
@@ -27,15 +31,16 @@
 #   $ENGINEERING_RULES_HOME, else this script's own parent directory. A relative
 #   PROJECT_BAN_PATTERNS is read from the directory the script was started in.
 #
-# Output: every introduced row in full (rule id, file:line, text), then every present-at-base
+# Output: `self-check: perf ok, law ok, design ok`, then every introduced row in full (rule id,
+#   file:line, text), then every present-at-base
 #   rule summarised to one line per file with a count, then the coverage lines the scouts printed
 #   over the change, then one closing line:
 #     scout: <n> introduced, <m> present at base in <k> files; ran: perf law[ design]
 #
 # Exit: 0 no row is introduced, 1 at least one row is introduced, 2 a usage error (no base, the
 #   base is not a commit, the working directory is not inside a git repository, or a scout's
-#   block could not be extracted, its path line swapped or 9.4's tables turned into commands),
-#   with a one-line message on stderr.
+#   block could not be extracted, its path line swapped or 9.4's tables turned into commands, or
+#   a scout missed its planted hit), with a one-line message on stderr.
 set -u
 umask 077
 
@@ -125,6 +130,24 @@ design_touches_ui() {
 [ -n "$(in_paths $UI $STYLE | head -c 1)" ]
 EOF
   SCOUT_PATHS="$touched" "$BASH" "$gate"
+}
+
+# self_check: all three scouts over one planted file each, each scout required to report the hit
+# planted for it; the suppression token is built in pieces, so this file never carries it.
+self_check() {
+  dir="$WORK/self"
+  mkdir -p "$dir"
+  printf 'const copy = JSON.parse(JSON.stringify(input))\n' > "$dir/perf.ts"
+  printf '// @ts-%s\nconst a = 1\n' ignore > "$dir/law.ts"
+  printf 'export const Hero = () => <div className="h-screen">hi</div>\n' > "$dir/design.tsx"
+  printf '%s\0' perf.ts law.ts design.tsx > "$dir.list"
+  for pair in perf=perf.memory.json-deep-clone law=ban.suppression design=tell.layout.h-screen; do
+    label=${pair%%=*} id=${pair#*=}
+    (cd "$dir" && SCOUT_LIST="$dir.list" SCOUT_PATHS="$dir-$label.paths" "$BASH" "$WORK/$label-block.sh") > "$dir-$label.out" 2>&1
+    awk -v id="$id " 'index($0, id) == 1 { found = 1 } END { exit !found }' "$dir-$label.out" \
+      || usage_error "self-check: the $label scout missed its planted $id"
+  done
+  printf 'self-check: perf ok, law ok, design ok\n'
 }
 
 # run_scouts <dir> <list> <out>: every scout in $ran, run from <dir> over the paths in <list>,
@@ -249,6 +272,7 @@ print_tally() {
 materialize_block "$LAW_DOC" law
 materialize_block "$DESIGN_DOC" design
 "$BASH" "$SCRIPTS/perf-scout.sh" "$PERF_DOC" > "$WORK/perf-block.sh" || exit 2
+self_check
 touched="$WORK/touched"
 build_touched "$touched"
 ran='perf law'
