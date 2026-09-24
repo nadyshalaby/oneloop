@@ -2,6 +2,22 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **4.0.0**: logic first, and `demystify` replaces `generate-pseudocode`. The user: "before start
+  working on a new task. to explain in short the business logic that will be implemented ...
+  (law, hard gate, mandatory)", in the shape "SHORT, pseudocode representation, plain words
+  explaination ... the main implementation idea, what effect it will add to the code, if
+  there're risks", and "the new skill replaces the plugin:pseudocode skill entirely since they
+  both fix the same problem". The core law's 1.4 gains a hard gate: before changing anything for
+  a new substantive task, explain it short (the problem, what you'd build in pseudocode, its
+  effect, the risks; no tests, reviews or specs) and get a yes through `AskUserQuestion`; nothing
+  changes before it, a changed logic asks again, a helper builds only confirmed logic, and only
+  the user can skip it, for one task. The new `engineering-rules:demystify` skill, which the
+  model can invoke, carries that shape with a neutral example, and a second mode explains
+  existing code the same way. `/engineering-rules:generate-pseudocode` is removed with its page
+  kit, worked example and scripts; the published full-page walkthrough, every helper expanded
+  with `file:line` notes, goes with it (ask `demystify` for more depth instead), which makes this
+  a major version. Six new pins hold the gate's wording. Core law 69 to 70 lines and 9,130 to
+  9,546 characters; code rules unchanged at 48 lines and 6,813.
 - **3.0.0**: no plugin. The law now binds every session from the user-global `CLAUDE.md`, with
   nothing to call. The always-on law is two short files. `law/engineering-law.md`, the core
   (definitions, precedence, the caps and bans in one line, 1.2, 1.4, 1.5, 1.7 to 1.11; capped

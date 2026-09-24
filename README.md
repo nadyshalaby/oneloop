@@ -24,7 +24,7 @@ the code rules. The first short law, one file, measured 6,756.)
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, copied to `~/.claude/rules/` | the first time a session or a helper reads a file its `paths:` globs match (the common code extensions); capped at 60 lines and 7,500 characters |
 | The phase workflow | `skills/engineering-rules/SKILL.md` | only when you call it by name or through a route |
 | The routes and the switch | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
-| `generate-pseudocode`, `update-engineering-rules` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
+| `demystify`, `update-engineering-rules` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
 | 127 reference sections, the long forms included | `references/**` | only when a rule or a phase names one |
 | Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short block per prompt |
 
@@ -106,7 +106,7 @@ you and your work on its own bug.
 | `/engineering-rules:full`, `:quick` | full mode (every check, a written plan, a spec review, a work-doc) or quick mode (every check, less ceremony) |
 | `/engineering-rules:shape`, `:explore-feature`, `:audit`, `:triage`, `:skill`, `:design`, `:log` | shaping an idea, tracing one feature onto a page, a whole-codebase audit, review triage, skill authoring, a design spec, the update log |
 | `/engineering-rules:agents` | switches the phase agents off for the conversation, and back on |
-| `/engineering-rules:generate-pseudocode` | one page of complete pseudocode for a code flow |
+| `/engineering-rules:demystify` | explains logic short and plain (the problem, pseudocode, the effect, the risks): before a new task, as the law's logic-first gate, or when you ask how code works |
 | `/update-engineering-rules` | changes these rules and ships the change |
 
 ## Tests

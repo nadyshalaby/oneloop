@@ -41,6 +41,12 @@ did not reach
 `AskUserQuestion`
 `(Recommended)`
 most effective fix
+the `demystify` skill
+get a yes through `AskUserQuestion`
+Nothing changes before that yes
+a changed logic asks again
+a helper builds only logic the user confirmed
+only the user can skip it, for one task
 `advisor`
 never by a number
 # one goal, pace, principles

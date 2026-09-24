@@ -15,7 +15,7 @@ SKILLS="${SKILLS_DIR:-$ROOT/skills}"
 MAIN_SKILL=engineering-rules
 SWITCH=agents
 # Skills that ship beside the law and trigger on their own description, space-separated.
-STANDALONE="generate-pseudocode update-engineering-rules"
+STANDALONE="demystify update-engineering-rules"
 OWN_NAME=update-engineering-rules
 REFS="$ROOT/references"
 LINE_CAP=500

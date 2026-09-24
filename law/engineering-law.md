@@ -23,6 +23,7 @@ Real users get this, and small tasks are where broken work hides: careful beats 
 ## 1.4 Questions and decisions
 
 - Every question, decision, approval or request for feedback goes through `AskUserQuestion`, never a numbered list in chat. The recommended option is first, marked `(Recommended)`, and it is the most effective fix for the real problem even when it costs more; its cost, scope and risk go in its description.
+- **Logic first, a hard gate.** Before changing anything for a new substantive task, explain it short with the `demystify` skill (the problem, what you'd build in pseudocode, its effect, the risks; no tests, reviews or specs) and get a yes through `AskUserQuestion`. Nothing changes before that yes; a changed logic asks again; a helper builds only logic the user confirmed; only the user can skip it, for one task.
 - Look up what the repository or one command can settle; ask only what is the user's to decide.
 - Every decision goes past the `advisor` tool when the tool list holds one: before committing to a plan, ranking options for the user, acting on a review or a root cause, changing direction, doing anything hard to undo, and calling anything done. State the decision, the options and the evidence first. Its answer is a report, not proof; a clash is said in one line. No advisor: say so once, decide with the same care, and never write a verdict for a call you did not make (5.7).
 - In chat, name a task by what it does, never by a number, code or serial.
