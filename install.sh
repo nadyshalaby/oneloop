@@ -3,6 +3,7 @@
 #   ~/.claude/engineering-rules   a link to this repository, unless it IS this repository
 #   ~/.claude/skills/<name>       one link per skill, named by its `name:` line, so every
 #                                 /engineering-rules:<route> command keeps its name
+#   ~/.claude/agents/<name>.md    one link per helper agent in agents/
 #   ~/.claude/CLAUDE.md           one managed block that imports law/engineering-law.md
 #   ~/.claude/rules/engineering-code.md
 #                                 a copy of law/engineering-code.md, never a link, because
@@ -25,6 +26,7 @@ REPO=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 CFG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 ER_HOME="$CFG/engineering-rules"
 SKILLS_DIR="$CFG/skills"
+AGENTS_DIR="$CFG/agents"
 CLAUDE_MD="$CFG/CLAUDE.md"
 RULES_DIR="$CFG/rules"
 RULES_FILE="$RULES_DIR/engineering-code.md"
@@ -105,6 +107,10 @@ conflicts() {
     link="$SKILLS_DIR/$(skill_name "$skill")"
     if { [ -e "$link" ] || [ -L "$link" ]; } && ! ours "$link"; then printf '%s\n' "$link"; fi
   done
+  for agent in "$REPO"/agents/*.md; do
+    link="$AGENTS_DIR/${agent##*/}"
+    if { [ -e "$link" ] || [ -L "$link" ]; } && ! ours "$link"; then printf '%s\n' "$link"; fi
+  done
   if { [ -e "$RULES_FILE" ] || [ -L "$RULES_FILE" ]; } && ! ours "$RULES_FILE" && ! managed_rules "$RULES_FILE"; then
     printf '%s (not a copy this installer wrote)\n' "$RULES_FILE"
   fi
@@ -125,14 +131,15 @@ $found"
 record_state() {
   [ -f "$STATE" ] && return 0
   mkdir -p "$BACKUPS"
-  had_md=false had_json=false had_rules=false src=/dev/null
+  had_md=false had_json=false had_rules=false had_agents=false src=/dev/null
   [ -e "$CLAUDE_MD" ] && had_md=true
   [ -d "$RULES_DIR" ] && had_rules=true
+  [ -d "$AGENTS_DIR" ] && had_agents=true
   [ -e "$SETTINGS" ] && { had_json=true; src=$SETTINGS; }
-  jq -n --slurpfile s "$src" --arg key "$PLUGIN_KEY" --argjson md "$had_md" --argjson js "$had_json" --argjson rd "$had_rules" '
+  jq -n --slurpfile s "$src" --arg key "$PLUGIN_KEY" --argjson md "$had_md" --argjson js "$had_json" --argjson rd "$had_rules" --argjson ad "$had_agents" '
     ($s[0] // {}) as $o | ($o.enabledPlugins // {}) as $p
     | {statusLine: ($o.statusLine // null), plugin: (if $p | has($key) then $p[$key] else null end),
-       hadHooks: ($o | has("hooks")), hadSettings: $js, hadClaudeMd: $md, hadRulesDir: $rd}' > "$STATE"
+       hadHooks: ($o | has("hooks")), hadSettings: $js, hadClaudeMd: $md, hadRulesDir: $rd, hadAgentsDir: $ad}' > "$STATE"
 }
 
 # backup: a copy of every file the run may change, before it changes any, in a folder of its
@@ -151,7 +158,16 @@ link_home() {
   ln -s "$REPO" "$ER_HOME" && say "linked $ER_HOME -> $REPO"
 }
 
-# link_skills: one link per skill, then the links a renamed or removed skill left behind go.
+# drop_stale <dir> <names>: this setup's links in the folder whose name is not among the
+# newline-separated names go, as a renamed or removed skill or agent leaves them behind.
+drop_stale() {
+  for link in "$1"/*; do
+    ours "$link" || continue
+    printf '%s' "$2" | grep -qxF "${link##*/}" || { rm "$link" && say "removed stale link $link"; }
+  done
+}
+
+# link_skills: one link per skill, named by its `name:` line, then the stale ones go.
 link_skills() {
   mkdir -p "$SKILLS_DIR"
   wanted=""
@@ -162,11 +178,22 @@ link_skills() {
     wanted="$wanted$name
 "
   done
-  for link in "$SKILLS_DIR"/*; do
-    ours "$link" || continue
-    printf '%s' "$wanted" | grep -qxF "${link##*/}" || { rm "$link" && say "removed stale link $link"; }
-  done
+  drop_stale "$SKILLS_DIR" "$wanted"
   say "linked $(printf '%s' "$wanted" | grep -c .) skills into $SKILLS_DIR"
+}
+
+# link_agents: one link per helper agent, under its file name, then the stale ones go. A
+# linked agent file loads, unlike a linked rules file.
+link_agents() {
+  mkdir -p "$AGENTS_DIR"
+  wanted=""
+  for agent in "$REPO"/agents/*.md; do
+    ln -sfn "$ER_HOME/agents/${agent##*/}" "$AGENTS_DIR/${agent##*/}"
+    wanted="$wanted${agent##*/}
+"
+  done
+  drop_stale "$AGENTS_DIR" "$wanted"
+  say "linked $(printf '%s' "$wanted" | grep -c .) agents into $AGENTS_DIR"
 }
 
 # copy_rules: the code rules copied into the rules folder, over a link of this setup's that an
@@ -264,6 +291,7 @@ install() {
   [ -e "$SETTINGS" ] || printf '{}\n' > "$SETTINGS"
   link_home
   link_skills
+  link_agents
   write_block
   copy_rules
   write_json merged && say "merged the hooks and the status line into $SETTINGS; the plugin is off"
@@ -272,11 +300,19 @@ install() {
 }
 
 # forget_created: a file or folder the first install created and the uninstall left empty goes
-# again. A record from before the rules folder existed says nothing of it, so it stays.
+# again.
 forget_created() {
   if [ "$(jq -r '.hadClaudeMd' "$STATE")" = false ] && [ -f "$CLAUDE_MD" ] && [ ! -s "$CLAUDE_MD" ]; then rm -f "$CLAUDE_MD"; fi
   if [ "$(jq -r '.hadSettings' "$STATE")" = false ] && [ "$(jq -c . "$SETTINGS" 2>/dev/null)" = '{}' ]; then rm -f "$SETTINGS"; fi
-  if [ "$(jq -r 'if has("hadRulesDir") then .hadRulesDir else true end' "$STATE")" = false ] && [ -d "$RULES_DIR" ] && [ -z "$(find "$RULES_DIR" -mindepth 1 -maxdepth 1)" ]; then rmdir "$RULES_DIR"; fi
+  forget_dir hadRulesDir "$RULES_DIR"
+  forget_dir hadAgentsDir "$AGENTS_DIR"
+}
+
+# forget_dir <state key> <dir>: the folder goes when the first install made it and it is empty.
+# A record from before the key existed says nothing of the folder, so it stays.
+forget_dir() {
+  made=$(jq -r --arg k "$1" 'if has($k) then (.[$k] | not) else false end' "$STATE")
+  if [ "$made" = true ] && [ -d "$2" ] && [ -z "$(find "$2" -mindepth 1 -maxdepth 1)" ]; then rmdir "$2"; fi
 }
 
 uninstall() {
@@ -287,10 +323,10 @@ uninstall() {
   drop_block
   write_json unmerged && say "took the hooks out of $SETTINGS and put back what the install replaced"
   if managed_rules "$RULES_FILE"; then rm "$RULES_FILE" && say "removed $RULES_FILE"; fi
-  forget_created
-  for link in "$SKILLS_DIR"/*; do
+  for link in "$SKILLS_DIR"/* "$AGENTS_DIR"/*; do
     if ours "$link"; then rm "$link"; fi
   done
+  forget_created
   if [ -L "$ER_HOME" ] && leads_here "$ER_HOME"; then rm "$ER_HOME" && say "removed the link $ER_HOME"; fi
   rm -f "$STATE"
   say "uninstalled; the repository itself is untouched"
@@ -314,6 +350,10 @@ check() {
   for skill in "$REPO"/skills/*/SKILL.md; do
     link="$SKILLS_DIR/$(skill_name "$skill")"
     ours "$link" && [ -f "$link/SKILL.md" ] || { say "missing: the skill link $link"; missing=1; }
+  done
+  for agent in "$REPO"/agents/*.md; do
+    link="$AGENTS_DIR/${agent##*/}"
+    ours "$link" && [ -f "$link" ] || { say "missing: the agent link $link"; missing=1; }
   done
   want=$(jq '[.hooks[][] | .hooks[]] | length' "$REPO/settings/hooks.json")
   have=$(jq --arg mark "$HOOK_MARK" '[(.hooks // {})[][] | .hooks[]? | select((.command // "") | contains($mark))] | length' "$SETTINGS" 2>/dev/null)

@@ -67,4 +67,4 @@ Ship small, stable, verified pieces, each as soon as it is proven, behind its ow
 
 ## Where the details are
 
-2.1 code quality, 2.2 file placement, 3.1 to 3.4 the performance, security, test-scenario and clean-code catalogs (look up an id), 5.7 the advisor, 9.5 the banned-token scanner, 14.1 worked anti-patterns, 15.x the frontend design law (UI work), 16.3 the codebase audit. Routes: `/engineering-rules:full`, `:quick`, `:shape`, `:explore-feature`, `:audit`, `:triage`, `:skill`, `:design`, `:log`, `:agents`.
+2.1 code quality, 2.2 file placement, 3.1 to 3.4 the performance, security, test-scenario and clean-code catalogs (look up an id), 5.7 the advisor, 9.5 the banned-token scanner, 14.1 worked anti-patterns, 15.x the frontend design law (UI work), 16.3 the codebase audit. Routes: `/engineering-rules:do` (the default: plan, implement, verify and deploy), `:shape`, `:explore-feature`, `:audit`, `:triage`, `:skill`, `:design`, `:log`; `:agents` is the helper switch.

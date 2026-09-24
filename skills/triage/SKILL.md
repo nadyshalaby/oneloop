@@ -12,22 +12,14 @@ batch of review findings becomes one decision per finding.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-In this order, before anything else:
-
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
-   the first code file read.) It binds this session
-   in full from that moment. Its intake does not fire; the route is already picked (4.4).
+   the first code file read.)
 2. **Read the findings.** They are the whole invocation or, when it is empty, the batch
    pasted most recently in this conversation; when there is neither, ask for them through
-   the wizard tool (4.4), one question, and nothing else.
-3. **Say the route and the mode in one line** (1.7, step 2): *"Review triage."*, then
-   *"Agents on, the default."*, unless they were switched off by
-   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
-   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
-4. **Read 16.2 from disk and run it.** The always-on law binds throughout; a finding accepted
-   for a fix is a task, and it starts under 1.7 when the user says go.
+   `AskUserQuestion`, one question, and nothing else.
+3. **Read 16.2 from disk and run it.** A finding accepted for a fix runs as
+   `/engineering-rules:do` when the user says go.
 
-Everything after that is the law, unchanged. A sub-command picks the row; it never waives a
-phase, a check or a gate.
+A sub-command picks the route; it waives no check, and the law binds throughout.

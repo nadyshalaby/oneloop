@@ -49,6 +49,21 @@ linked_skills() {
   printf '%s' "$n"
 }
 
+# linked_agents <config dir>: how many agent links lead to a real file.
+linked_agents() {
+  n=0
+  for link in "$1"/agents/*.md; do
+    if [ -L "$link" ] && [ -f "$link" ]; then n=$((n + 1)); fi
+  done
+  printf '%s' "$n"
+}
+
+# agent_total: how many helper agents the repository ships.
+agent_total() {
+  set -- "$ROOT"/agents/*.md
+  printf '%s' "$#"
+}
+
 # skill_total: how many skills the repository ships.
 skill_total() {
   set -- "$ROOT"/skills/*/SKILL.md
@@ -70,7 +85,7 @@ plain_copy() {
 snapshot() {
   cksum < "$1/CLAUDE.md"; cksum < "$1/settings.json"; cksum < "$1/backups/engineering-rules/state.json"
   cksum < "$1/rules/engineering-code.md"
-  for link in "$1"/skills/*; do printf '%s -> %s\n' "${link##*/}" "$(readlink "$link")"; done
+  for link in "$1"/skills/* "$1"/agents/*; do printf '%s -> %s\n' "${link##*/}" "$(readlink "$link")"; done
 }
 
 test_first_install_wires_every_piece() {
@@ -81,6 +96,7 @@ test_first_install_wires_every_piece() {
   assert_contains "and checks itself wired" "engineering-rules: installed and wired" "$out"
   assert_eq "the home leads to the repository" "$ROOT" "$(cd -P "$cfg/engineering-rules" && pwd)"
   assert_eq "every skill is linked under its name" "$(skill_total)" "$(linked_skills "$cfg")"
+  assert_eq "every helper agent is linked under its file name" "$(agent_total)" "$(linked_agents "$cfg")"
   assert_contains "CLAUDE.md imports the short law" "@~/.claude/engineering-rules/law/engineering-law.md" "$(cat "$cfg/CLAUDE.md")"
   assert_eq "below the user's own lines" "# My rules" "$(head -n 1 "$cfg/CLAUDE.md")"
   assert_eq "the code rules are a plain copy in the rules folder" "yes" "$(plain_copy "$cfg/rules/engineering-code.md")"
@@ -106,6 +122,7 @@ test_uninstall_puts_back_what_it_replaced() {
   assert_eq "CLAUDE.md is back byte for byte" "$(cksum < "$WORK/first.md")" "$(cksum < "$cfg/CLAUDE.md")"
   assert_eq "settings.json is back byte for byte" "$(cksum < "$WORK/first.settings")" "$(cksum < "$cfg/settings.json")"
   assert_eq "no skill link is left" "0" "$(linked_skills "$cfg")"
+  assert_eq "no agent link, and not the agents folder the install made" "0 no" "$(linked_agents "$cfg") $(exists "$cfg/agents")"
   assert_eq "the home link is gone" "no" "$(exists "$cfg/engineering-rules")"
   assert_eq "the code rules and the rules folder the install made are gone" "no" "$(exists "$cfg/rules")"
   assert_eq "the backups stay" "yes" "$(exists "$cfg/backups/engineering-rules")"
@@ -124,14 +141,19 @@ test_compact_json_comes_back_as_the_same_json() {
 
 test_what_is_not_ours_is_refused_with_nothing_changed() {
   home=$(fresh_home conflict); seed "$home"; cfg="$home/.claude"
-  mkdir -p "$cfg/skills/engineering-rules:quick"
+  mkdir -p "$cfg/skills/engineering-rules:do"
   before="$(cksum < "$cfg/settings.json")$(cksum < "$cfg/CLAUDE.md")"
   out=$(run_install "$home")
   assert_contains "a skill folder that is not ours is refused" "exit=1" "$out"
-  assert_contains "and named" "skills/engineering-rules:quick" "$out"
+  assert_contains "and named" "skills/engineering-rules:do" "$out"
   assert_eq "settings.json and CLAUDE.md are untouched" "$before" "$(cksum < "$cfg/settings.json")$(cksum < "$cfg/CLAUDE.md")"
   assert_eq "nothing is linked and no record written" "no no" "$(exists "$cfg/engineering-rules") $(exists "$cfg/backups/engineering-rules/state.json")"
-  rmdir "$cfg/skills/engineering-rules:quick"
+  rmdir "$cfg/skills/engineering-rules:do"
+  mkdir -p "$cfg/agents"; rm -f "$cfg/agents/er-reviewer.md"; printf 'mine\n' > "$cfg/agents/er-reviewer.md"
+  out=$(run_install "$home")
+  assert_contains "an agent file that is not ours is refused" "exit=1" "$out"
+  assert_contains "and named" "agents/er-reviewer.md" "$out"
+  rm -r "$cfg/agents"
   printf '<!-- engineering-rules:begin (half)\nno end marker\n' >> "$cfg/CLAUDE.md"
   assert_contains "a block missing its end marker is refused" "missing or doubled marker" "$(run_install "$home")"
   seed "$home"; printf '{ broken' > "$cfg/settings.json"
@@ -173,10 +195,12 @@ test_stale_links_go_and_check_names_a_missing_one() {
   mkdir -p "$cfg/skills"; ln -s "$cfg/engineering-rules/skills/gone" "$cfg/skills/engineering-rules:gone"
   run_install "$home" > /dev/null
   assert_eq "a link a removed skill left behind is cleared" "no" "$(exists "$cfg/skills/engineering-rules:gone")"
-  rm "$cfg/skills/engineering-rules:quick"
+  rm "$cfg/skills/engineering-rules:do"
   out=$(run_install "$home" --check)
   assert_contains "--check fails on a missing skill link" "exit=1" "$out"
-  assert_contains "and names it" "missing: the skill link $cfg/skills/engineering-rules:quick" "$out"
+  assert_contains "and names it" "missing: the skill link $cfg/skills/engineering-rules:do" "$out"
+  rm "$cfg/agents/er-reader.md"
+  assert_contains "--check names a missing agent link" "missing: the agent link $cfg/agents/er-reader.md" "$(run_install "$home" --check)"
 }
 
 # The rules folder may hold the user's own rules: they stay through the install and the
@@ -194,7 +218,7 @@ test_the_code_rules_live_beside_the_users_own() {
   rm "$cfg/rules/engineering-code.md"; ln -s "$ROOT/law/engineering-code.md" "$cfg/rules/engineering-code.md"
   assert_contains "a link of this setup's is taken over" "exit=0" "$(run_install "$home")"
   assert_eq "by a plain copy" "yes" "$(plain_copy "$cfg/rules/engineering-code.md")"
-  printf 'edited by hand\n' >> "$cfg/rules/engineering-code.md"
+  if [ ! -L "$cfg/rules/engineering-code.md" ]; then printf 'edited by hand\n' >> "$cfg/rules/engineering-code.md"; fi
   out=$(run_install "$home" --check)
   assert_contains "--check fails on a copy edited by hand" "exit=1" "$out"
   assert_contains "and names it stale" "stale: $cfg/rules/engineering-code.md" "$out"

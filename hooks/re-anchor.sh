@@ -4,9 +4,10 @@
 # law is not the law (1.7, step 7): after context loss the always-on law is read again from
 # disk before anything else. This hook prints that instruction into the new context with the
 # path to read, names the code rules to read before writing code (they load with a code
-# read, and the loss may have taken them), and adds the last phase-ledger position it finds
-# in the transcript, so the ledger re-opens on the right item (5.1, pause and resume). Plain
-# text on stdout is context for a SessionStart hook. Any other start reason, or input that
+# read, and the loss may have taken them), adds the last phase-ledger position it finds in the
+# transcript, so the ledger re-opens on the right item, and names every in-flight work-doc of
+# the project with its status and next step, so the task resumes where it stopped. Plain text
+# on stdout is context for a SessionStart hook. Any other start reason, or input that
 # cannot be read, prints nothing and exits 0.
 set -u
 umask 077
@@ -33,6 +34,20 @@ last_position() {
   tail -c "$SCAN_BYTES" "$transcript" 2>/dev/null | claude_text | read_ledger_position
 }
 
+# front <file> <key>: the frontmatter value of the key, empty when absent.
+front() { sed -n '2,/^---$/p' "$1" | sed -n -E "s/^$2: *//p" | head -n 1; }
+
+# in_flight <project dir>: one line per work-doc under docs/work/ (done/ left out) whose status
+# is not done.
+in_flight() {
+  [ -n "$1" ] && [ -d "$1/docs/work" ] || return 0
+  for doc in "$1"/docs/work/*.md; do
+    [ -f "$doc" ] && [ "$(front "$doc" status)" != "done" ] || continue
+    printf 'In-flight work-doc: %s (status: %s; next: %s). After the re-read, resume at its next step.\n' \
+      "$doc" "$(front "$doc" status)" "$(front "$doc" next)"
+  done
+}
+
 read_hook_input || exit 0
 [ "$(hook_field '.hook_event_name // empty')" = SessionStart ] || exit 0
 reason=$(hook_field '.how_started // .source // empty')
@@ -51,5 +66,6 @@ if [ -n "$position" ]; then
 else
   printf 'No phase-ledger position was found in the transcript. If a task was in flight, re-open its ledger from the last print you can see.\n'
 fi
+in_flight "$cwd"
 append_log "${cwd##*/}" "anchor | $reason | ${position:-no ledger position}"
 exit 0

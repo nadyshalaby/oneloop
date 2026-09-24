@@ -65,6 +65,31 @@ test_quoted_headings_are_not_positions() {
   assert_missing "a cut-short one is not" "(6 of 6, Phase 6)" "$out"
 }
 
+# The workflow's own heading format, quoted with letters for the counts, is no position; a
+# three-phase heading is.
+test_a_placeholder_is_no_position() {
+  reply_line '## 0. Phase ledger  (N of 3, <Phase>)' > "$T"
+  out=$(start compact "$T")
+  assert_contains "a placeholder heading is no position" "No phase-ledger position was found in the transcript" "$out"
+  { reply_line '## 0. Phase ledger  (2 of 3, Implement)'; reply_line '## 0. Phase ledger  (N of 3, <Phase>)'; } > "$T"
+  out=$(start compact "$T")
+  assert_contains "a three-phase heading is read" "Last phase-ledger position printed before the loss: (2 of 3, Implement)" "$out"
+}
+
+# A work-doc still in flight is named with its status and next step; one marked done, and the
+# archive under done/, are not.
+test_an_in_flight_work_doc_is_named() {
+  proj="$WORK/proj"; mkdir -p "$proj/docs/work/done"
+  printf -- '---\nstatus: implement\nbase: abc\nnext: task 2, the parser\n---\n# x\n' > "$proj/docs/work/2026-09-24-parser.md"
+  printf -- '---\nstatus: done\nnext: none\n---\n# y\n' > "$proj/docs/work/2026-09-20-old.md"
+  printf -- '---\nstatus: implement\nnext: archived\n---\n# z\n' > "$proj/docs/work/done/2026-09-01-archived.md"
+  reply_line 'nothing' > "$T"
+  out=$(jq -cn --arg t "$T" --arg d "$proj" '{hook_event_name:"SessionStart",how_started:"compact",cwd:$d,transcript_path:$t}' | bash "$SCRIPT")
+  assert_contains "the in-flight work-doc is named with its next step" "In-flight work-doc: $proj/docs/work/2026-09-24-parser.md (status: implement; next: task 2, the parser)" "$out"
+  assert_missing "a done one is not" "2026-09-20-old.md" "$out"
+  assert_missing "nor the archive" "archived" "$out"
+}
+
 test_other_starts_and_bad_input_print_nothing() {
   assert_eq "a fresh start prints nothing" "" "$(start startup "$T")"
   assert_eq "a cleared session prints nothing" "" "$(start clear "$T")"
@@ -85,6 +110,8 @@ test_source_field_and_the_home_variable() {
 test_compact_carries_the_last_position
 test_resume_without_a_position
 test_quoted_headings_are_not_positions
+test_a_placeholder_is_no_position
+test_an_in_flight_work_doc_is_named
 test_other_starts_and_bad_input_print_nothing
 test_source_field_and_the_home_variable
 report

@@ -13,26 +13,17 @@ as one page the user can click through.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-In this order, before anything else:
-
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
-   the first code file read.) It binds this session
-   in full from that moment. Its intake does not fire; the route is already picked (4.4).
+   the first code file read.)
 2. **Read the entry point.** It is the whole invocation. When it is empty, ask for it
-   through the wizard tool (4.4), one question; 16.9 stops on an ambiguous entry point
-   anyway, so it is settled before anything is read.
-3. **Say the route and the mode in one line** (1.7, step 2): *"Explore feature."*, then
-   *"Agents on, the default."*, unless they were switched off by
-   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
-   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
-4. **Read 16.9 from disk and run it**, with 16.10 and 16.11 as it names them. The page
+   through `AskUserQuestion`, one question; 16.9 stops on an ambiguous entry point anyway,
+   so it is settled before anything is read.
+3. **Read 16.9 from disk and run it**, with 16.10 and 16.11 as it names them. The page
    template, the three scripts it runs and the capture's loaders live beside this file,
-   under `assets/`, `scripts/` and `capture/`. The always-on law binds throughout, the
-   wizard tool for every question included. The route edits nothing in the explored
+   under `assets/`, `scripts/` and `capture/`. The route edits nothing in the explored
    repository, so no ledger opens unless the user turns a finding into a task, which then
-   starts under 1.7.
+   runs as `/engineering-rules:do`.
 
-Everything after that is the law, unchanged. A sub-command picks the row; it never waives a
-phase, a check or a gate.
+A sub-command picks the route; it waives no check, and the law binds throughout.

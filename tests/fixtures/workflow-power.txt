@@ -1,0 +1,76 @@
+# Every row of the old workflow's own checklists, and where the lite workflow keeps it. Read by
+# tests/workflow-power.test.sh. One row per line: <old row> :: <kept|merged> :: <file> :: <text>.
+# The text is a fixed string the file must carry, matched with its line breaks and indentation
+# folded into single spaces. A row may not be dropped here: a check the lite flow no longer runs
+# is a loosening, which needs the user's words and a CHANGELOG line, not a quiet edit.
+# the old law self-audit, nineteen rows
+audit 1, every phase ticked with its exit, skips reasoned :: kept :: skills/engineering-rules/SKILL.md :: Phases ticked with their exit, skips reasoned
+audit 2, every question through the question tool :: kept :: skills/engineering-rules/SKILL.md :: questions only through AskUserQuestion
+audit 3, every scout run, every row disposed :: kept :: skills/engineering-rules/SKILL.md :: The scout run after every task, every row disposed
+audit 4, an evidence row per task and per acceptance bullet :: kept :: skills/engineering-rules/SKILL.md :: A fresh Evidence row per task and per Done-when check
+audit 5, the three ship-gate rows :: kept :: skills/engineering-rules/SKILL.md :: ship-gate rows present
+audit 6, a coverage row per touched path, decision table empty :: kept :: skills/engineering-rules/SKILL.md :: a row per touched path, every finding challenged and decided
+audit 7, zero banned tokens, cap breaks, inline types :: kept :: skills/engineering-rules/SKILL.md :: Zero banned tokens, cap breaks or inline types in the touched scope
+audit 8, every new file placed per 2.2 :: kept :: skills/engineering-rules/SKILL.md :: files per 2.2
+audit 9, no discarding git command, no AI attribution :: kept :: skills/engineering-rules/SKILL.md :: No git command that discards work; explicit staging; no AI attribution
+audit 10, every update-log claim has a proof row :: kept :: skills/engineering-rules/SKILL.md :: the proof behind every claim
+audit 11, agent availability recorded once :: merged :: skills/engineering-rules/SKILL.md :: `Helpers: on | off by user | unavailable. Advisor: yes | no.`
+audit 12, every agent result re-run before its tick :: kept :: skills/engineering-rules/SKILL.md :: Helper results re-run before their ticks
+audit 13, own leftovers swept, nothing found fixed, reuse search shown :: kept :: skills/engineering-rules/SKILL.md :: Own leftovers swept, reuse searches shown
+audit 14, a coverage map with no holes :: merged :: skills/engineering-rules/SKILL.md :: None left open.
+audit 14, the intent confirmed (Q0) :: merged :: skills/engineering-rules/SKILL.md :: When the ask reads two ways, the first question confirms which
+audit 15, every phase on its agent and model :: merged :: skills/engineering-rules/SKILL.md :: Three custom agents, each with its own model and turn cap
+audit 16, the goal delivered, every other finding filed :: kept :: skills/engineering-rules/SKILL.md :: Nothing found on the way fixed; every follow-up filed with its file:line
+audit 17, the six deploy proofs and the live verify :: kept :: skills/engineering-rules/SKILL.md :: Where anything deployed, the six proofs and the live check pasted
+audit 18, files read whole, numbers counted :: kept :: skills/engineering-rules/SKILL.md :: files read whole, numbers counted
+audit 19, every advisor run point consulted :: kept :: skills/engineering-rules/SKILL.md :: the advisor at plan, review, direction, done
+# the old exit artifacts (5.1), one per phase
+exit clarify, the goal restated and the repo read :: merged :: skills/engineering-rules/SKILL.md :: Restate the goal in one line: who it is for, what changes, what is left out
+exit plan, the work-doc written and said in chat :: kept :: skills/engineering-rules/SKILL.md :: the work-doc with Goal, Done when and Plan, said in chat in two lines
+exit spec review, the plan checked before any code :: merged :: skills/engineering-rules/SKILL.md :: Then the advisor checks the plan.
+exit implement, every task ticked, scouted and committed :: kept :: skills/engineering-rules/SKILL.md :: every Plan box ticked with a fresh proof line, the scout clean or every row disposed, every task committed
+exit debug, root cause, then regression test, then fix :: kept :: skills/engineering-rules/SKILL.md :: confirm the root cause from evidence (10.1), then a regression test, then the fix
+exit verify, proof per task and check, what was not reached :: kept :: skills/engineering-rules/SKILL.md :: One Evidence row each, output pasted, and one line on what the checks did not reach
+exit verify, the design pre-flight on UI work :: kept :: skills/engineering-rules/SKILL.md :: on UI-bearing work the design pre-flight (15.30)
+exit review, one review and one fix pass, re-verified :: kept :: skills/engineering-rules/SKILL.md :: One review, one fix pass
+exit land, the landing chosen by the user :: kept :: skills/engineering-rules/SKILL.md :: when there is a choice (merge, a pull request, keep the branch), ask through `AskUserQuestion`
+exit sweep, one line per class, zero included :: kept :: skills/engineering-rules/SKILL.md :: one line each with its count, zero included
+exit archive, status done then the move :: kept :: skills/engineering-rules/SKILL.md :: Write `status: done`, then at once `git mv` the work-doc into `docs/work/done/`
+exit close, the self-audit and the update log :: kept :: skills/engineering-rules/SKILL.md :: print the self-audit below; any `no` reopens the phase that owns it
+# the cleanup sweep's thirteen classes (13.2)
+sweep 1, debug output :: kept :: skills/engineering-rules/SKILL.md :: zero included: debug output
+sweep 2, commented-out code :: kept :: skills/engineering-rules/SKILL.md :: commented-out code and `removed:` markers
+sweep 3, ownerless markers :: kept :: skills/engineering-rules/SKILL.md :: ownerless TODOs
+sweep 4, dead code both ways :: kept :: skills/engineering-rules/SKILL.md :: dead code both ways
+sweep 5, unused imports, dependencies, env vars :: kept :: skills/engineering-rules/SKILL.md :: unused imports, dependencies and env vars
+sweep 6, scratch files and empty dirs :: kept :: skills/engineering-rules/SKILL.md :: scratch files and empty dirs
+sweep 7, placeholders and stubs :: kept :: skills/engineering-rules/SKILL.md :: placeholders and stubs
+sweep 8, unrelated changes :: kept :: skills/engineering-rules/SKILL.md :: changes outside the plan's files
+sweep 9, stale references :: kept :: skills/engineering-rules/SKILL.md :: stale references to what you renamed or removed
+sweep 10, what was already there is a follow-up :: kept :: skills/engineering-rules/SKILL.md :: Anything that was already there is a follow-up.
+sweep 11, leaked runtime state :: kept :: skills/engineering-rules/SKILL.md :: leaked processes and ports
+sweep 12, branches the task made :: kept :: skills/engineering-rules/SKILL.md :: branches you made
+sweep 13, focused or skipped tests :: kept :: skills/engineering-rules/SKILL.md :: focused or skipped tests (13.2)
+# the review (12.2 to 12.9)
+review 12.2, a coverage row per touched path :: kept :: agents/er-reviewer.md :: one row per touched path, the checks that read it, its verdict
+review 12.3, security and correctness :: kept :: agents/er-reviewer.md :: 12.3 (security and correctness)
+review 12.4, performance :: kept :: agents/er-reviewer.md :: 12.4 (performance)
+review 12.5, design conformance on UI work :: kept :: agents/er-reviewer.md :: 12.5 (design conformance) only when the diff is UI-bearing
+review 12.6, cross-module coherence :: kept :: agents/er-reviewer.md :: 12.6 (cross-module coherence)
+review 12.7, quality, layering, plan and scope :: kept :: agents/er-reviewer.md :: 12.7 (quality, layering, plan and scope)
+review, every finding tagged and graded :: kept :: agents/er-reviewer.md :: Tag every finding `introduced`
+review 12.8, a finding stands unless refuted with a file:line :: kept :: skills/engineering-rules/SKILL.md :: a finding stands unless a `file:line` refutes it
+review 12.8, a Critical needs both lenses to fail :: kept :: skills/engineering-rules/SKILL.md :: a Critical one needs both reproduction and authority to fail, 12.8
+review 12.9, one decision per finding :: kept :: skills/engineering-rules/SKILL.md :: accept, push back with the citation, defer with the user's say, or needs restatement
+review 12.9, a Critical never deferred on own judgment :: kept :: skills/engineering-rules/SKILL.md :: A Critical finding is never deferred or pushed back on your own judgment.
+review, on every diff that changes behaviour :: kept :: skills/engineering-rules/SKILL.md :: for every diff that changes behaviour
+# the clarify round's coverage map (6.15) and the rest of the old ledger rules
+coverage map, every aspect settled :: merged :: skills/engineering-rules/SKILL.md :: each aspect the task touches
+ledger, phases in order, none silently dropped :: kept :: skills/engineering-rules/SKILL.md :: one open at a time, none silently dropped
+ledger, a tick carries its reflection, the doc first :: kept :: skills/engineering-rules/SKILL.md :: lands in the work-doc before the chat re-print; a deferred write is no tick
+ledger, a notification per boundary :: kept :: skills/engineering-rules/SKILL.md :: one `PushNotification` line under 200 characters
+ledger, the check-in and the drift check :: kept :: skills/engineering-rules/SKILL.md :: run the drift check
+loop-back, a red or a finding reopens Implement :: kept :: skills/engineering-rules/SKILL.md :: reopens Implement; run forward again with fresh evidence
+waivers, never the caps, integrity, questions, git, gate, review, Critical fix :: kept :: skills/engineering-rules/SKILL.md :: never the caps and bans, claim integrity, questions through `AskUserQuestion`, git safety, a blocking ship-gate leg, the review, or the fix of a Critical finding
+what never leaves the session :: kept :: skills/engineering-rules/SKILL.md :: This session keeps the ledger and every tick
+re-anchor after context loss :: kept :: skills/engineering-rules/SKILL.md :: After context loss, re-read the law, the code rules, this skill and the in-flight work-doc

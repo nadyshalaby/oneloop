@@ -1,7 +1,9 @@
 #!/bin/bash
 # Shared by progress-notify.sh, re-anchor.sh and statusline.sh: the phase-ledger heading Claude
-# prints, "## 0. Phase ledger  (3 of 6, Phase 4)", and how to read the position out of it.
-LEDGER_HEADING='## 0\. Phase ledger +\([^)]*\)'
+# prints, "## 0. Phase ledger  (2 of 3, Implement)", and how to read the position out of it.
+# The counts must be digits, so the format as the workflow skill spells it out, with letters
+# standing in for them, is never read as a position when Claude quotes it in a reply.
+LEDGER_HEADING='## 0\. Phase ledger +\([0-9]+ of [0-9]+, [^)]*\)'
 LEDGER_PREFIX='## 0. Phase ledger'
 
 # read_ledger_position: text on stdin, the last "(N of M, Phase X)" on stdout, empty when none.

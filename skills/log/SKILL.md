@@ -7,15 +7,14 @@ disable-model-invocation: true
 # The update log, on demand
 
 The user typed `/engineering-rules:log`. That picks the update log (16.13) outright. It takes
-no request: printing a summary is not a task, and it sends no agent.
+no request: printing a summary is not a task, and it sends no helper.
 
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
-   the first code file read.) Its intake does not
-   fire; the route is already picked (4.4).
+   the first code file read.)
 2. **Read 16.13 from disk** and print the log with `{{invocation_phase}}` set to
-   `mid-flight`, from the ledger, the evidence and the commits of the task in flight in this
-   conversation. Every claim in it has a proof row behind it (1.5, 1.7).
+   `mid-flight`, from the ledger, the work-doc, the evidence and the commits of the task in
+   flight in this conversation. Every claim in it has a proof row behind it (law 1.5).
 3. **When no task is in flight**, say so in one line and print nothing else. The ledger does
    not move, nothing is ticked, and nothing else starts.

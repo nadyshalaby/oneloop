@@ -12,22 +12,14 @@ new reusable skill, invoked by name later, not a one-off script.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-In this order, before anything else:
-
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
-   the first code file read.) It binds this session
-   in full from that moment. Its intake does not fire; the route is already picked (4.4).
+   the first code file read.)
 2. **Read the request**: what the skill should do, and for whom. It is the whole invocation.
    When it is empty, it is what this conversation was last discussing; when there is
-   nothing, ask through the wizard tool (4.4), one question.
-3. **Say the route and the mode in one line** (1.7, step 2): *"Skill authoring."*, then
-   *"Agents on, the default."*, unless they were switched off by
-   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
-   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
-4. **Read 16.12 from disk and run it.** Writing a skill is a substantive task: the task start
-   in 1.7 runs first, and the file is written last, in the order 16.12 fixes.
+   nothing, ask through `AskUserQuestion`, one question.
+3. **Read 16.12 from disk and run it** as a `/engineering-rules:do` task: 16.12 shapes its
+   plan, and the file is written last, in the order 16.12 fixes.
 
-Everything after that is the law, unchanged. A sub-command picks the row; it never waives a
-phase, a check or a gate.
+A sub-command picks the route; it waives no check, and the law binds throughout.

@@ -12,24 +12,16 @@ not a task yet, and the trigger phrases 16.1 lists no longer matter.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-In this order, before anything else:
-
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
-   the first code file read.) It binds this session
-   in full from that moment. Its intake does not fire; the route is already picked (4.4).
+   the first code file read.)
 2. **Read the idea.** It is the whole invocation. When it is empty, it is what this
    conversation was last discussing; when there is nothing, ask what is on their mind
-   through the wizard tool (4.4), one question, and nothing else.
-3. **Say the route and the mode in one line** (1.7, step 2): *"Shaping."*, then
-   *"Agents on, the default."*, unless they were switched off by
-   `/engineering-rules:agents off` earlier in this conversation or the request asks for this
-   chat only, then *"Agents off, because you asked for it."* with the cost line 4.4 names.
-4. **Read 16.1 from disk and run it**: one or two forking questions per turn, every one
-   through the wizard tool, nothing edited, until the user signals intent to build. The
-   handoff runs the task start in 1.7 under the route 16.1 names, full mode unless the user
-   named quick, with the mode carried into the build.
+   through `AskUserQuestion`, one question, and nothing else.
+3. **Read 16.1 from disk and run it**: one or two forking questions per turn, every one
+   through `AskUserQuestion`, nothing edited, until the user signals intent to build. The
+   shaped task then runs as `/engineering-rules:do`, its Plan starting from what shaping
+   settled.
 
-Everything after that is the law, unchanged. A sub-command picks the row; it never waives a
-phase, a check or a gate.
+A sub-command picks the route; it waives no check, and the law binds throughout.
