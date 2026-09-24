@@ -25,7 +25,7 @@ Write, in this order and short:
 - **What I'd build.** Pseudocode of the core logic only: what goes in, the decisions in order,
   what comes out. Comments mark what is unchanged, what is new and any switch that guards it.
 - **Effect.** What changes for the user and in the code, in a line or two.
-- **Risks.** What could go wrong or is given up, one line each.
+- **Risks.** What could go wrong for the user or in the code, or is given up, one line each.
 
 Then ask through `AskUserQuestion` whether this is the right logic, "Yes, build it
 (Recommended)" first. Build nothing before a yes. An answer that changes the logic gets a new
@@ -42,7 +42,8 @@ no question follows.
 - A screen, not a page; more depth only when the user asks for it.
 - The user's own words and domain terms; no jargon, and no file paths or line numbers unless
   asked.
-- Never about tests, reviews, specs or process; the rules already cover those.
+- Never about tests, reviews, specs or process, not even as a risk (a missing test setup
+  included); the rules already cover those.
 - Pseudocode reads like the logic: real names for the domain things, `IF`, `FOR`, `RETURN`, `←`
   for a value taken, `--` for a comment.
 
