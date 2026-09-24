@@ -30,7 +30,7 @@ exit plan, the work-doc written and said in chat :: kept :: skills/engineering-r
 exit spec review, the plan checked before any code :: merged :: skills/engineering-rules/SKILL.md :: Then the advisor checks the plan.
 exit implement, every task ticked, scouted and committed :: kept :: skills/engineering-rules/SKILL.md :: every Plan box ticked with a fresh proof line, the scout clean or every row disposed, every task committed
 exit debug, root cause, then regression test, then fix :: kept :: skills/engineering-rules/SKILL.md :: confirm the root cause from evidence (10.1), then a regression test, then the fix
-exit verify, proof per task and check, what was not reached :: kept :: skills/engineering-rules/SKILL.md :: One Evidence row each, output pasted, and one line on what the checks did not reach
+exit verify, proof per task and check, what was not reached :: kept :: skills/engineering-rules/SKILL.md :: One Evidence line each, `command → result line`, and one line on what the checks did not reach
 exit verify, the design pre-flight on UI work :: kept :: skills/engineering-rules/SKILL.md :: on UI-bearing work the design pre-flight (15.30)
 exit review, one review and one fix pass, re-verified :: kept :: skills/engineering-rules/SKILL.md :: One review, one fix pass
 exit land, the landing chosen by the user :: kept :: skills/engineering-rules/SKILL.md :: when there is a choice (merge, a pull request, keep the branch), ask through `AskUserQuestion`
@@ -74,3 +74,11 @@ loop-back, a red or a finding reopens Implement :: kept :: skills/engineering-ru
 waivers, never the caps, integrity, questions, git, gate, review, Critical fix :: kept :: skills/engineering-rules/SKILL.md :: never the caps and bans, claim integrity, questions through `AskUserQuestion`, git safety, a blocking ship-gate leg, the review, or the fix of a Critical finding
 what never leaves the session :: kept :: skills/engineering-rules/SKILL.md :: This session keeps the ledger and every tick
 re-anchor after context loss :: kept :: skills/engineering-rules/SKILL.md :: After context loss, re-read the law, the code rules, this skill and the in-flight work-doc
+# the logic-first gate (law 1.4) and the two lanes, added with them
+logic gate, the yes before any change :: kept :: skills/engineering-rules/SKILL.md :: nothing is written or changed before the yes
+logic gate, survives a skipped Plan :: kept :: skills/engineering-rules/SKILL.md :: A skipped Plan still shows the logic
+logic gate, the yes recorded :: kept :: skills/engineering-rules/SKILL.md :: Logic confirmed: <the user's answer>
+logic gate, a helper builds only confirmed logic :: kept :: agents/er-builder.md :: the logic in your brief is the one the user confirmed
+lanes, fast only by the lane picker and the plan line :: kept :: skills/engineering-rules/SKILL.md :: `lane: fast` with that line honestly true
+lanes, the fast lane is still reviewed :: kept :: skills/engineering-rules/SKILL.md :: fast lane or helpers off, the same review here
+review, one reproducing command per finding :: kept :: agents/er-reviewer.md :: each finding gets one command that shows it

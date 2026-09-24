@@ -60,8 +60,11 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
   and `git status` shows nothing it does not explain. Plan is skipped (the doc is the plan) and
   Implement resumes at `next`; a task whose commit is gone is reopened.
 - **Fully known.** The user's own message gives the goal, the done-when checks and the steps: Plan
-  writes the work-doc from their words, with no exploration and no questions, and the advisor
-  still checks it unless every task is their words verbatim.
+  takes the work-doc from their words, with no exploration and no question but the logic gate, and
+  the advisor still checks it unless every task is their words verbatim.
+- **The logic gate never skips.** A skipped Plan still shows the logic (the `demystify` skill) and
+  waits for the yes, unless the work-doc's `Logic confirmed:` line holds the user's yes to this
+  same logic; only the user can waive it (law 1.4).
 - **Verify & Deploy never skips a check.** The triad, every Done-when check, the ship gate and,
   when deploying, the six proofs run fresh on the exact commit. Only a review of an unchanged diff
   (`git rev-parse HEAD` equal to the reviewed commit, a clean `git status`) is reused.
@@ -80,11 +83,20 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    question. None left open.
 5. **Questions:** one `AskUserQuestion` batch, only for forks the code and the ask cannot settle,
    recommended option first and most effective; an unfamiliar domain borrows its bank from 6.3 to 6.11.
-6. Write the work-doc (below): Done-when checks and Plan tasks, each with `→ verify: <command>` and
-   the files it may touch. Then the advisor checks the plan. **Exit:** the work-doc with Goal, Done
-   when and Plan, said in chat in two lines.
+6. **Lane:** `bash ~/.claude/engineering-rules/scripts/lane.sh --test "<the test command>" <every
+   file the plan touches>`, and one plan line: touches no money, auth, state machine, migration,
+   concurrency or data-loss code, and does not deploy. `lane: fast` with that line honestly true is
+   the fast lane (one Goal line, at most three Done-when checks and three Plan tasks, the review
+   done here); anything else is the careful lane.
+7. Draft the Done-when checks and Plan tasks, each with `→ verify: <command>` and the files it may
+   touch. Then the advisor checks the plan.
+8. **Logic gate (law 1.4):** show the logic with the `demystify` skill and ask through
+   `AskUserQuestion`; nothing is written or changed before the yes. Then write the work-doc (below),
+   the user's answer in its `Logic confirmed:` line. **Exit:** the work-doc with Goal, Done when and
+   Plan, said in chat in two lines.
 
-**The work-doc**, `docs/work/<YYYY-MM-DD>-<slug>.md`, written once and appended to:
+**The work-doc**, `docs/work/<YYYY-MM-DD>-<slug>.md`, written once after the yes, then only edited
+(ticks, one Log line per task, `status`, `next`):
 
 ```
 ---
@@ -95,14 +107,16 @@ next: <the step to take next>
 ---
 # <the goal in a few words>
 ## Goal
+<one line: who it is for, what changes, what is left out>
+Lane: <the line lane.sh printed>. Logic confirmed: <the user's answer>
 ## Done when
 - [ ] <observable check> → verify: `<command>`
 ## Plan
 - [ ] 1. <task> (files: <paths>) → verify: `<command>`
 ## Log
-- <HH:MM> <task>: <what changed, what the check printed, commit>
+- <task>: <what changed, the check's result line, commit>
 ## Evidence
-| Check | Command | Output | Result |
+- <check>: `<command>` → <its result line>
 ## Follow-ups
 - `<file:line>` <what is wrong> (<present at base | seen on the way>)
 ```
@@ -111,14 +125,17 @@ next: <the step to take next>
 
 For each task, in order:
 
-1. Read every file it changes in full; read 2.2 before creating a file or a folder.
+1. Read every file it changes in full; read 2.2 only before creating a source or test file or a
+   folder (the work-doc's place is fixed).
 2. Search for an existing function, type, constant, schema or component that does it; paste the
    search. Reuse or extend what exists.
-3. Where the project has tests, write the test first and watch it fail for the right reason.
+3. Where the project has tests, write the test first and watch it fail for the right reason; that
+   red run is the planted instance, and no other control is built.
 4. Make the smallest change that meets the task, with its edges handled: empty, one, many, absent,
    malformed, duplicate, unauthorized, the error path.
 5. Run the task's verify command fresh, then `bash ~/.claude/engineering-rules/scripts/scout.sh <base>`
-   (it reads the working tree, committed or not). Every `introduced` row is fixed now, or
+   (it reads the working tree, committed or not; its `self-check:` line is its own planted
+   instance). Every `introduced` row is fixed now, or
    dismissed with a one-line reason tied to that row's guard (a perf row is a candidate, not a
    verdict); every `present at base` row goes to Follow-ups as the scout summarises it, never
    fixed here; its `not run:` lines go to the review.
@@ -129,20 +146,22 @@ For each task, in order:
 **Stuck twice on one symptom:** stop editing. Write the hypotheses, test the cheapest first, confirm
 the root cause from evidence (10.1), then a regression test, then the fix. **Parallel work:** only
 when two or more tasks are independent, one `er-builder` each, sent in one message with a brief of at
-most fifteen lines (the task, its files, its verify command, the base); re-run each verify here
+most fifteen lines (the task, its files, its verify command, the base, the confirmed logic); re-run each verify here
 before its tick. **Exit:** every Plan box ticked with a fresh proof line, the scout clean or every
 row disposed, every task committed.
 
 ## 3 Verify & Deploy
 
-1. **Prove it, fresh, on the exact commit:** the triad; every Done-when check; the ship gate when
-   the diff touches source the build compiles or config the app reads at startup (rows
-   `ship.build`, `ship.boot`, `ship.smoke`, each run or carrying the reason it has no target; 11.3
-   says what to run); on UI-bearing work the design pre-flight (15.30). One Evidence row each,
-   output pasted, and one line on what the checks did not reach.
-2. **Review:** one `er-reviewer` over `git diff <base>..HEAD` for every diff that changes behaviour,
-   handed the scout's `not run:` lines (helpers off: the same review here, from
-   `~/.claude/agents/er-reviewer.md`). It returns a
+1. **Prove it, fresh, on the exact commit** (the committed tree with a clean `git status`; a clean
+   export only when deploying): the triad; every Done-when check; the ship gate when the diff
+   touches source the build compiles or config the app reads at startup (rows `ship.build`,
+   `ship.boot`, `ship.smoke`, each run or carrying the reason it has no target; read 11.3 only when
+   the manifest has a build or start script or the task deploys); on UI-bearing work the design
+   pre-flight (15.30). One Evidence line each, `command → result line`, and one line on what the
+   checks did not reach; no probe or control the plan did not name.
+2. **Review,** for every diff that changes behaviour: careful lane, one `er-reviewer` over
+   `git diff <base>..HEAD`, handed the Evidence lines and the scout's `not run:` lines; fast lane or
+   helpers off, the same review here, from `~/.claude/agents/er-reviewer.md`. It returns a
    coverage row per touched path and findings tagged `introduced` or `present at base`, graded
    Critical, Important or Minor.
 3. **Challenge, then decide:** a finding stands unless a `file:line` refutes it (doubt is not a
@@ -168,7 +187,7 @@ row disposed, every task committed.
 
 ```
 Law self-audit
-1. Phases ticked with their exit, skips reasoned, questions only through AskUserQuestion?  yes / no
+1. Phases ticked with their exit, skips reasoned, the logic confirmed first, questions only through AskUserQuestion?  yes / no
 2. A fresh Evidence row per task and per Done-when check; ship-gate rows present?          yes / no
 3. The scout run after every task, every row disposed?                                     yes / no
 4. Review: a row per touched path, every finding challenged and decided, Critical fixed?   yes / no
