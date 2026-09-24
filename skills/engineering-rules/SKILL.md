@@ -89,8 +89,8 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    file the tasks name>`, and one plan line: touches no money, auth, state machine, migration,
    concurrency or data-loss code, and does not deploy. `lane: fast` with that line honestly true
    and at most three checks and three tasks is the fast lane (one Goal line, the review done here);
-   anything else, or a work-doc with no `Lane:` line, is the careful lane. Then the advisor checks
-   the plan.
+   anything else, or a work-doc with no `Lane:` line, is the careful lane. Then
+   the advisor checks the plan.
 8. **Logic gate (law 1.4):** show the logic with the `demystify` skill and ask through
    `AskUserQuestion`; nothing is written or changed before the yes. Then write the work-doc (below),
    the user's answer in its `Logic confirmed:` line. **Exit:** the work-doc with Goal, Done when and
