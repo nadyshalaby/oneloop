@@ -83,13 +83,14 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    question. None left open.
 5. **Questions:** one `AskUserQuestion` batch, only for forks the code and the ask cannot settle,
    recommended option first and most effective; an unfamiliar domain borrows its bank from 6.3 to 6.11.
-6. **Lane:** `bash ~/.claude/engineering-rules/scripts/lane.sh --test "<the test command>" <every
-   file the plan touches>`, and one plan line: touches no money, auth, state machine, migration,
-   concurrency or data-loss code, and does not deploy. `lane: fast` with that line honestly true is
-   the fast lane (one Goal line, at most three Done-when checks and three Plan tasks, the review
-   done here); anything else is the careful lane.
-7. Draft the Done-when checks and Plan tasks, each with `→ verify: <command>` and the files it may
-   touch. Then the advisor checks the plan.
+6. Draft the Done-when checks and Plan tasks, each with `→ verify: <command>` and the files it may
+   touch.
+7. **Lane:** `bash ~/.claude/engineering-rules/scripts/lane.sh --test "<the test command>" <every
+   file the tasks name>`, and one plan line: touches no money, auth, state machine, migration,
+   concurrency or data-loss code, and does not deploy. `lane: fast` with that line honestly true
+   and at most three checks and three tasks is the fast lane (one Goal line, the review done here);
+   anything else, or a work-doc with no `Lane:` line, is the careful lane. Then the advisor checks
+   the plan.
 8. **Logic gate (law 1.4):** show the logic with the `demystify` skill and ask through
    `AskUserQuestion`; nothing is written or changed before the yes. Then write the work-doc (below),
    the user's answer in its `Logic confirmed:` line. **Exit:** the work-doc with Goal, Done when and
