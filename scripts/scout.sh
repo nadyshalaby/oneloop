@@ -1,11 +1,12 @@
 #!/bin/bash
 # engineering-rules scout.
-# Runs the repository's deterministic scouts (the law scout 9.5, and the design scout 15.29 when
-# the change touches a UI or style file) over the files this change touched, and reports which of
-# their hits this change introduced against which were already there at a base commit. The
-# scouts' own ### HOW fences are the one source of their patterns: this script extracts, runs and
-# classifies them, it never repeats a pattern from either doc, and the design gate is assembled
-# from 15.29's own block.
+# Runs the repository's deterministic scouts (the perf scout 9.4, the law scout 9.5, and the
+# design scout 15.29 when the change touches a UI or style file) over the files this change
+# touched, and reports which of their hits this change introduced against which were already
+# there at a base commit. The scouts' own docs are the one source of their patterns: this script
+# extracts 9.5's and 15.29's ### HOW blocks, has scripts/perf-scout.sh turn 9.4's tables into a
+# block, runs all three the same way and classifies their output; it never repeats a pattern,
+# and the design gate is assembled from 15.29's own block.
 #
 # The change is the working tree against the base, committed or not: every file that differs from
 # the base (a deleted one has nothing to read) and every untracked file git does not ignore,
@@ -29,11 +30,12 @@
 # Output: every introduced row in full (rule id, file:line, text), then every present-at-base
 #   rule summarised to one line per file with a count, then the coverage lines the scouts printed
 #   over the change, then one closing line:
-#     scout: <n> introduced, <m> present at base in <k> files; ran: law[ design]
+#     scout: <n> introduced, <m> present at base in <k> files; ran: perf law[ design]
 #
 # Exit: 0 no row is introduced, 1 at least one row is introduced, 2 a usage error (no base, the
 #   base is not a commit, the working directory is not inside a git repository, or a scout's
-#   block could not be extracted or its path line swapped), with a one-line message on stderr.
+#   block could not be extracted, its path line swapped or 9.4's tables turned into commands),
+#   with a one-line message on stderr.
 set -u
 umask 077
 
@@ -45,7 +47,9 @@ usage_error() {
 
 here=${BASH_SOURCE[0]%/*}
 [ "$here" = "${BASH_SOURCE[0]}" ] && here=.
+SCRIPTS=$(cd -P "$here" && pwd)
 ER_HOME="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}"
+PERF_DOC="$ER_HOME/references/09-phase-3-implement/9.4-the-perf-scout.md"
 LAW_DOC="$ER_HOME/references/09-phase-3-implement/9.5-the-law-scout.md"
 DESIGN_DOC="$ER_HOME/references/15-design/15.29-the-design-scout.md"
 # The line both blocks build their own path list with, and the line it is swapped for.
@@ -244,10 +248,11 @@ print_tally() {
 
 materialize_block "$LAW_DOC" law
 materialize_block "$DESIGN_DOC" design
+"$BASH" "$SCRIPTS/perf-scout.sh" "$PERF_DOC" > "$WORK/perf-block.sh" || exit 2
 touched="$WORK/touched"
 build_touched "$touched"
-ran=law
-if design_touches_ui; then ran='law design'; fi
+ran='perf law'
+if design_touches_ui; then ran='perf law design'; fi
 : > "$WORK/candidates.tsv"
 : > "$WORK/coverage.log"
 : > "$WORK/base-keys"

@@ -134,7 +134,8 @@ law/engineering-code.md         the code rules install.sh copies into ~/.claude/
 skills/engineering-rules/       the workflow
 skills/<route>/                 one command per route (do is the default), the agents switch, the standalone skills
 agents/                         the three helpers the workflow sends, each with its model and turn cap
-scripts/scout.sh                the law and design scouts in one call over the working tree, every hit tagged introduced or present at base
+scripts/scout.sh                the perf, law and design scouts in one call over the working tree, every hit tagged introduced or present at base
+scripts/perf-scout.sh           turns the perf scout's tables (9.4) into the block scout.sh runs
 references/                     127 sections, one file each, numbered as the workflow's map numbers them
 hooks/                          the hook scripts, their shared helpers and their tests
 settings/hooks.json             the hooks and the status line the installer merges into settings.json

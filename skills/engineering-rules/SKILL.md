@@ -117,9 +117,11 @@ For each task, in order:
 3. Where the project has tests, write the test first and watch it fail for the right reason.
 4. Make the smallest change that meets the task, with its edges handled: empty, one, many, absent,
    malformed, duplicate, unauthorized, the error path.
-5. Run the task's verify command fresh, then `bash ~/.claude/engineering-rules/scripts/scout.sh <base>`.
-   Every `introduced` row is fixed now (or shown to be no code, with the line); every
-   `present at base` row goes to Follow-ups as the scout summarises it, never fixed here.
+5. Run the task's verify command fresh, then `bash ~/.claude/engineering-rules/scripts/scout.sh <base>`
+   (it reads the working tree, committed or not). Every `introduced` row is fixed now, or
+   dismissed with a one-line reason tied to that row's guard (a perf row is a candidate, not a
+   verdict); every `present at base` row goes to Follow-ups as the scout summarises it, never
+   fixed here; its `not run:` lines go to the review.
 6. Sweep your own leftovers: debug lines, commented-out code, unused imports, symbols your change
    orphaned, scratch files.
 7. Tick the task with its proof line, one Log line, commit with explicit paths, update `next`.
@@ -138,8 +140,9 @@ row disposed, every task committed.
    `ship.build`, `ship.boot`, `ship.smoke`, each run or carrying the reason it has no target; 11.3
    says what to run); on UI-bearing work the design pre-flight (15.30). One Evidence row each,
    output pasted, and one line on what the checks did not reach.
-2. **Review:** one `er-reviewer` over `git diff <base>..HEAD` for every diff that changes behaviour
-   (helpers off: the same review here, from `~/.claude/agents/er-reviewer.md`). It returns a
+2. **Review:** one `er-reviewer` over `git diff <base>..HEAD` for every diff that changes behaviour,
+   handed the scout's `not run:` lines (helpers off: the same review here, from
+   `~/.claude/agents/er-reviewer.md`). It returns a
    coverage row per touched path and findings tagged `introduced` or `present at base`, graded
    Critical, Important or Minor.
 3. **Challenge, then decide:** a finding stands unless a `file:line` refutes it (doubt is not a

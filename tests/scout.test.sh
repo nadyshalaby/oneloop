@@ -82,13 +82,13 @@ test_introduced_named_present_at_base_summarised() {
   assert_missing "the old occurrence is not its own introduced row" "introduced ban.suppression a.ts:1:" "$out"
   assert_contains "the old occurrence is summarised once with a count" "present-at-base ban.suppression a.ts (1 hit)" "$out"
   tally=$(printf '%s\n' "$out" | grep '^scout:')
-  assert_eq "the closing tally line" 'scout: 2 introduced, 1 present at base in 1 files; ran: law' "$tally"
+  assert_eq "the closing tally line" 'scout: 2 introduced, 1 present at base in 1 files; ran: perf law' "$tally"
   assert_contains "exit 1 when a row is introduced" "exit=1" "$out"
 }
 
 test_ui_file_triggers_the_design_scout() {
   out=$(run_scout base2 base3)
-  assert_contains "the design scout ran" 'ran: law design' "$out"
+  assert_contains "the design scout ran" 'ran: perf law design' "$out"
   assert_contains "and its own tell fired on the new file" "introduced tell.layout.h-screen Hero.tsx:1:" "$out"
   assert_contains "exit 1 when a row is introduced" "exit=1" "$out"
 }
@@ -97,7 +97,7 @@ test_no_ui_file_skips_design_and_a_clean_change_finds_nothing() {
   out=$(run_scout base3 base4)
   assert_missing "the design scout did not run" "design" "$out"
   tally=$(printf '%s\n' "$out" | grep '^scout:')
-  assert_eq "a clean change introduces nothing" 'scout: 0 introduced, 0 present at base in 0 files; ran: law' "$tally"
+  assert_eq "a clean change introduces nothing" 'scout: 0 introduced, 0 present at base in 0 files; ran: perf law' "$tally"
   assert_contains "exit 0 when nothing is introduced" "exit=0" "$out"
 }
 
@@ -106,7 +106,7 @@ test_a_copy_of_an_old_line_is_introduced() {
   out=$(run_scout base4 base5)
   assert_contains "the copy is introduced" "introduced ban.suppression a.ts:5:// $TOK" "$out"
   tally=$(printf '%s\n' "$out" | grep '^scout:')
-  assert_eq "and the two old lines stay at base" 'scout: 1 introduced, 2 present at base in 1 files; ran: law' "$tally"
+  assert_eq "and the two old lines stay at base" 'scout: 1 introduced, 2 present at base in 1 files; ran: perf law' "$tally"
 }
 
 test_uncommitted_work_is_scanned_and_judged_against_the_base() {
@@ -122,7 +122,7 @@ test_uncommitted_work_is_scanned_and_judged_against_the_base() {
   assert_contains "the same row already true at the base is at base" "present-at-base tell.layout.mobile-implicit Cols.tsx (1 hit)" "$out"
   assert_contains "a relative ban list is read in both passes" "present-at-base ban.custom c.ts (1 hit)" "$out"
   tally=$(printf '%s\n' "$out" | grep '^scout:')
-  assert_eq "the closing tally line" 'scout: 5 introduced, 5 present at base in 5 files; ran: law design' "$tally"
+  assert_eq "the closing tally line" 'scout: 5 introduced, 5 present at base in 5 files; ran: perf law design' "$tally"
 }
 
 test_usage_errors_exit_2() {
