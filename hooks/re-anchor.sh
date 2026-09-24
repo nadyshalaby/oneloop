@@ -62,7 +62,7 @@ position=$(last_position)
 printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: if the always-on law is no longer verbatim in your context, read it from disk before the next step (1.7, step 7): %s\n' "$happened" "$LAW"
 printf 'The code rules are part of it: before writing code, read them from disk unless they are verbatim in your context: %s\n' "$RULES"
 if [ -n "$position" ]; then
-  printf 'Last phase-ledger position printed before the loss: %s. A phase-workflow task was in flight: re-read the workflow skill (%s), re-print the ledger with that item open and continue from it; nothing from before carries over as proof (5.1).\n' "$position" "$WORKFLOW"
+  printf 'Last phase-ledger position printed before the loss: %s. A phase-workflow task was in flight: re-read the workflow skill (%s), re-print the ledger with that item open and continue from it; nothing from before carries over as proof.\n' "$position" "$WORKFLOW"
 else
   printf 'No phase-ledger position was found in the transcript. If a task was in flight, re-open its ledger from the last print you can see.\n'
 fi

@@ -45,10 +45,7 @@ The first print adds one line: `Helpers: on | unavailable. Advisor: yes | no.` A
 carries a one-line reflection (what changed, did it pass, what is next) and lands in the work-doc
 before the chat re-print; a deferred write is no tick. After each re-print, one `PushNotification`
 line under 200 characters. At each boundary, restate the goal in one line and run the drift check
-(law 1.9). **Check-in** (every ten minutes, the user's `loop.md`): a `build` task counts as full mode
-and its work-doc is the one to update: its Plan boxes are the Sprint Backlog, its Done-when boxes
-the Acceptance Criteria, a Log line the Daily Update, and frontmatter `status` and `next` the
-phase ledger. After context loss, re-read the law, the code rules, this skill and the in-flight
+(law 1.9). After context loss, re-read the law, the code rules, this skill and the in-flight
 work-doc before the next step; nothing from before is proof.
 
 ## Skip what is done or fully known
@@ -223,7 +220,7 @@ the fix of a Critical finding.
 | **Brainstorm** | `/engineering-rules:brainstorm` | The idea is not a task yet: one or two forking questions per turn. | 16.1 |
 | **Codebase audit** | `/engineering-rules:audit` | A whole codebase against its rules, not one diff. | 16.3 |
 | **Review triage** | `/engineering-rules:triage` | A batch of review findings needs a decision each. | 16.2 |
-| **Design system** | `/engineering-rules:design-system` | Authoring, extracting or refreshing the design spec. | 15.19 |
+| **Design spec** | `/engineering-rules:design-spec` | Authoring, extracting or refreshing the design spec. | 15.19 |
 | **Release notes** | `/engineering-rules:release-notes` | The plain summary of the task in flight. | 16.13 |
 
 A section number is the file under `references/` whose name starts with it: 2.2 placement, 3.1 to
