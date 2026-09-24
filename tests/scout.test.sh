@@ -3,9 +3,8 @@
 # base: a banned token already at the base, a second (textually distinct) one added to that same
 # file, a third in a brand new file, a UI file, a plain-file change, then an exact copy of a line
 # that was already there. The second has one commit and every change left uncommitted: an
-# unstaged edit, a staged one, an untracked file, a file over the line cap at the base that grows,
-# one that crosses it, a whole-file design row the change caused away from line 1 and one that was
-# already true at the base, and a project ban list named by a relative path. It checks: new hits
+# unstaged edit, a staged one, an untracked file, a whole-file design row the change caused away
+# from line 1 and one that was already true at the base, and a project ban list named by a relative path. It checks: new hits
 # are introduced in full and old ones summarised once with a count, a copy of an old line is
 # introduced, uncommitted work is scanned, a whole-file row is judged against the base file, the
 # design scout runs only when the touched scope has a UI file, a clean change finds nothing, every
@@ -34,8 +33,6 @@ run_scout() {
 
 commit() { git -c user.name=t -c user.email=t@example.com commit -q -m "$1"; }
 
-# numbered <n>: n distinct lines of plain code, for the file-line cap.
-numbered() { seq 1 "$1" | sed 's/^/const x/; s/$/ = 1/'; }
 
 # build_fixture: the first repo, a linear history with one git tag per base the tests run from.
 build_fixture() (
@@ -59,17 +56,15 @@ build_uncommitted_fixture() (
   git init -q "$WORK/tree" && cd "$WORK/tree" || return 1
   printf '// %s\nconst w = 1\n' "$TOK" > w.ts
   printf '// %s\n' "$TOK" > dup.ts
-  numbered 600 > big.ts
-  numbered 450 > mid.ts
+
   printf 'export const G = () => (\n  <div className="flex">a</div>\n)\n' > Grid.tsx
   printf 'export const C = () => (\n  <div className="grid-cols-3">a</div>\n)\n' > Cols.tsx
   printf 'legacyCall()\nconst c = 1\n' > c.ts
-  git add -- w.ts dup.ts big.ts mid.ts Grid.tsx Cols.tsx c.ts && commit base
+  git add -- w.ts dup.ts Grid.tsx Cols.tsx c.ts && commit base
   printf '// %s -- unstaged\n' "$TOK" >> w.ts
   printf '// %s\n' "$TOK" >> dup.ts && git add -- dup.ts
   printf '// %s -- untracked\n' "$TOK" > u.ts
-  numbered 10 >> big.ts
-  numbered 100 >> mid.ts
+
   printf 'export const G = () => (\n  <div className="flex">a</div>\n  <div className="grid-cols-3">b</div>\n)\n' > Grid.tsx
   printf 'export const C = () => (\n  <div className="grid-cols-3">b</div>\n)\n' > Cols.tsx
   printf 'const c2 = 2\n' >> c.ts
@@ -117,13 +112,12 @@ test_uncommitted_work_is_scanned_and_judged_against_the_base() {
   assert_contains "a staged copy of an old line is introduced" "introduced ban.suppression dup.ts:2:// $TOK" "$out"
   assert_contains "and the old line stays at base" "present-at-base ban.suppression dup.ts (1 hit)" "$out"
   assert_contains "an untracked file is scanned" "introduced ban.suppression u.ts:1:// $TOK -- untracked" "$out"
-  assert_contains "a file over the cap at the base that grows is at base" "present-at-base cap.file-lines big.ts (1 hit)" "$out"
-  assert_contains "a file that crosses the cap is introduced" "introduced cap.file-lines mid.ts: 550 lines" "$out"
+
   assert_contains "a whole-file row caused away from line 1 is introduced" "introduced tell.layout.mobile-implicit Grid.tsx:1:" "$out"
   assert_contains "the same row already true at the base is at base" "present-at-base tell.layout.mobile-implicit Cols.tsx (1 hit)" "$out"
   assert_contains "a relative ban list is read in both passes" "present-at-base ban.custom c.ts (1 hit)" "$out"
   tally=$(printf '%s\n' "$out" | grep '^scout:')
-  assert_eq "the closing tally line" 'scout: 5 introduced, 5 present at base in 5 files; ran: perf law design' "$tally"
+  assert_eq "the closing tally line" 'scout: 4 introduced, 4 present at base in 4 files; ran: perf law design' "$tally"
 }
 
 test_usage_errors_exit_2() {

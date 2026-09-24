@@ -20,8 +20,8 @@
 #
 # A row is introduced unless its line is unchanged since the base AND the same scouts, run a
 # second time over the base copies of the same files, fire the same rule on the same file. So a
-# new copy of a line that was already there is introduced, and a whole-file row (the file-line
-# cap, a file with no mobile variant) is judged by whether the base file tripped it too. Three
+# new copy of a line that was already there is introduced, and a whole-file row (a file with no
+# mobile variant) is judged by whether the base file tripped it too. Three
 # edges, all erring toward the finding: a row with no file (a scope count) is introduced, a
 # renamed file reads as new, and a whole-file row pinned to line 1 reads introduced whenever line
 # 1 was edited.
@@ -158,16 +158,13 @@ run_scouts() {
   done
 }
 
-# parse_row <row>: rule, file and line of a rule-led row, from the grep -n shape "file:line:text"
-# or cap.file-lines' whole-file shape "file: N lines" (no line); any other row has no file.
+# parse_row <row>: rule, file and line of a rule-led row, from the grep -n shape "file:line:text";
+# any other row has no file.
 parse_row() {
   rule=${1%% *} rest=${1#* } file='' line=''
   fre='^([^:]*):([0-9]+):'
-  cre='^([^:]*):[[:space:]]*[0-9]+ lines$'
   if [[ $rest =~ $fre ]]; then
     file=${BASH_REMATCH[1]} line=${BASH_REMATCH[2]}
-  elif [[ $rest =~ $cre ]]; then
-    file=${BASH_REMATCH[1]}
   fi
 }
 
