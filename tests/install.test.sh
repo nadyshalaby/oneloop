@@ -4,7 +4,8 @@
 # puts CLAUDE.md back byte for byte and settings.json back as the same JSON, byte for byte in
 # the two-space layout Claude Code writes; a path that is not this setup's, a damaged block or
 # a broken settings file is refused with nothing changed; permissions and a link leading to a
-# file survive; --check fails when a piece is missing. INSTALL_SH points the test at another
+# file survive; the code rules land as a plain copy beside the user's own rules and leave with
+# the uninstall; --check fails when a piece is missing or stale. INSTALL_SH points the test at another
 # copy of the installer, kept in the repository root, which is how it proves it can fail.
 # Run: bash tests/install.test.sh
 # shellcheck source-path=SCRIPTDIR
@@ -60,9 +61,15 @@ exists() { if [ -e "$1" ] || [ -L "$1" ]; then echo yes; else echo no; fi; }
 # file_mode <file>: its permission bits, on GNU or BSD stat.
 file_mode() { if stat -c '%a' "$1" > /dev/null 2>&1; then stat -c '%a' "$1"; else stat -f '%Lp' "$1"; fi; }
 
+# plain_copy <file>: yes when it is a plain file, not a link, holding the repository's code rules.
+plain_copy() {
+  if [ -f "$1" ] && [ ! -L "$1" ] && cmp -s "$ROOT/law/engineering-code.md" "$1"; then echo yes; else echo no; fi
+}
+
 # snapshot <config dir>: every file and link the installer owns, as checksums and targets.
 snapshot() {
   cksum < "$1/CLAUDE.md"; cksum < "$1/settings.json"; cksum < "$1/backups/engineering-rules/state.json"
+  cksum < "$1/rules/engineering-code.md"
   for link in "$1"/skills/*; do printf '%s -> %s\n' "${link##*/}" "$(readlink "$link")"; done
 }
 
@@ -76,6 +83,7 @@ test_first_install_wires_every_piece() {
   assert_eq "every skill is linked under its name" "$(skill_total)" "$(linked_skills "$cfg")"
   assert_contains "CLAUDE.md imports the short law" "@~/.claude/engineering-rules/law/engineering-law.md" "$(cat "$cfg/CLAUDE.md")"
   assert_eq "below the user's own lines" "# My rules" "$(head -n 1 "$cfg/CLAUDE.md")"
+  assert_eq "the code rules are a plain copy in the rules folder" "yes" "$(plain_copy "$cfg/rules/engineering-code.md")"
   assert_eq "every hook of the fragment is in settings.json" "$(jq '[.hooks[][] | .hooks[]] | length' "$ROOT/settings/hooks.json")" "$(our_hooks "$cfg")"
   assert_eq "the user's own hook stays" "bash ~/own-stop.sh" "$(setting "$cfg" '.hooks.Stop[0].hooks[0].command')"
   assert_contains "the plugin's status line is taken over" "/engineering-rules/hooks/statusline.sh" "$(setting "$cfg" '.statusLine.command')"
@@ -99,6 +107,7 @@ test_uninstall_puts_back_what_it_replaced() {
   assert_eq "settings.json is back byte for byte" "$(cksum < "$WORK/first.settings")" "$(cksum < "$cfg/settings.json")"
   assert_eq "no skill link is left" "0" "$(linked_skills "$cfg")"
   assert_eq "the home link is gone" "no" "$(exists "$cfg/engineering-rules")"
+  assert_eq "the code rules and the rules folder the install made are gone" "no" "$(exists "$cfg/rules")"
   assert_eq "the backups stay" "yes" "$(exists "$cfg/backups/engineering-rules")"
   out=$(run_install "$WORK/first" --check)
   assert_contains "--check now fails" "exit=1" "$out"
@@ -170,6 +179,32 @@ test_stale_links_go_and_check_names_a_missing_one() {
   assert_contains "and names it" "missing: the skill link $cfg/skills/engineering-rules:quick" "$out"
 }
 
+# The rules folder may hold the user's own rules: they stay through the install and the
+# uninstall, a file of theirs where the copy goes is refused, a link an earlier layout left is
+# made a plain copy (a link would not load), and a copy edited by hand is named stale.
+test_the_code_rules_live_beside_the_users_own() {
+  home=$(fresh_home rules); seed "$home"; cfg="$home/.claude"
+  mkdir -p "$cfg/rules"; printf '# mine\n' > "$cfg/rules/mine.md"
+  printf '# my own code rules\n' > "$cfg/rules/engineering-code.md"
+  before=$(cksum < "$cfg/settings.json")
+  out=$(run_install "$home")
+  assert_contains "a code rules file the user wrote is refused" "exit=1" "$out"
+  assert_contains "and named" "$cfg/rules/engineering-code.md (not a copy this installer wrote)" "$out"
+  assert_eq "and left as it was, with settings.json" "# my own code rules $before" "$(cat "$cfg/rules/engineering-code.md") $(cksum < "$cfg/settings.json")"
+  rm "$cfg/rules/engineering-code.md"; ln -s "$ROOT/law/engineering-code.md" "$cfg/rules/engineering-code.md"
+  assert_contains "a link of this setup's is taken over" "exit=0" "$(run_install "$home")"
+  assert_eq "by a plain copy" "yes" "$(plain_copy "$cfg/rules/engineering-code.md")"
+  printf 'edited by hand\n' >> "$cfg/rules/engineering-code.md"
+  out=$(run_install "$home" --check)
+  assert_contains "--check fails on a copy edited by hand" "exit=1" "$out"
+  assert_contains "and names it stale" "stale: $cfg/rules/engineering-code.md" "$out"
+  run_install "$home" > /dev/null
+  assert_eq "a second install puts the copy right" "yes" "$(plain_copy "$cfg/rules/engineering-code.md")"
+  run_install "$home" --uninstall > /dev/null
+  assert_eq "the uninstall takes the copy away" "no" "$(exists "$cfg/rules/engineering-code.md")"
+  assert_eq "and keeps the user's own rules and their folder" "# mine" "$(cat "$cfg/rules/mine.md")"
+}
+
 test_a_moved_config_dir_gets_full_paths() {
   cfg="$WORK/elsewhere"; mkdir -p "$cfg"
   HOME="$WORK/nohome" CLAUDE_CONFIG_DIR="$cfg" bash "$SCRIPT" > /dev/null 2>&1
@@ -186,5 +221,6 @@ test_permissions_and_links_survive
 test_a_fresh_machine_is_left_as_it_was
 test_an_own_status_line_is_kept
 test_stale_links_go_and_check_names_a_missing_one
+test_the_code_rules_live_beside_the_users_own
 test_a_moved_config_dir_gets_full_paths
 report

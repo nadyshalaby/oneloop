@@ -13,7 +13,8 @@ description: >-
 # Engineering rules: the phase workflow
 
 > The always-on law, `~/.claude/engineering-rules/law/engineering-law.md`, is already in context through the
-> user-global `CLAUDE.md` and binds every task. This skill adds the phase workflow; everything in
+> user-global `CLAUDE.md` and binds every task; its code rules, `~/.claude/rules/engineering-code.md`, load
+> the first time a code file is read. This skill adds the phase workflow; everything in
 > it binds from the moment it loads until the task is done. Every file under
 > `~/.claude/engineering-rules/references/` is read at the moment its phase calls for it, and once read, it binds
 > too. **How** the work gets carried out is your call; **what** has to be true, in what order,
@@ -21,7 +22,8 @@ description: >-
 
 ## How to read this skill
 
-The always-on law is the short form in `~/.claude/engineering-rules/law/engineering-law.md`; the workflow's own law
+The always-on law is the short form in `~/.claude/engineering-rules/law/engineering-law.md`, with its code rules
+(1.1, 1.3, 1.6) in `~/.claude/rules/engineering-code.md`; the workflow's own law
 (1.4, 1.7, 1.8) is here. Everything else lives in `~/.claude/engineering-rules/references/`, one file per
 section, numbered exactly as the map at the end of this file numbers it. Read a reference at the moment its phase
 calls for it, from disk, never from memory: yourself when it is short, or through a fork that
@@ -138,7 +140,7 @@ These three sections bind from the moment this skill loads. The rest of the alwa
 4. Send the heading line and the reflection through the notification tool (1.4), one line under 200 characters.
 5. Read the next phase's reference file from disk.
 6. Restate the anchor's North-Star Goal and its top Non-Goal in one line, so drift is visible.
-7. **Re-anchor after context loss.** If the always-on law or this skill is no longer verbatim in your context, because the conversation was compacted or summarized, re-read `~/.claude/engineering-rules/law/engineering-law.md` and this skill before doing anything else in the new phase. A summary of the law is not the law. On Claude Code, the re-anchor hook this setup installs prints this instruction and the last ledger position into the new context after a compaction or a resume; the re-read is still yours to do.
+7. **Re-anchor after context loss.** If the always-on law or this skill is no longer verbatim in your context, because the conversation was compacted or summarized, re-read `~/.claude/engineering-rules/law/engineering-law.md`, `~/.claude/rules/engineering-code.md` and this skill before doing anything else in the new phase. A summary of the law is not the law. On Claude Code, the re-anchor hook this setup installs prints this instruction and the last ledger position into the new context after a compaction or a resume; the re-read is still yours to do.
 
 **Loop-back, when a later phase sends you back.** A red in Phase 4, a Critical or Important finding in Phase 5, a red re-verify in Phase 6, or a task you cannot finish in Phase 3, sends you back to Phase 3 (or 3b when stuck). Re-open the earlier item as `- [>]` with `reopened: <reason>` appended, leave every later item open, and run forward again through every phase in between. Never patch and skip ahead. Every re-run of a phase produces fresh evidence; nothing from the earlier pass carries over as proof.
 
@@ -276,7 +278,7 @@ Every section is a file in `~/.claude/engineering-rules/references/`. The number
 | Group | What is in it | When you read it |
 |---|---|---|
 | **0** | Orientation and the full section table | When the group table below is not enough. |
-| **1** | Always-on law, 1.1 to 1.11 | The short form is in context through CLAUDE.md; 1.4, 1.7 and 1.8 are above; the long forms of the rest are group 1's files. |
+| **1** | Always-on law, 1.1 to 1.11 | The short form is in context through CLAUDE.md, its code rules (1.1, 1.3, 1.6) from the first code read; 1.4, 1.7 and 1.8 are above; the long forms of the rest are group 1's files. |
 | **2** | Doctrine: code quality (2.1), file and folder law (2.2) | Before writing code, and before creating any file or folder. |
 | **3** | Catalogs: performance (3.1), security (3.2), test scenarios (3.3), clean code (3.4) | Look up an ID or a fix direction; never read end to end. |
 | **4** | Routes: how one is picked (4.1), quick mode (4.2), full mode (4.3), the sub-commands, the intake and the agent modes (4.4) | At task start; 4.4 the moment the skill is invoked bare, a sub-command loads it, or the user switches the agents off or on. |

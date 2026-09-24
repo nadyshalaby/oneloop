@@ -16,7 +16,8 @@ In this order, before anything else:
 
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
-   (The always-on law is already in context through CLAUDE.md.) It binds this session
+   (The always-on law is already in context through CLAUDE.md; its code rules load with
+   the first code file read.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the request**: the mode 15.19 names (author, extract or refresh) and a direction
    from the library (15.4) when the user named one. It is the whole invocation. Empty means

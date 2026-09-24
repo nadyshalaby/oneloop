@@ -4,6 +4,10 @@
 #   ~/.claude/skills/<name>       one link per skill, named by its `name:` line, so every
 #                                 /engineering-rules:<route> command keeps its name
 #   ~/.claude/CLAUDE.md           one managed block that imports law/engineering-law.md
+#   ~/.claude/rules/engineering-code.md
+#                                 a copy of law/engineering-code.md, never a link, because
+#                                 Claude Code skips a linked rules file; it loads the first
+#                                 time a code file is read
 #   ~/.claude/settings.json       the hooks and the status line of settings/hooks.json, and the
 #                                 old engineering-rules plugin switched off
 # Nothing changes until every check passes. Each file it changes is first copied to
@@ -22,6 +26,10 @@ CFG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 ER_HOME="$CFG/engineering-rules"
 SKILLS_DIR="$CFG/skills"
 CLAUDE_MD="$CFG/CLAUDE.md"
+RULES_DIR="$CFG/rules"
+RULES_FILE="$RULES_DIR/engineering-code.md"
+RULES_SRC="$REPO/law/engineering-code.md"
+RULES_MARK='managed-by: engineering-rules'
 SETTINGS="$CFG/settings.json"
 BACKUPS="$CFG/backups/engineering-rules"
 STATE="$BACKUPS/state.json"
@@ -56,6 +64,9 @@ ours() {
   [ -L "$1" ] || return 1
   case "$(readlink "$1")" in "$ER_HOME"/*|"$REPO"/*) return 0 ;; *) return 1 ;; esac
 }
+
+# managed_rules <file>: a plain file carrying the marker this installer writes into its copy.
+managed_rules() { [ -f "$1" ] && [ ! -L "$1" ] && grep -qF "$RULES_MARK" "$1"; }
 
 # resolve <file>: where a chain of links ends, so a write replaces the target, never the link.
 resolve() {
@@ -94,6 +105,9 @@ conflicts() {
     link="$SKILLS_DIR/$(skill_name "$skill")"
     if { [ -e "$link" ] || [ -L "$link" ]; } && ! ours "$link"; then printf '%s\n' "$link"; fi
   done
+  if { [ -e "$RULES_FILE" ] || [ -L "$RULES_FILE" ]; } && ! ours "$RULES_FILE" && ! managed_rules "$RULES_FILE"; then
+    printf '%s (not a copy this installer wrote)\n' "$RULES_FILE"
+  fi
 }
 
 # preflight: every reason to stop, checked before anything is changed.
@@ -111,13 +125,14 @@ $found"
 record_state() {
   [ -f "$STATE" ] && return 0
   mkdir -p "$BACKUPS"
-  had_md=false had_json=false src=/dev/null
+  had_md=false had_json=false had_rules=false src=/dev/null
   [ -e "$CLAUDE_MD" ] && had_md=true
+  [ -d "$RULES_DIR" ] && had_rules=true
   [ -e "$SETTINGS" ] && { had_json=true; src=$SETTINGS; }
-  jq -n --slurpfile s "$src" --arg key "$PLUGIN_KEY" --argjson md "$had_md" --argjson js "$had_json" '
+  jq -n --slurpfile s "$src" --arg key "$PLUGIN_KEY" --argjson md "$had_md" --argjson js "$had_json" --argjson rd "$had_rules" '
     ($s[0] // {}) as $o | ($o.enabledPlugins // {}) as $p
     | {statusLine: ($o.statusLine // null), plugin: (if $p | has($key) then $p[$key] else null end),
-       hadHooks: ($o | has("hooks")), hadSettings: $js, hadClaudeMd: $md}' > "$STATE"
+       hadHooks: ($o | has("hooks")), hadSettings: $js, hadClaudeMd: $md, hadRulesDir: $rd}' > "$STATE"
 }
 
 # backup: a copy of every file the run may change, before it changes any, in a folder of its
@@ -125,7 +140,7 @@ record_state() {
 backup() {
   mkdir -p "$BACKUPS"
   dir=$(mktemp -d "$BACKUPS/$(date '+%Y%m%d-%H%M%S').XXXX") || die "could not make a backup folder in $BACKUPS; nothing changed"
-  for file in "$CLAUDE_MD" "$SETTINGS"; do
+  for file in "$CLAUDE_MD" "$SETTINGS" "$RULES_FILE"; do
     if [ -f "$file" ]; then cp -p "$file" "$dir/"; fi
   done
   say "backed up to $dir"
@@ -152,6 +167,15 @@ link_skills() {
     printf '%s' "$wanted" | grep -qxF "${link##*/}" || { rm "$link" && say "removed stale link $link"; }
   done
   say "linked $(printf '%s' "$wanted" | grep -c .) skills into $SKILLS_DIR"
+}
+
+# copy_rules: the code rules copied into the rules folder, over a link of this setup's that an
+# earlier layout left; a copy already the same is left alone.
+copy_rules() {
+  mkdir -p "$RULES_DIR"
+  if [ -L "$RULES_FILE" ]; then rm "$RULES_FILE"; fi
+  cmp -s "$RULES_SRC" "$RULES_FILE" && return 0
+  replace_file "$RULES_FILE" "$RULES_SRC" && say "copied the code rules to $RULES_FILE"
 }
 
 # write_block: the managed block replaced where it is, or appended after one blank line. A file
@@ -241,15 +265,18 @@ install() {
   link_home
   link_skills
   write_block
+  copy_rules
   write_json merged && say "merged the hooks and the status line into $SETTINGS; the plugin is off"
   say "start a new Claude Code session to load it"
   check
 }
 
-# forget_created: a file the first install created and the uninstall left empty goes again.
+# forget_created: a file or folder the first install created and the uninstall left empty goes
+# again. A record from before the rules folder existed says nothing of it, so it stays.
 forget_created() {
   if [ "$(jq -r '.hadClaudeMd' "$STATE")" = false ] && [ -f "$CLAUDE_MD" ] && [ ! -s "$CLAUDE_MD" ]; then rm -f "$CLAUDE_MD"; fi
   if [ "$(jq -r '.hadSettings' "$STATE")" = false ] && [ "$(jq -c . "$SETTINGS" 2>/dev/null)" = '{}' ]; then rm -f "$SETTINGS"; fi
+  if [ "$(jq -r 'if has("hadRulesDir") then .hadRulesDir else true end' "$STATE")" = false ] && [ -d "$RULES_DIR" ] && [ -z "$(find "$RULES_DIR" -mindepth 1 -maxdepth 1)" ]; then rmdir "$RULES_DIR"; fi
 }
 
 uninstall() {
@@ -259,6 +286,7 @@ uninstall() {
   backup
   drop_block
   write_json unmerged && say "took the hooks out of $SETTINGS and put back what the install replaced"
+  if managed_rules "$RULES_FILE"; then rm "$RULES_FILE" && say "removed $RULES_FILE"; fi
   forget_created
   for link in "$SKILLS_DIR"/*; do
     if ours "$link"; then rm "$link"; fi
@@ -268,11 +296,21 @@ uninstall() {
   say "uninstalled; the repository itself is untouched"
 }
 
+# rules_problem: why the installed code rules are not a plain copy of the repository's, or nothing.
+rules_problem() {
+  if [ ! -f "$RULES_FILE" ]; then printf 'missing: the code rules at %s' "$RULES_FILE"
+  elif [ -L "$RULES_FILE" ]; then printf 'wrong: %s is a link, which Claude Code does not load' "$RULES_FILE"
+  elif ! cmp -s "$RULES_SRC" "$RULES_FILE"; then printf 'stale: %s differs from %s; run install.sh again' "$RULES_FILE" "$RULES_SRC"
+  fi
+}
+
 # check: every piece in place, one line per missing piece, exit 1 when any is.
 check() {
   missing=0
   leads_here "$ER_HOME" || { say "missing: $ER_HOME does not lead to $REPO"; missing=1; }
   grep -qF "$BEGIN_MARK" "$CLAUDE_MD" 2>/dev/null || { say "missing: the managed block in $CLAUDE_MD"; missing=1; }
+  problem=$(rules_problem)
+  [ -z "$problem" ] || { say "$problem"; missing=1; }
   for skill in "$REPO"/skills/*/SKILL.md; do
     link="$SKILLS_DIR/$(skill_name "$skill")"
     ours "$link" && [ -f "$link/SKILL.md" ] || { say "missing: the skill link $link"; missing=1; }

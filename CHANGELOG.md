@@ -3,16 +3,22 @@
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
 - **3.0.0**: no plugin. The law now binds every session from the user-global `CLAUDE.md`, with
-  nothing to call: `law/engineering-law.md` is a short form of the always-on law (136 lines,
-  19,329 characters, capped at 200 and 20,000) that a managed `CLAUDE.md` block imports, and a
-  pin list in `tests/short-law.test.sh` holds every cap, ban, guardrail, git rule, banned phrase
-  and deploy proof it must keep. The plugin's long always-on text moved to
+  nothing to call. The always-on law is two short files. `law/engineering-law.md`, the core
+  (definitions, precedence, the caps and bans in one line, 1.2, 1.4, 1.5, 1.7 to 1.11; capped
+  at 90 lines and 10,000 characters), is imported by a managed `CLAUDE.md` block and measured
+  3,144 tokens a message. `law/engineering-code.md`, 1.1, 1.3 and 1.6 in full (capped at 60
+  lines and 7,500 characters, about 2,414 tokens), is copied by `install.sh` into
+  `~/.claude/rules/`, where its `paths:` globs make Claude Code load it the first time a code
+  file is read; a session that reads no code never pays for it. The first one-file short law
+  measured 6,756 tokens a message. Two pin lists in `tests/short-law.test.sh` hold every cap,
+  ban, guardrail, git rule, banned phrase and deploy proof the two files must keep. The plugin's long always-on text moved to
   `references/01-always-on-law/` as long forms the short one wins over. The phase workflow no
   longer loads on its own whenever code is touched; it runs when the user calls it by name or
   through a route, and every command keeps its plugin-era name through its skill's `name:`
   line. `install.sh` wires the folder in: a link home, one link per skill, the `CLAUDE.md`
-  block, the hooks and the status line merged into `settings.json` from `settings/hooks.json`,
-  and the plugin switched off; it checks before it changes, backs each file up to a folder of
+  block, the copy of the code rules (refusing a file there it did not write), the hooks and the
+  status line merged into `settings.json` from `settings/hooks.json`, and the plugin switched
+  off; it checks before it changes, backs each file up to a folder of
   its own, keeps permissions and links, runs twice with no change, and `--uninstall` puts back
   what it replaced. The hooks find the repository through `ENGINEERING_RULES_HOME` or their own
   path instead of the plugin root. **Never chase what you find on the way** (1.9): a bug, a
@@ -27,7 +33,7 @@ One entry per version, newest first. The README says what the setup is now; this
   position only from Claude's own reply text, so a heading quoted in a file or a tool result no
   longer reports a workflow in flight and asks for a full re-read. `/update-engineering-rules`
   changes these rules and ships the change: the ethics (the user's words are the
-  specification, nothing loosened quietly or lost by accident, the short law's size reported,
+  specification, nothing loosened quietly or lost by accident, both law files' sizes reported,
   one source of truth) and a release that tests in a worktree, merges, installs, verifies in a
   fresh session, commits and pushes. The plugin packaging (`.claude-plugin/`), its evals and
   its docs are gone. Major, because the packaging changed, a standing rule was retired and the

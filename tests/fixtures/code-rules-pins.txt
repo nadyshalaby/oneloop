@@ -1,0 +1,83 @@
+# Fixed strings law/engineering-code.md, the code rules that load on a code read, must carry, one
+# per line; read by tests/short-law.test.sh. A line starting with # is a comment.
+# caps
+40 lines per function
+3 parameters
+3 levels of nesting
+500 lines per file
+# bans
+`biome-ignore`
+`eslint-disable`
+`@ts-ignore`
+`@ts-expect-error`
+`@ts-nocheck`
+`istanbul ignore`
+`c8 ignore`
+`v8 ignore`
+non-null `!`
+`catch (e) {}`
+`.catch(() => {})`
+`except: pass`
+discarded into `_`
+inline `interface` or `type` of 2+ properties
+`*.types`
+`TypeError`
+`RangeError`
+`RuntimeException`
+`Promise.reject(new Error(...))`
+`.only`
+`fit`
+`fdescribe`
+`.skip`
+`xit`
+`xdescribe`
+`test.todo`
+`debugger`
+`console.*`
+# one thing per file
+`*.constants`
+`*.config`
+`*.schema`
+`*.styles`
+read 2.2 before creating any file or folder
+# principles
+second caller
+paste the search that found none
+Leave nothing behind
+Dead code that was there before your change is a follow-up
+# clean-code floor
+does or answers, never both
+No flag parameters
+Never mutate inputs
+Fail fast at the boundary
+One level of abstraction per function
+Talk to what you hold
+keeps its cause and context
+awaited, returned or handled
+Composition before inheritance
+A closed set is a type
+# refuse on sight
+Add error handling later
+a `TODO` with no owner
+commented-out code
+zero references
+# performance guardrails
+Never query or call per loop item
+Parallelize independent I/O
+Bound every result set
+Bound every cache
+Bound every fan-out
+No sync blocking I/O
+Filter on indexes
+No O(n²) on unbounded input
+Batch bulk writes
+Stream large payloads
+Stable props and keys in UI hot paths
+before optimizing
+# four principles
+Think before coding
+Simplicity first
+Surgical changes
+Goal-driven execution
+→ verify:
+never hunks of this diff

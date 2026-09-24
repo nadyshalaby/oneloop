@@ -17,7 +17,8 @@ In this order, before anything else:
 
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
-   (The always-on law is already in context through CLAUDE.md.) It binds this session
+   (The always-on law is already in context through CLAUDE.md; its code rules load with
+   the first code file read.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the entry point.** It is the whole invocation. When it is empty, ask for it
    through the wizard tool (4.4), one question; 16.9 stops on an ambiguous entry point

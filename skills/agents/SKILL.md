@@ -19,7 +19,8 @@ In this order, before anything else:
 
 1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
    loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
-   (The always-on law is already in context through CLAUDE.md.) Its intake does not
+   (The always-on law is already in context through CLAUDE.md; its code rules load with
+   the first code file read.) Its intake does not
    fire from here.
 2. **Read the invocation.**
    - The single word `off` switches to agentless: print the agent line

@@ -26,6 +26,7 @@ test_compact_carries_the_last_position() {
   out=$(start compact "$T")
   assert_contains "names the event" "engineering-rules re-anchor (context was compacted)" "$out"
   assert_contains "cites the re-read rule" "read it from disk before the next step (1.7, step 7)" "$out"
+  assert_contains "names the code rules in the config dir" "before writing code, read them from disk unless they are verbatim in your context: $WORK/config/rules/engineering-code.md" "$out"
   assert_contains "carries the last position, not the first" "Last phase-ledger position printed before the loss: (3 of 6, Phase 4)" "$out"
   assert_missing "and not the earlier one" "(2 of 6, Phase 3)" "$out"
   path=$(skill_path "$out")
