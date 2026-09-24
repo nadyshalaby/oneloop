@@ -1,0 +1,136 @@
+# Fixed strings law/engineering-law.md must carry, one per line; read by tests/short-law.test.sh.
+# A line starting with # is a comment. Add a pin here whenever a rule is added to the short law.
+# caps
+40 lines per function
+3 parameters
+3 levels of nesting
+500 lines per file
+# bans
+`biome-ignore`
+`eslint-disable`
+`@ts-ignore`
+`@ts-expect-error`
+`@ts-nocheck`
+`istanbul ignore`
+`c8 ignore`
+`v8 ignore`
+non-null `!`
+`catch (e) {}`
+`.catch(() => {})`
+`except: pass`
+discarded into `_`
+inline `interface` or `type` of 2+ properties
+`*.types`
+`TypeError`
+`RangeError`
+`RuntimeException`
+`Promise.reject(new Error(...))`
+`.only`
+`fit`
+`fdescribe`
+`.skip`
+`xit`
+`xdescribe`
+`test.todo`
+`debugger`
+`console.*`
+# one thing per file
+`*.constants`
+`*.config`
+`*.schema`
+`*.styles`
+read 2.2 before creating any file or folder
+# principles
+second caller
+paste the search that found none
+Leave nothing behind
+own cleanup commit
+# clean-code floor
+does or answers, never both
+No flag parameters
+Never mutate inputs
+Fail fast at the boundary
+One level of abstraction per function
+Talk to what you hold
+keeps its cause and context
+awaited, returned or handled
+Composition before inheritance
+A closed set is a type
+# refuse on sight
+Add error handling later
+a `TODO` with no owner
+commented-out code
+zero references
+# performance guardrails
+Never query or call per loop item
+Parallelize independent I/O
+Bound every result set
+Bound every cache
+Bound every fan-out
+No sync blocking I/O
+Filter on indexes
+No O(n²) on unbounded input
+Batch bulk writes
+Stream large payloads
+Stable props and keys in UI hot paths
+before optimizing
+# git safety
+`git checkout -- <path>`
+`git restore`
+`git stash`
+`git reset --hard`
+`git clean`
+`git push --force`
+`git add -A`
+`git add .`
+`git commit -a`
+`--no-verify`
+`--amend`
+No AI attribution in commits
+# never say
+"should work"
+"looks good"
+"I believe this is fine"
+"tests should pass"
+"I'll add tests later"
+"probably"
+"you're absolutely right"
+# the six deploy proofs and the live check
+green on the exact commit being shipped
+booted against a production-like copy
+switches that default off
+rolled back cleanly
+no regression with the switch off
+the rollback named
+verify live
+# claims
+Code is the only source of truth
+planted instance
+Memory is a hypothesis
+search for the family
+find every reader
+name the tier
+did not reach
+# questions and decisions
+`AskUserQuestion`
+`(Recommended)`
+most effective fix
+`advisor`
+never by a number
+# one goal, pace, principles
+exactly one main goal
+`file:line`
+Drift check
+Read the whole thing
+Finish the whole task
+Every detail the user gave
+Think before coding
+Simplicity first
+Surgical changes
+Goal-driven execution
+→ verify:
+# precedence and helpers
+This law is the floor
+the stricter rule wins
+Never waivable
+never a `fork`

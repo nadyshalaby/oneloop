@@ -19,7 +19,7 @@ test_over_the_cap_is_reported() {
   seq 1 501 > "$WORK/big.ts"
   out=$(after_write Write "$WORK/big.ts")
   assert_contains "names the file and the count" "cap.file-lines $WORK/big.ts: 501 lines" "$out"
-  assert_contains "cites the law" "SKILL.md 1.1 caps a file at 500 lines" "$out"
+  assert_contains "cites the law" "The law (1.1) caps a file at 500 lines" "$out"
   assert_contains "is PostToolUse context" '"hookEventName":"PostToolUse"' "$out"
   assert_missing "never a permission decision" "permissionDecision" "$out"
   assert_contains "is logged" " ${WORK##*/} | cap | file-lines | $WORK/big.ts | 501 lines" "$(cat "$LOG" 2>/dev/null)"

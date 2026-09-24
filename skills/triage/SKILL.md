@@ -1,5 +1,5 @@
 ---
-name: triage
+name: engineering-rules:triage
 description: "Review triage under the engineering-rules law, picked by your word: a batch of review findings becomes a per-finding accept, push-back, defer or needs-restatement table. Usage: /engineering-rules:triage <the pasted findings>"
 argument-hint: "[the pasted findings]"
 disable-model-invocation: true
@@ -14,8 +14,9 @@ batch of review findings becomes one decision per finding.
 
 In this order, before anything else:
 
-1. **Load the law**, unless its always-on section is already verbatim in this context:
-   invoke the Skill tool with `engineering-rules:engineering-rules`. It binds this session
+1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+   (The always-on law is already in context through CLAUDE.md.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the findings.** They are the whole invocation or, when it is empty, the batch
    pasted most recently in this conversation; when there is neither, ask for them through

@@ -1,6 +1,6 @@
 #!/bin/bash
 # engineering-rules file cap.
-# Runs on PostToolUse for Edit, Write, MultiEdit and NotebookEdit. SKILL.md 1.1 caps a file
+# Runs on PostToolUse for Edit, Write, MultiEdit and NotebookEdit. The law's 1.1 caps a file
 # at 500 lines, and the cap binds every code file, tests included. After an edit lands, this
 # hook counts the file and, when it is over the cap, hands Claude one line of context naming
 # the file and the count, so the split happens before the stage ends instead of at the
@@ -31,6 +31,6 @@ case "$(path_kind "$(relative_path "$path" "$cwd")")" in prose|generated) exit 0
 lines=$(wc -l < "$path" | tr -d ' ')
 [ "$lines" -gt "$CAP" ] || exit 0
 append_log "${cwd##*/}" "cap | file-lines | $path | $lines lines"
-jq -cn --arg c "cap.file-lines $path: $lines lines. SKILL.md 1.1 caps a file at $CAP lines; split it by responsibility before this stage ends." \
+jq -cn --arg c "cap.file-lines $path: $lines lines. The law (1.1) caps a file at $CAP lines; split it by responsibility before this stage ends." \
   '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$c}}'
 exit 0

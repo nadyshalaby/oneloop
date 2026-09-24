@@ -22,10 +22,10 @@ skill_path() {
 }
 
 test_compact_carries_the_last_position() {
-  printf '%s\n' '{"type":"assistant","text":"## 0. Phase ledger  (2 of 6, Phase 3)\n- [>] 2"}' '{"type":"user","text":"more"}' '{"type":"assistant","text":"## 0. Phase ledger  (3 of 6, Phase 4)\n- [>] 3"}' > "$T"
+  { reply_line $'## 0. Phase ledger  (2 of 6, Phase 3)\n- [>] 2'; reply_line 'more'; reply_line $'## 0. Phase ledger  (3 of 6, Phase 4)\n- [>] 3'; } > "$T"
   out=$(start compact "$T")
   assert_contains "names the event" "engineering-rules re-anchor (context was compacted)" "$out"
-  assert_contains "cites the re-read rule" "read the always-on law from disk before the next step (SKILL.md 1.7, step 7)" "$out"
+  assert_contains "cites the re-read rule" "read it from disk before the next step (1.7, step 7)" "$out"
   assert_contains "carries the last position, not the first" "Last phase-ledger position printed before the loss: (3 of 6, Phase 4)" "$out"
   assert_missing "and not the earlier one" "(2 of 6, Phase 3)" "$out"
   path=$(skill_path "$out")
@@ -37,7 +37,7 @@ test_compact_carries_the_last_position() {
 }
 
 test_resume_without_a_position() {
-  printf '%s\n' '{"type":"assistant","text":"no ledger here"}' > "$T"
+  reply_line 'no ledger here' > "$T"
   out=$(start resume "$T")
   assert_contains "names the event" "engineering-rules re-anchor (session resumed)" "$out"
   assert_contains "says no position was found" "No phase-ledger position was found in the transcript" "$out"
@@ -45,6 +45,23 @@ test_resume_without_a_position() {
   out=$(start compact "$WORK/not-there.jsonl")
   assert_contains "a missing transcript still re-anchors" "(context was compacted)" "$out"
   assert_contains "and says no position was found" "No phase-ledger position" "$out"
+}
+
+# A heading Claude only quoted, in a file it wrote or read, is no position: the last one it
+# printed in a reply wins, a transcript of quotes alone has none, and a line the byte window
+# cut short is skipped rather than misread.
+test_quoted_headings_are_not_positions() {
+  { reply_line '## 0. Phase ledger  (2 of 6, Phase 3)'; quoted_line '## 0. Phase ledger  (5 of 6, Phase 6)'; } > "$T"
+  out=$(start compact "$T")
+  assert_contains "the last position Claude printed wins" "Last phase-ledger position printed before the loss: (2 of 6, Phase 3)" "$out"
+  assert_missing "over a later one it only quoted" "(5 of 6, Phase 6)" "$out"
+  quoted_line '## 0. Phase ledger  (3 of 6, Phase 4)' > "$T"
+  out=$(start compact "$T")
+  assert_contains "quotes alone are no position" "No phase-ledger position was found in the transcript" "$out"
+  { printf '%s\n' 'xt","text":"## 0. Phase ledger  (6 of 6, Phase 6)"}]}}'; reply_line '## 0. Phase ledger  (1 of 6, Phase 1)'; } > "$T"
+  out=$(start compact "$T")
+  assert_contains "a whole line is read" "(1 of 6, Phase 1)" "$out"
+  assert_missing "a cut-short one is not" "(6 of 6, Phase 6)" "$out"
 }
 
 test_other_starts_and_bad_input_print_nothing() {
@@ -61,11 +78,12 @@ test_source_field_and_plugin_root() {
   out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",source:"resume",cwd:"/tmp/proj",transcript_path:$t}' | bash "$SCRIPT")
   assert_contains "the older source field still starts it" "(session resumed)" "$out"
   out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",how_started:"compact",cwd:"/tmp/proj",transcript_path:$t}' | ENGINEERING_RULES_HOME=/opt/er bash "$SCRIPT")
-  assert_contains "the home variable decides the path" "/opt/er/skills/engineering-rules/SKILL.md" "$out"
+  assert_contains "the home variable decides the path" "/opt/er/law/engineering-law.md" "$out"
 }
 
 test_compact_carries_the_last_position
 test_resume_without_a_position
+test_quoted_headings_are_not_positions
 test_other_starts_and_bad_input_print_nothing
 test_source_field_and_plugin_root
 report

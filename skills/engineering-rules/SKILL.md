@@ -1,32 +1,29 @@
 ---
-name: engineering-rules
+name: engineering-rules:engineering-rules
 argument-hint: "[what you want done]"
 description: >-
-  The complete engineering law and working method for shipping code: hard caps on function,
-  file, parameter and nesting size; zero-tolerance bans on suppressions, non-null assertions,
-  empty catches, bare Error throws, inline types, focused tests and debug artifacts; the file
-  and folder organization law; performance, security, test-scenario and clean-code catalogs;
-  an eight-phase workflow (clarify, plan,
-  spec review, implement, debug, verify, review, finish) with a phase ledger that refuses to
-  advance; six question banks; five review checks; the ship gate; a frontend design law, a
-  design scout and twelve ready-made specs. Use it whenever you are about to write, change,
-  refactor, review, debug, verify, audit or plan ANY code, including one-line edits, and
-  whenever the user asks about engineering standards, code quality, naming, where a file
-  should live, how to structure a module, how to review a diff, what counts as evidence, or
-  how to carry a task from request to done. Load it before writing code, not after.
+  The engineering-rules phase workflow: the phase ledger, the eight phases (clarify, plan, spec
+  review, implement, debug, verify, review, finish), the routes, the intake and the phase agents.
+  The always-on engineering law already binds every session through the user-global CLAUDE.md;
+  this skill adds the phases. Use it only when the user names the engineering-rules workflow or
+  one of its routes (full mode, quick mode, shaping, explore a feature, audit, triage, skill
+  authoring, design spec, update log) in their words, or when a /engineering-rules: command loads it.
 ---
 
-# Engineering rules and working method
+# Engineering rules: the phase workflow
 
-> Everything in this file binds for the whole session from the moment it loads. It is law,
-> not advice. Every file under `references/` is read at the moment its phase calls for it,
-> and once read, it binds too. **How** the work gets carried out is your call; **what** has
-> to be true, in what order, and with what evidence, is not.
+> The always-on law, `~/.claude/engineering-rules/law/engineering-law.md`, is already in context through the
+> user-global `CLAUDE.md` and binds every task. This skill adds the phase workflow; everything in
+> it binds from the moment it loads until the task is done. Every file under
+> `~/.claude/engineering-rules/references/` is read at the moment its phase calls for it, and once read, it binds
+> too. **How** the work gets carried out is your call; **what** has to be true, in what order,
+> and with what evidence, is not.
 
 ## How to read this skill
 
-The law is here, in full. Everything else lives in `references/`, one file per section, numbered
-exactly as the map at the end of this file numbers it. Read a reference at the moment its phase
+The always-on law is the short form in `~/.claude/engineering-rules/law/engineering-law.md`; the workflow's own law
+(1.4, 1.7, 1.8) is here. Everything else lives in `~/.claude/engineering-rules/references/`, one file per
+section, numbered exactly as the map at the end of this file numbers it. Read a reference at the moment its phase
 calls for it, from disk, never from memory: yourself when it is short, or through a fork that
 reads it in its own context and returns the lines that apply (1.8, 5.5); in agentless mode (4.4)
 always yourself. What the fork returns binds exactly as the file does. Section `0.1` carries the
@@ -49,8 +46,9 @@ full per-section table.
 This skill loads three ways, and all three bind identically; none is a lighter version of
 another.
 
-1. **Automatically**, the moment a task touches code. The request is the user's message, and
-   it classifies under 4.1.
+1. **By the user's word**: they name the engineering-rules workflow or one of its routes in their
+   message. The request is that message, and it classifies under 4.1. The workflow never starts
+   on its own because a task touches code; the always-on law covers that.
 2. **By name with a request**: `/engineering-rules:engineering-rules <what you want done>`.
    The request is what follows the name, and it classifies under 4.1 exactly as prose does.
    This form carries no route token; every route has a sub-command of its own.
@@ -63,14 +61,14 @@ another.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-That line renders empty when this skill loaded automatically, was invoked bare, or was loaded by a sub-command; empty is not a route and not a request.
+That line renders empty when this skill was loaded by the user's word in prose, was invoked bare, or was loaded by a sub-command; empty is not a route and not a request.
 
 **The intake, and the three times it must not fire.** When the user invoked this skill by name
 with nothing after it, walk them through the options through the wizard tool, the way 4.4 lays
 out: what they are here for, then which route, then agents or agentless, then the request. The
 flow starts only when all three facts are settled, and nothing is classified, opened or read for
-the task before then. The intake never fires in the other three cases: not when this skill loaded
-automatically because a task began, not when the message carries a request in any form, however
+the task before then. The intake never fires in the other three cases: not when the user named
+the workflow in a message that carries the task, not when the message carries a request in any form, however
 short, and not when a sub-command loaded it. A menu in front of somebody who already said what
 they want is ceremony, and 4.1 forbids reading a task's shape as a request for more of it.
 
@@ -94,7 +92,7 @@ question switches the conversation to agentless: every phase then runs here, not
 | **Touched scope** | `git diff --name-only <base>..HEAD -- . ':(exclude)docs/work/*'`, where `<base>` is the commit recorded at task start. |
 | **The triad** | The project's own test, lint and typecheck commands, taken verbatim from its manifest, `CLAUDE.md` or README. Never guessed. |
 | **The wizard tool** | The runtime's structured question tool: `AskUserQuestion` on Claude Code. |
-| **The agent tool** | The runtime's subagent tool: `Agent` on Claude Code. Every phase agent runs on a type Claude Code ships itself, none on an agent of this plugin's: `subagent_type: "fork"` for a reader that needs the conversation (the scouts, the question batch), `"Explore"` for a wide read-only search, `"Plan"` for the spec reviewer of Phase 2.5 and for the planner when it is hunting a root cause, both read-only by construction, and `"general-purpose"` for the planner of Phase 2, which writes the work-doc itself, for the reviewer of the diff, the mechanic and a builder, each sent its shape's prompt from 5.5 pasted whole. Every send but a fork names its `model`, from the map in 1.8: `sonnet` where the phase writes code or runs commands, `opus` where it plans, judges or decides. Section 1.8 is this skill's standing request for it. In agentless mode (4.4), the opt-out, nothing is sent to it and every phase runs here. |
+| **The agent tool** | The runtime's subagent tool: `Agent` on Claude Code. Every phase agent runs on a type Claude Code ships itself, none on an agent of this setup's: `subagent_type: "fork"` for a reader that needs the conversation (the scouts, the question batch), `"Explore"` for a wide read-only search, `"Plan"` for the spec reviewer of Phase 2.5 and for the planner when it is hunting a root cause, both read-only by construction, and `"general-purpose"` for the planner of Phase 2, which writes the work-doc itself, for the reviewer of the diff, the mechanic and a builder, each sent its shape's prompt from 5.5 pasted whole. Every send but a fork names its `model`, from the map in 1.8: `sonnet` where the phase writes code or runs commands, `opus` where it plans, judges or decides. Section 1.8 is this skill's standing request for it. In agentless mode (4.4), the opt-out, nothing is sent to it and every phase runs here. |
 | **Phase agent** | The agent that carries one phase's work: a reader, a planner, a spec reviewer, a builder, a mechanic or a reviewer (5.5), on the type and model 1.8's map gives that run point. Never an owner of a phase, a tick or a claim. The phase stays this session's, and what comes back is a report until this session re-runs it. |
 | **Agentless mode** | The opt-out mode: every phase agent's work runs in this session for the whole task and nothing is sent to the agent tool. Switched on by `/engineering-rules:agents off`, by the user's own words in the message that starts the task, or through the intake (4.4), and it holds for the conversation until they switch back. Recorded once, on the agent line (1.8). |
 | **Follow-up** | Anything true, useful and outside the main goal: a pre-existing defect, a law break in a file you happened to open, a missing test, a smell, a better idea. Written down with its `file:line` the moment it is seen, fixed in a task of its own, never in this one (1.9). |
@@ -103,105 +101,10 @@ question switches the conversation to agentless: every phase then runs here, not
 | **The ledger substrate** | The runtime's todo tracker when it exposes one; otherwise the printed block. Named once at the first print. On Claude Code the tracker is the `Task` family (`TaskCreate`, `TaskList`, `TaskUpdate`, `TaskGet`), which arrives deferred and is loaded once at task start before the first call; there is no `TodoWrite` (5.1). |
 | **Exit artifact** | The concrete thing that must exist before a ledger item may tick. One per phase, listed in section 5.1. |
 
-## Precedence, who wins when rules disagree
+## The workflow's own law
 
-1. **This law is the floor.** Nothing below it may lower it.
-2. **A project's `CLAUDE.md`, `AGENTS.md` or documented rules may add rules or tighten a cap.** They may never relax a ban, widen a cap, drop a phase or lower an evidence bar. "Project rules win" means the project may be stricter, not looser.
-3. **On a convention, the repository wins.** Naming, layout, formatter and test placement follow what the repo already does, because consistency inside one codebase is itself law (section 2.2). Where the repo has decided nothing, section 2.2 decides.
-4. **Between user-global and workspace `CLAUDE.md`, the stricter rule wins.**
-5. **The user may waive ceremony, never law.** What that means exactly is in 1.7.
-
-## Always-on law
-
-### 1.1 [rule] Hard caps, the zero-tolerance bans, one thing per file
-
-**Size caps.**
-
-- **≤ 40 lines** per function or method. Extract helpers if longer.
-- **≤ 3 parameters.** Group into a named interface or DTO if more.
-- **≤ 3 levels of nesting.** Guard clauses and early returns over deep nesting.
-- **≤ 500 lines** per file. Split by responsibility. This binds every file in this plugin too.
-
-**Bans, zero tolerance, in production code.**
-
-- **0 lint, type or coverage suppressions**: no `biome-ignore`, `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, no coverage-ignore marker (`istanbul ignore`, `c8 ignore`, `v8 ignore`), and no equivalent in any other language or tool. Sole exception: `@ts-expect-error` in a test file over deliberately invalid input, with a comment saying WHY; test files are exempt from the other bans in this list, never from this one. These tokens stay literal here because they are among the strings the scouts grep for; 9.5 carries the full list and 16.7 the per-language analogs.
-- **0 non-null `!` assertions.**
-- **0 empty catches.** `catch (e) {}` and every equivalent is banned unconditionally: a catch holding only a comment, a `.catch(() => {})` on a promise, an `except: pass`, an error discarded into `_`.
-- **0 inline `interface` / `type` blocks of 2 or more properties** in any router, service, middleware, guard, controller, component, page or route module. Extract to a `*.types` file in the feature's `types/` folder.
-- **0 bare `Error` throws** in domain code, `Error` or any other built-in error class (`TypeError`, `RangeError`, a JVM or .NET `RuntimeException`), with or without `new`, and none of its cousins: no thrown string, number or object literal, no `Promise.reject(new Error(...))`. Throw a domain-specific exception subclass.
-- **0 focused or skipped tests committed.** No `.only`, `fit` or `fdescribe`; no `.skip`, `xit`, `xdescribe`, `test.todo` or a language equivalent without a ticket or an owner on the same line. A focused test silently drops the rest of the suite. This ban is written for test files, which the other bans exempt.
-- **0 debug artifacts.** No `debugger` statement in production code; no `console.*` call in domain code, which logs through the project's logger.
-
-On Claude Code, this plugin's edit guard hook refuses, at the tool boundary, an edit that adds one of the tokens the law scout (9.5) can judge without a lexer; its refusal is this rule speaking, never an obstacle to route around through the shell, and the scout still runs at every stage end for what a hook cannot see.
-
-**File separation, one thing per file.**
-
-- **One component per file**, public or private. A sub-component used only by its parent gets its own file inside a `<component>/` folder.
-- **One class per file.** Its private helpers stay with it. This is one class per file, not one function per file.
-- **A dedicated file per concern**: types → `*.types`, constants → `*.constants`, config → `*.config`, schemas → `*.schema`, style tokens and class-name maps → `*.styles`. Implementation files import these; they never declare them. Genuinely single-use values read in place stay inline; extraction serves reuse, not ceremony.
-- **One folder skeleton per repository.** Every module follows the same documented layout. "Just this once, elsewhere" is a violation; fix the convention in one place, never deviate locally. Section 2.2 is the placement contract and it is read before any file is created.
-- **A technical exception must cite the concrete compiler or linter error it prevents.** An undocumented inline exception is a finding.
-
-**Always-on principles.**
-
-- **Reusable, generic, shareable, the prime directive.** Write every unit so a second caller could import it as-is: parameterize over hard-coding, carry dependencies explicitly, keep it independently testable. Extract on the SECOND use, never speculatively.
-- **DRY, with the search shown.** Before writing a function, type, constant, schema or component, search the repo for one that already does it, and reuse or extend it. Every new symbol a stage adds carries the search that found no equivalent, pasted (1.5); a new symbol whose equivalent existed is a finding (`style.reuse`, `style.dry`). The same 3+ lines twice → extract.
-- **Named types.** Any object shape with 2+ properties is a named `interface` or `type`.
-- **Single responsibility.** One function does one thing; one service owns one domain; one command owns one job.
-- **Explicit over clever.** No magic, no implicit behaviour, no code that needs a comment to be understood.
-- **Edge cases.** Handle null, undefined, empty, concurrent and partial-failure paths. Do not hope.
-- **Leave nothing behind.** A change deletes what it orphans: the callee whose last caller it removed, and the import, type, constant, schema, fixture, flag, config key, env var, translation, test and doc line that served only what it replaced. Git is the history. Every stage sweeps its own leftovers before it commits (9.1), and dead code already sitting in a file the stage touched is removed in its own cleanup commit, never silently left (13.2, class 10).
-- **Comments.** Default to none. Write one only when the WHY is non-obvious.
-
-**The clean-code floor, ten lines distilled from the clean-code catalog (section 3.4).** Judged, not grepped; the quality-and-plan check (12.7) cites the catalog row.
-
-1. **A function does or answers, never both.** A query has no side effect; a command returns nothing it did not change.
-2. **No flag parameters.** A boolean that switches behaviour is two functions, or a named option.
-3. **Inputs are never mutated.** Return a new value; mark shared data read-only; mutate only what you own.
-4. **Fail fast at the boundary.** Validate on entry, throw at the first bad state, never carry a bad value inward.
-5. **One level of abstraction per function.** Orchestration and byte-pushing never share a body.
-6. **Talk to what you hold.** No `a.b().c().d()` into another object's internals; ask the nearest object.
-7. **Every error keeps its cause and its context.** Wrap and rethrow with `cause`; never log-and-continue where the caller cannot proceed.
-8. **Every promise is awaited, returned or handled.** No floating promise; no sleep standing in for a signal.
-9. **Composition before inheritance.** No hierarchy deeper than two, none built to share code.
-10. **A closed set is a type, not a string.** Enum or union for statuses, kinds and ids; a domain value is never a bare primitive.
-
-**Refuse on sight.** "Add error handling later"; a `TODO` with no owner; a fallback for a hypothetical future requirement; a backwards-compat shim for code that is never deployed; a half-finished implementation; re-exporting types "for convenience"; a `// removed: <X>` comment for deleted code; a block of commented-out code; a symbol your change left with zero references.
-
-### 1.2 [rule] Expert mindset
-
-This work ships to real users. A skipped phase, an unproven claim or a missed edge case is a production incident waiting to happen, not a style nit. Treat every task as load-bearing, small ones included, because "small" is where broken work hides. Careful work is faster than fast work redone.
-
-You are a senior, multi-disciplinary engineer, not a code typist. Wear the hat the moment calls for:
-
-- **Problem-solver.** Root cause, never the first symptom. Reproduce, gather evidence, trace the bad value to its source. No guessing.
-- **Security engineer.** Assume adversarial input. Guard auth, permissions, secrets, injection and migrations by default.
-- **Performance engineer.** Watch complexity, N+1 queries, allocations and hot paths. Cheapest-correct beats clever-slow.
-- **Solutions architect.** Respect layer boundaries; reuse before you rewrite; build each unit for a second caller.
-- **Tech advisor.** Give an opinionated recommendation with concrete trade-offs, never a fence-sitting survey.
-- **Product owner.** Outcome before output: who it is for, what changes for them, how anyone would know, what a wrong guess costs, and what is deliberately not being done. Ask the question whose wrong answer costs the most, first; scope every question to a deliverable; bring the options the user did not think to ask for.
-- **QA / verifier.** Prove, do not claim. Every "done" carries fresh, real output.
-
-**Think before you type. Prove, do not claim. Reflect after each step. When unsure, stop and ask.** The full doctrine, with the hat-by-hat table, is section 5.4.
-
-### 1.3 [rule] Performance guardrails
-
-Twelve guardrails, distilled from the canonical performance catalog (section 3.1). Hot paths get zero tolerance.
-
-1. **Never query or call per loop item.** Batch it: JOIN, `IN (...)`, bulk endpoint, dataloader.
-2. **Parallelize independent I/O**, bounded. Sequential awaits on independent calls pay the sum of latencies.
-3. **Bound every result set.** Every list query ships a LIMIT and a pagination strategy; prefer keyset over deep OFFSET.
-4. **Bound every cache.** TTL or LRU cap on every cache and memo. A cache without eviction is a leak.
-5. **Bound every fan-out.** No `Promise.all` over a data-sized list; use a concurrency pool or chunks.
-6. **No sync blocking I/O on servers.** No sync fs, sync crypto or MB-scale sync parse on a request path.
-7. **Filter on indexes.** Every hot WHERE, JOIN and ORDER BY column is index-backed; no function around an indexed column; no leading-wildcard LIKE on big tables.
-8. **No O(n²) on unbounded input.** Build a Map or Set instead of nested scans; hoist loop-invariant work.
-9. **Batch bulk writes.** One bulk statement instead of n single-row writes; buffer small writes.
-10. **Stream large payloads.** Never buffer a whole large file or response in memory.
-11. **Stable props and keys in UI hot paths.** No inline object, array or lambda props to memoized children; no index-as-key on mutable lists; virtualize long lists.
-12. **Measure before optimizing.** Profile or EXPLAIN first; no speculative micro-optimization that costs clarity.
-
-**Enforcement.** The perf scout (9.4) runs at the end of every implementation stage and at the start of Phase 5, and the performance check (12.4) judges every staged candidate against the catalog. This holds in every mode.
+These three sections bind from the moment this skill loads. The rest of the always-on law
+(1.1 to 1.3, 1.5, 1.6, 1.9 to 1.11) is the short form already in context.
 
 ### 1.4 [rule] Phase discipline
 
@@ -209,47 +112,10 @@ Twelve guardrails, distilled from the canonical performance catalog (section 3.1
 - **Phases run in order, one open at a time.** No later phase starts while an earlier one is open. This is the refuse-to-advance law and the whole point of the ledger.
 - **No phase is ever silently skipped.** A phase that genuinely does not apply is ticked complete with a one-line reason. Never deleted, never dropped in silence, in any mode.
 - **Every question goes through the wizard tool.** Any question, decision, approval or request for feedback put to the user, in every phase: a fork the plan leaves open, fix approvals, the finish menu, a mid-task fork. A plain numbered list in chat is forbidden. The recommended option is first and carries ` (Recommended)`.
-- **Every decision goes past the advisor tool, whenever the tool list holds one.** Before an approach or a plan is committed to, before a recommendation is put to the user, before acting on a review or a root cause, before a change of direction, before anything hard to undo, and before verified or done is said: state the decision, the options and the evidence in a line or two, call the advisor, then decide. The test is the tool list, never the model this session or an agent runs on. Its answer is a report, never proof (1.5): the user's words, the anchor, this law and fresh evidence outrank it, and a clash is said in one line. No advisor tool is never an error: say so once, on the line that names the substrate, and decide alone with the same care. On Claude Code this plugin's advisor cue hook puts this rule into every prompt, so it binds a session that never loaded this skill; it judges nothing and refuses nothing, because the tool list belongs to the session. The run points, the record that rides the tick and the line the deciding agents carry are 5.7.
+- **Every decision goes past the advisor tool, whenever the tool list holds one.** Before an approach or a plan is committed to, before a recommendation is put to the user, before acting on a review or a root cause, before a change of direction, before anything hard to undo, and before verified or done is said: state the decision, the options and the evidence in a line or two, call the advisor, then decide. The test is the tool list, never the model this session or an agent runs on. Its answer is a report, never proof (1.5): the user's words, the anchor, this law and fresh evidence outrank it, and a clash is said in one line. No advisor tool is never an error: say so once, on the line that names the substrate, and decide alone with the same care. On Claude Code the advisor cue hook this setup installs puts this rule into every prompt, so it binds a session that never loaded this skill; it judges nothing and refuses nothing, because the tool list belongs to the session. The run points, the record that rides the tick and the line the deciding agents carry are 5.7.
 - **A tick with no reflection is an untrusted tick, and a deferred write is no tick at all.** One line saying what changed and whether it passed, then flip the item, then open the next, in one saved edit. There is no later. In full mode the work-doc edit comes before the chat re-print; in Phase 3 the checkbox and the Daily Updates entry land together as each task closes; at the close, the one edit that writes `status: done` is followed immediately by the archive move. **In full mode the work-doc is the map and nothing overrides it:** the phase it shows open is the phase you are in, the task it lists next is the task you take, and a task is reordered by editing the doc first, with the reason written down. Nothing at the tool boundary enforces this; it holds because you hold it (7.3).
 - **Every tick also goes out through the notification tool.** At every phase boundary and every stage end, right after the re-print, send the ledger heading and the one-line reflection as one line under 200 characters. The user may be away from the terminal, and this is the one step that reaches them there. The runtime drops the line when they are watching, which is never an error; a runtime with no notification tool says so once and carries on.
 - **A check-in every ten minutes, not only at the boundaries.** Bring the work-doc up to date, print the three-line brief (doing, done, todo) in plain words, run the drift check (1.9), then carry on; a check-in never ends the work, and when work will keep running after your turn ends you start the recurring one before you stop. The protocol is 5.6.
-
-### 1.5 [rule] Claim integrity, evidence before claims
-
-Code is the only source of truth about code. A README, a comment, a changelog, a work-doc or an earlier report is a record of what somebody believed when they wrote it, never evidence about what the code does now. Read docs for intent; re-derive every fact from the code, in this session, before you assert it.
-
-- **Code is the only source of truth.** When a doc and the code disagree, the code wins and the doc is the defect.
-- **Read docs for intent, re-derive every fact from the code.** Behaviour, names, counts, line positions and wiring come from the tree, freshly.
-- **Prove every claim with fresh output, or do not make it.** Fresh means run in this session, pasted, not summarized, not remembered.
-- **A number you did not just count is already wrong.** Where you can, print the number instead of maintaining it.
-- **Open every citation you write and every one you trust.** A path, a line, an ID or a symbol you name is a claim that the thing is there. Resolve it before you write it.
-- **Fixing the filed site is not fixing the defect.** Search for the family; fix every member or write down which you left and why.
-- **A comment's reason may no longer be the only one.** Before changing a setting, find its readers in the code; the comment is one reader's opinion.
-- **Hand every agent your facts and permission to refute them.** A pre-derived fact with no invitation to contradict it is just faster wrongness.
-- **A verification that can fail silently is not a verification.** If failure output cannot be told from success output, the run proved nothing.
-- **A clean result is only as good as the method's ability to have returned a dirty one.** Before reporting a zero, show the search finding a planted instance.
-- **An absence is only as good as the method's ability to have found the thing present.** Name the one path your search covered.
-- **A pre-derived fact has a shelf life shorter than a session.** Anchor a citation that must outlive a step to a symbol or heading, not a line number.
-- **A safety claim is about this case, not the class.** "All of these are pinned" never licenses an edit; "this one is pinned" does.
-- **Match depth to what a wrong claim costs, and name the tier.** Full re-derivation for money, security, auth, state machines, migrations, concurrency and data loss; a fresh run cited by name for behaviour a test already exercises; a spot-check for cosmetic claims. No tier skips proof.
-- **Say what the checks do not reach.** Naming the gap is part of the report.
-- **Memory is a hypothesis.** What you remember about a library, a framework, an API, a tool, a version, a flag or a platform limit is not a fact until verified this session: in the lockfile, the installed package's source or types, the tool's own help, or documentation fetched now. Cite where. What cannot be verified is labelled `unverified`, asked or spiked, and never built on; nothing the model "knows" outranks the repo, the user or a fetched page, and a myth stated with confidence is the most expensive kind of wrong.
-
-The procedures behind these laws (choosing the tier, proving a zero, the tells of a silent failure, rationale drift, the facts-plus-refutation pairing) are in section 1.5's reference file. Read it at Phase 4 and whenever you are about to write a claim about code.
-
-### 1.6 [rule] The four principles
-
-**Think Before Coding.** The first move on any non-trivial prompt is not a keystroke, it is a question. State your assumptions out loud. List at least two plausible interpretations when the ask is ambiguous; commit to one and say why. Push back when the request collides with a cap, a prior decision or evidence already on screen. Stop and ask when the next step depends on a fact you do not have; never substitute a guess. Re-read the acceptance criteria before the first line of a task. The clarify round is where truth is collected: every fact tagged with the source that produced it this session, every aspect of the task marked on the coverage map (6.15), the intent restated and confirmed by the user before any domain question (6.4, Q0). *The test: can you point at the line in the plan, the file or the user's message that authorized this code? If not, stop.*
-
-**Simplicity First.** Ship the minimum code that solves the stated problem. Build only what was asked; speculative features, "while I'm here" extras and unrequested options are out. No abstraction for single-use code. No error handling for scenarios the call site's contract makes impossible. No configuration knobs for hypothetical tuning. Prefer deletion over addition. *The test: if you removed this line, would the stated acceptance criterion still pass? If yes, the line is overhead.*
-
-**Surgical Changes.** Every changed line traces to the request. Touch only the files the task names; the file allowlist is a hard boundary. Do not refactor adjacent code "while you're in there"; open a separate task. Match the surrounding style even when you would have written it differently. Note pre-existing smells or bugs in the follow-ups; never silently rewrite them. Clean up every orphan your own diff created, in the stage. Dead code already in a file you touched is the one hunk that traces to the law instead of the request: it is removed in its own cleanup commit with the zero-reference proof beside it (9.1, 13.2 class 10), because a dead symbol beside a live change is the next reader's trap. *The test: can a reviewer trace every hunk back to a task line or acceptance criterion? If not, the diff is too wide.*
-
-**Goal-Driven Execution.** Convert every imperative ask into a verifiable goal. Annotate each plan step with `→ verify: <one-line check>`, the exact command, grep or assertion that proves it. Prefer machine-checkable verifications; reserve "manual smoke" for genuine UI-shape changes. When a verification fails, stop and report; never loosen the check to make it pass. *The test: for each step, can you name the exact check that flips from red to green when it is done? If not, it is not yet a goal.*
-
-Section 14.1 carries seven worked examples of these principles being broken. Phase 3 reads it; Phase 5 cites it by example number.
-
-_Adapted from Andrej Karpathy's observations on the recurring failure modes of large language models asked to write production code._
 
 ### 1.7 [rule] Run discipline, how a task starts, advances, loops back and ends
 
@@ -270,7 +136,7 @@ _Adapted from Andrej Karpathy's observations on the recurring failure modes of l
 4. Send the heading line and the reflection through the notification tool (1.4), one line under 200 characters.
 5. Read the next phase's reference file from disk.
 6. Restate the anchor's North-Star Goal and its top Non-Goal in one line, so drift is visible.
-7. **Re-anchor after context loss.** If this file's always-on section is no longer verbatim in your context, because the conversation was compacted or summarized, re-read this file before doing anything else in the new phase. A summary of the law is not the law. On Claude Code, this plugin's re-anchor hook prints this instruction and the last ledger position into the new context after a compaction or a resume; the re-read is still yours to do.
+7. **Re-anchor after context loss.** If the always-on law or this skill is no longer verbatim in your context, because the conversation was compacted or summarized, re-read `~/.claude/engineering-rules/law/engineering-law.md` and this skill before doing anything else in the new phase. A summary of the law is not the law. On Claude Code, the re-anchor hook this setup installs prints this instruction and the last ledger position into the new context after a compaction or a resume; the re-read is still yours to do.
 
 **Loop-back, when a later phase sends you back.** A red in Phase 4, a Critical or Important finding in Phase 5, a red re-verify in Phase 6, or a task you cannot finish in Phase 3, sends you back to Phase 3 (or 3b when stuck). Re-open the earlier item as `- [>]` with `reopened: <reason>` appended, leave every later item open, and run forward again through every phase in between. Never patch and skip ahead. Every re-run of a phase produces fresh evidence; nothing from the earlier pass carries over as proof.
 
@@ -374,79 +240,6 @@ committed. An agent asked to do one of these has been sent the wrong job, and it
 usable even when it is right. The six shapes, the return contract, the brief and the runtime mapping
 are 5.5, read before the first send and after a compaction.
 
-### 1.9 [rule] One goal, and what happens to everything else you find
-
-**A task has exactly one main goal, and it ends when that goal is delivered and verified**, not when
-the code around it got better. The goal is the anchor's North-Star Goal (5.2), written at Phase 1
-and unchanged until the user changes it.
-
-**Everything else you notice on the way is a follow-up.** A pre-existing bug, a law break in a file
-you happened to open, a missing test, a smell, a refactor that is obviously right: write it down the
-moment you see it, one line with its `file:line`, and keep going. It gets fixed in a task of its
-own, and the user says when. This holds however small the fix looks, because a two-minute detour
-costs two minutes off the goal plus every minute the verify, the review and the sweep then spend on
-ground the plan never claimed. A follow-up with no `file:line` and no one-line statement of what is
-wrong is not a follow-up, it is a feeling. They go under `## Follow-ups` in the work-doc in full
-mode, in the printed block in quick mode, and into the update log (16.13) at the finish, where the
-user says what happens next.
-
-**The four things that are not follow-ups**, because the goal is not delivered without them:
-
-1. **What your own diff broke or orphaned.** Your change's leftovers are your change (1.1).
-2. **Dead code already sitting in a file this task touched**, removed in its own cleanup commit with the zero-reference proof beside it (9.1, 13.2 class 10). That is a standing decision of the law, not a detour you chose.
-3. **A defect that genuinely blocks the goal**, where it cannot be delivered or verified around the defect. Say in one line why it blocks, fix the smallest thing that unblocks it, record it in Daily Updates as a change the plan did not authorize so the review sees it, then get back on the goal. *"It was right there"* is not a block.
-4. **A Critical finding of Phase 5 against this diff**, which is this diff's own defect.
-
-**The drift check, at every phase boundary and every stage end.** One line: the goal, and whether
-the work since the last boundary served it. Work that did not is named, stopped and moved into the
-follow-ups. Drift caught at the review costs the whole review.
-
-### 1.10 [rule] Pace and attention, quick, never lazy, never approximate
-
-Quick and careful are one skill here, and neither is ever bought with the other. This binds every
-phase agent as well as this session: 5.5 pastes it into the brief every non-fork agent carries,
-because an agent that skims is only a faster way to be wrong.
-
-**Quick.** Tool calls that do not depend on each other go out in one message, never one per turn,
-and independent stages go to their builders in one message. One short line says what you are about
-to do (5.3), then you do it; a paragraph of plan in chat is not progress. A fact the repository
-holds is looked up, never asked: the wizard tool is for decisions that are the user's to make (6.2).
-What this session already proved is not re-derived to feel sure; what could have changed under you
-is.
-
-**Never lazy, never approximate.**
-
-- **Read the whole thing:** the whole file when it is the file you are changing, the whole function when it is the function, every hit of the search and not the first one. A first hit answered is a question half asked.
-- **Finish the whole task**, the boring part and the part you would have scoped out included. A part that is genuinely blocked is delivered as far as it goes and named in one line as blocked, with what is missing. No half-landing to keep a tick: a task that cannot close stays open (9.1).
-- **Never hand back a decision the law already made.** Ask the user what is theirs; decide what is yours.
-- **A fact one command would settle is never guessed:** not a path, not a flag, not a version, not a line number, not what a function returns. Memory is a hypothesis (1.5), and a number is counted this session, printed rather than maintained.
-- **Every input gets its edges read:** empty, one, many, absent, malformed, duplicate, unauthorized, the error path (9.3).
-- **"Should" is not evidence.** *"Should work"*, *"looks right"*, *"probably fine"* and *"tests should pass"* are banned (1.7). Say what you ran and what it printed.
-- **Every detail the user gave is a requirement.** A number, a name, a format, an order or an example in their message is part of the goal, not colour. Meet it exactly, or say plainly which one you did not meet and why.
-
-### 1.11 [rule] Shipping in small verified releases, and the proof before a deploy
-
-**Ship in small, stable, verified pieces.** A piece that works and is proven lands as soon as it is
-proven; it never waits for the rest of the task so everything can go at once. Each piece lands
-behind its own switch, or as its own config change, defaulting to the behaviour already live, so
-every release leaves the live system better or unchanged, never worse.
-
-**Before any deployment, prove it will not break what is live, and show the proof.** A deployment is
-a push or merge that deploys, a flag flip, or any config change on a live environment. Six rows,
-each with its own output pasted, before the deploy and never after:
-
-1. **Green on the exact commit being shipped:** the triad and the build, run on that commit and not on a neighbour.
-2. **That commit's build artifact booted against a production-like copy**, with production's settings, smoke-tested on the key endpoints.
-3. **New behaviour behind switches that default off**, so nothing changes until a switch is flipped.
-4. **Migrations applied and rolled back cleanly** on that copy.
-5. **Quality checks showing no regression with the switch off**, and the measured gain with it on.
-6. **No other deploy in flight, and the rollback named:** the previous image or commit.
-
-**After deploying, verify live before calling it done** or flipping anything else: real requests,
-against the deployed version, with clean logs, pasted. A deploy nobody verified is a deploy nobody
-can defend, and 1.5 governs the claim that it worked. The ship gate of Phase 4 (11.3) is the
-in-repository half of this rule; this half binds the moment the change leaves the repository.
-
 ## Picking the route
 
 Every substantive prompt takes exactly one route. Pick it from what the user asked for, never from how large the task looks.
@@ -476,12 +269,12 @@ Every substantive prompt takes exactly one route. Pick it from what the user ask
 
 ## The map
 
-Every section is a file in `references/`. The number is the section id; "section 2.2" means the file whose name starts with `2.2`. The full per-section table is in `0.1`.
+Every section is a file in `~/.claude/engineering-rules/references/`. The number is the section id; "section 2.2" means the file whose name starts with `2.2`. The full per-section table is in `0.1`.
 
 | Group | What is in it | When you read it |
 |---|---|---|
 | **0** | Orientation and the full section table | When the group table below is not enough. |
-| **1** | Always-on law, 1.1 to 1.11 | Inlined above. The reference files are stubs, except 1.5, which carries the claim-integrity procedures. |
+| **1** | Always-on law, 1.1 to 1.11 | The short form is in context through CLAUDE.md; 1.4, 1.7 and 1.8 are above; the long forms of the rest are group 1's files. |
 | **2** | Doctrine: code quality (2.1), file and folder law (2.2) | Before writing code, and before creating any file or folder. |
 | **3** | Catalogs: performance (3.1), security (3.2), test scenarios (3.3), clean code (3.4) | Look up an ID or a fix direction; never read end to end. |
 | **4** | Routes: how one is picked (4.1), quick mode (4.2), full mode (4.3), the sub-commands, the intake and the agent modes (4.4) | At task start; 4.4 the moment the skill is invoked bare, a sub-command loads it, or the user switches the agents off or on. |

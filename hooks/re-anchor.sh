@@ -1,7 +1,7 @@
 #!/bin/bash
 # engineering-rules re-anchor.
 # Runs on SessionStart when a session resumes or its context was compacted. A summary of the
-# law is not the law (SKILL.md 1.7, step 7): after context loss the always-on section is read
+# law is not the law (1.7, step 7): after context loss the always-on law is read
 # again from disk before anything else. This hook prints that instruction into the new
 # context with the path to read, and adds the last phase-ledger position it finds in the
 # transcript, so the ledger re-opens on the right item (5.1, pause and resume). Plain text on
@@ -19,13 +19,16 @@ here=${BASH_SOURCE[0]%/*}
 # shellcheck source=./ledger-position.sh
 . "$here/ledger-position.sh"
 
-SKILL="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}/skills/engineering-rules/SKILL.md"
+ER_HOME="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}"
+LAW="$ER_HOME/law/engineering-law.md"
+WORKFLOW="$ER_HOME/skills/engineering-rules/SKILL.md"
 SCAN_BYTES=4000000
 
-# The last ledger heading in the transcript's final bytes; empty when there is none.
+# The last ledger heading Claude printed in the transcript's final bytes; empty when there is
+# none. Only Claude's reply text counts, never a heading quoted in a file or a tool result.
 last_position() {
   [ -n "$transcript" ] && [ -f "$transcript" ] || return 0
-  tail -c "$SCAN_BYTES" "$transcript" 2>/dev/null | read_ledger_position
+  tail -c "$SCAN_BYTES" "$transcript" 2>/dev/null | claude_text | read_ledger_position
 }
 
 read_hook_input || exit 0
@@ -39,9 +42,9 @@ esac
 transcript=$(hook_field '.transcript_path // empty')
 cwd=$(hook_field '.cwd // empty')
 position=$(last_position)
-printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: read the always-on law from disk before the next step (SKILL.md 1.7, step 7): %s\n' "$happened" "$SKILL"
+printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: if the always-on law is no longer verbatim in your context, read it from disk before the next step (1.7, step 7): %s\n' "$happened" "$LAW"
 if [ -n "$position" ]; then
-  printf 'Last phase-ledger position printed before the loss: %s. Re-print the ledger with that item open and continue from it; nothing from before carries over as proof (5.1).\n' "$position"
+  printf 'Last phase-ledger position printed before the loss: %s. A phase-workflow task was in flight: re-read the workflow skill (%s), re-print the ledger with that item open and continue from it; nothing from before carries over as proof (5.1).\n' "$position" "$WORKFLOW"
 else
   printf 'No phase-ledger position was found in the transcript. If a task was in flight, re-open its ledger from the last print you can see.\n'
 fi

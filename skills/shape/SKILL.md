@@ -1,5 +1,5 @@
 ---
-name: shape
+name: engineering-rules:shape
 description: "Shaping under the engineering-rules law, picked by your word: one Socratic conversation, one or two forking questions a turn, until the idea is a task and the build starts. Usage: /engineering-rules:shape <the idea>"
 argument-hint: "[the idea]"
 disable-model-invocation: true
@@ -14,8 +14,9 @@ not a task yet, and the trigger phrases 16.1 lists no longer matter.
 
 In this order, before anything else:
 
-1. **Load the law**, unless its always-on section is already verbatim in this context:
-   invoke the Skill tool with `engineering-rules:engineering-rules`. It binds this session
+1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+   (The always-on law is already in context through CLAUDE.md.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the idea.** It is the whole invocation. When it is empty, it is what this
    conversation was last discussing; when there is nothing, ask what is on their mind

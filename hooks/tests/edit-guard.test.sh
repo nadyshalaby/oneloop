@@ -135,7 +135,7 @@ test_a_broken_block_is_logged_not_trusted() {
 
 test_reasons_and_log() {
   decide "$(write_json "$P/src/cfg2.ts" "const key = \"$KEY\"")" >/dev/null
-  assert_contains "a deny cites 1.1 and the rule" "engineering law (SKILL.md 1.1): zero hardcoded secrets" "$last_reason"
+  assert_contains "a deny cites 1.1 and the rule" "engineering law (1.1): zero hardcoded secrets" "$last_reason"
   assert_contains "a deny names the line" "sec.hardcoded-secret at line 1 of the new text" "$last_reason"
   assert_contains "the secret is redacted in the reason" "[REDACTED]" "$last_reason"
   assert_missing "and never shown" "$KEY" "$last_reason"

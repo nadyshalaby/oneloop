@@ -110,14 +110,14 @@ test_the_deciding_prompts_carry_the_line() {
 }
 
 test_the_cue_is_wired_at_the_prompt_boundary() {
-  wired=$(jq -r '.hooks.UserPromptSubmit[]?.hooks[]?.command' "$ROOT/hooks/hooks.json")
+  wired=$(jq -r '.hooks.UserPromptSubmit[]?.hooks[]?.command' "$ROOT/settings/hooks.json")
   assert_contains "the cue runs on UserPromptSubmit" 'hooks/advisor-cue.sh' "$wired"
   if [ -f "$ROOT/hooks/advisor-cue.sh" ]; then present=present; else present=missing; fi
   assert_contains "the cue script is there" present "$present"
   cue=$(cat "$ROOT/hooks/advisor-cue.sh")
   assert_contains "the cue answers only its own event" '= UserPromptSubmit ] || exit 0' "$cue"
   assert_contains "the cue names the protocol file" '5.7-the-advisor.md' "$cue"
-  assert_contains "1.4 names the hook" "this plugin's advisor cue hook puts this rule into every prompt" "$(cat "$SKILL")"
+  assert_contains "1.4 names the hook" "the advisor cue hook this setup installs puts this rule into every prompt" "$(cat "$SKILL")"
   assert_contains "5.7 says the cue refuses nothing" 'It judges
 nothing and refuses nothing.' "$(cat "$(ref_file 5.7)")"
 }

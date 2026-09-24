@@ -1,5 +1,5 @@
 ---
-name: agents
+name: engineering-rules:agents
 description: "The agent switch for the engineering-rules law: every phase runs as an agent on its own model by default (sonnet where the phase writes code or runs commands, opus where it plans, judges or decides). `off` runs every phase in this chat instead, for the task in flight and every task after it, until you switch back. Usage: /engineering-rules:agents [off | what you want done]"
 argument-hint: "[off | what you want done]"
 disable-model-invocation: true
@@ -17,8 +17,9 @@ no route; the routes have sub-commands of their own, and this one combines with 
 
 In this order, before anything else:
 
-1. **Load the law**, unless its always-on section is already verbatim in this context:
-   invoke the Skill tool with `engineering-rules:engineering-rules`. Its intake does not
+1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+   (The always-on law is already in context through CLAUDE.md.) Its intake does not
    fire from here.
 2. **Read the invocation.**
    - The single word `off` switches to agentless: print the agent line

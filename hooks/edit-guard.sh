@@ -1,6 +1,6 @@
 #!/bin/bash
 # engineering-rules edit guard.
-# Runs on PreToolUse for Edit, Write, MultiEdit and NotebookEdit. The bans in SKILL.md 1.1
+# Runs on PreToolUse for Edit, Write, MultiEdit and NotebookEdit. The bans in the law's 1.1
 # are zero tolerance in production code. This hook runs the law scout's own shell block (9.5)
 # over the text an edit would write, and refuses the edit when it ADDS a finding under a rule
 # a grep can judge: suppressions and coverage-ignore markers, empty catches, bare Error throws
@@ -116,7 +116,7 @@ refuse() {
   line_no=${detail%%:*}
   evidence=$(printf '%s' "${detail#*:}" | cut -c1-"$EVIDENCE_CHARS")
   append_log "$project" "guard | edit | deny | $1 | $path | line $line_no of the new text"
-  emit deny "engineering law (SKILL.md 1.1): $(why "$1"), and this edit adds one. $1 at line $line_no of the new text: $evidence. Remove it before writing; the judgment is the law scout's (9.5), run over the edit."
+  emit deny "engineering law (1.1): $(why "$1"), and this edit adds one. $1 at line $line_no of the new text: $evidence. Remove it before writing; the judgment is the law scout's (9.5), run over the edit."
 }
 
 # first_growth: reads `new <finding>` and `old <finding>` lines; prints the first new finding

@@ -27,7 +27,6 @@ dim="${ESC}[2m"
 bold="${ESC}[1m"
 gray="${ESC}[0;90m"
 CACHE_DIR="${TMPDIR:-/tmp}"
-SCAN_OVERLAP=64
 # Claude Code writes one transcript line carrying COMPACT_MARKER per compaction. A copy quoted
 # inside a message or a tool result has its quotes escaped, so it never matches.
 COMPACT_MARKER='"subtype":"compact_boundary"'
@@ -123,9 +122,10 @@ ends_on_a_line() {
   [ -z "$(read_bytes $(( $1 - 1 )) 1)" ]
 }
 
-# The last ledger heading Claude printed. The cursor file holds "<bytes scanned> <position>";
-# each render greps only the bytes added since, with an overlap so a heading that straddles
-# the cursor is still seen. A transcript that shrank was replaced, so the cursor resets.
+# The last ledger heading Claude printed in a reply, never one quoted in a file or a tool
+# result. The cursor file holds "<bytes scanned> <position>"; each render reads only the whole
+# lines added since and waits while the last line is still being written, so the cursor always
+# sits on a line boundary. A transcript that shrank was replaced, so the cursor resets.
 render_phase_segment() {
   [ -n "$transcript_path" ] && [ -f "$transcript_path" ] || return 0
   cache=$(transcript_cache statusline)
@@ -135,9 +135,8 @@ render_phase_segment() {
   [ -f "$cache" ] && IFS=' ' read -r offset position < "$cache"
   case "$offset" in ''|*[!0-9]*) offset=0 ;; esac
   [ "$size" -lt "$offset" ] && { offset=0; position=""; }
-  if [ "$size" -gt "$offset" ]; then
-    from=$(( offset > SCAN_OVERLAP ? offset - SCAN_OVERLAP : 0 ))
-    found=$(read_bytes "$from" $(( size - from )) | read_ledger_position)
+  if [ "$size" -gt "$offset" ] && ends_on_a_line "$size"; then
+    found=$(read_bytes "$offset" $(( size - offset )) | claude_text | read_ledger_position)
     [ -n "$found" ] && position="$found"
     printf '%s %s\n' "$size" "$position" > "$cache" 2>/dev/null
   fi

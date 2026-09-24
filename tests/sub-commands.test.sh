@@ -16,6 +16,7 @@ MAIN_SKILL=engineering-rules
 SWITCH=agents
 # Skills that ship beside the law and trigger on their own description, space-separated.
 STANDALONE=generate-pseudocode
+OWN_NAME=update-engineering-rules
 REFS="$ROOT/references"
 LINE_CAP=500
 
@@ -32,12 +33,19 @@ table_sections() { route_rows "$1" | sed -E 's/.*\| ([0-9]+\.[0-9]+) \|$/\1/'; }
 # skill_dirs <skills dir>: every skill directory beside the main one, sorted.
 skill_dirs() { find "$1" -mindepth 1 -maxdepth 1 -type d ! -name "$MAIN_SKILL" | sed 's#.*/##' | sort; }
 
+# command_name <dir>: the name a skill must carry, which install.sh also gives its link in
+# ~/.claude/skills: the plugin-era `engineering-rules:<dir>`, so every command keeps the name it
+# had, except the skills listed in OWN_NAME, which the user named outright.
+command_name() {
+  case " $OWN_NAME " in *" $1 "*) printf '%s' "$1" ;; *) printf '%s:%s' "$MAIN_SKILL" "$1" ;; esac
+}
+
 # front_value <SKILL.md> <key>: the frontmatter value of the key, empty when absent.
 front_value() { sed -n '2,/^---$/p' "$1" | sed -n -E "s/^$2: *//p" | head -n 1; }
 
 # shape_defects <route> <SKILL.md>: one line per departure from the shape 4.4 promises.
 shape_defects() {
-  [ "$(front_value "$2" name)" = "$1" ] || printf '%s: name is not %s\n' "$1" "$1"
+  [ "$(front_value "$2" name)" = "$(command_name "$1")" ] || printf '%s: name is not %s\n' "$1" "$(command_name "$1")"
   [ "$(front_value "$2" disable-model-invocation)" = true ] || printf '%s: model invocation is not disabled\n' "$1"
   grep -q -F "$MAIN_SKILL:$MAIN_SKILL" "$2" || printf '%s: does not load the main skill\n' "$1"
   [ -z "$(front_value "$2" arguments)" ] || printf '%s: takes an argument list\n' "$1"
@@ -60,7 +68,7 @@ standalone_defects() {
   for name in $(tr ' ' '\n' <<< "$STANDALONE"); do
     file="$1/$name/SKILL.md"
     [ -f "$file" ] || { printf '%s: no skill directory\n' "$name"; continue; }
-    [ "$(front_value "$file" name)" = "$name" ] || printf '%s: name is not %s\n' "$name" "$name"
+    [ "$(front_value "$file" name)" = "$(command_name "$name")" ] || printf '%s: name is not %s\n' "$name" "$(command_name "$name")"
     [ -n "$(front_value "$file" description)" ] || printf '%s: no description\n' "$name"
     [ "$(front_value "$file" disable-model-invocation)" != true ] || printf '%s: model invocation is disabled\n' "$name"
     lines=$(wc -l < "$file" | tr -d ' ')

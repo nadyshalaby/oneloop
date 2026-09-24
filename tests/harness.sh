@@ -1,6 +1,7 @@
 #!/bin/bash
 # Shared by the tests beside it: strict mode, the repo root, a scratch dir removed on exit, the
-# pass and fail counters, the three assertions and the closing report line. Source it first:
+# pass and fail counters, the three assertions, two builders of transcript lines in Claude
+# Code's real shape and the closing report line. Source it first:
 #   . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 set -u
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/$(basename "${BASH_SOURCE[1]:-plugin-test}" .sh).XXXXXX")
@@ -36,6 +37,18 @@ assert_missing() {
     *"$2"*) printf 'FAIL %s\n  did not want: %s\n  in:           %s\n' "$1" "$2" "$3"; failures=$((failures + 1)); return ;;
   esac
   printf 'ok   %s\n' "$1"
+}
+
+# reply_line <text>: a transcript line in Claude Code's shape for a reply Claude wrote.
+reply_line() {
+  jq -cn --arg t "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "text", text: $t}]}}'
+}
+
+# quoted_line <text>: transcript lines carrying the text where Claude did not say it, first in
+# a tool's input, then in a tool result, as a file Claude wrote or read would put it there.
+quoted_line() {
+  jq -cn --arg t "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "t1", name: "Write", input: {content: $t}}]}}'
+  jq -cn --arg t "$1" '{type: "user", message: {role: "user", content: [{type: "tool_result", tool_use_id: "t1", content: $t}]}}'
 }
 
 # report: the closing line every test prints, and its exit status.

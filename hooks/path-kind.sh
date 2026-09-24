@@ -1,7 +1,7 @@
 #!/bin/bash
 # Shared by the edit guard and the file cap: the path as the project knows it, and what kind
 # of file it names, by the law's
-# own definitions (SKILL.md Definitions, production code) and the law scout's globs (9.5).
+# own definitions (the law's Definitions, production code) and the law scout's globs (9.5).
 # File-name globs look at the name alone and directory globs at the path, so a directory
 # that happens to be called `x.test.y` does not turn everything under it into a test file.
 

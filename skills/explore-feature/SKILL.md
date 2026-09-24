@@ -1,5 +1,5 @@
 ---
-name: explore-feature
+name: engineering-rules:explore-feature
 description: "Explore one feature under the engineering-rules law, picked by your word: one entry point traced to its leaves and published as a browsable page, every cited line verified against the working tree first, with what one real run did at every function on the page, masked, from the project's own test or a request you fire. Usage: /engineering-rules:explore-feature <the entry point>"
 argument-hint: "[the entry point]"
 disable-model-invocation: true
@@ -15,8 +15,9 @@ as one page the user can click through.
 
 In this order, before anything else:
 
-1. **Load the law**, unless its always-on section is already verbatim in this context:
-   invoke the Skill tool with `engineering-rules:engineering-rules`. It binds this session
+1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+   (The always-on law is already in context through CLAUDE.md.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the entry point.** It is the whole invocation. When it is empty, ask for it
    through the wizard tool (4.4), one question; 16.9 stops on an ambiguous entry point

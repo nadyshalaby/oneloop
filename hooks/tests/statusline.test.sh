@@ -67,22 +67,37 @@ test_context_meter() {
 }
 
 test_ledger_position() {
-  printf '%s\n' '{"timestamp":"2026-09-05T00:00:00.000Z"}' '{"type":"assistant","text":"## 0. Phase ledger  (2 of 6, Phase 3)\n- [>] 2"}' > "$T"
+  { printf '%s\n' '{"timestamp":"2026-09-05T00:00:00.000Z"}'; reply_line $'## 0. Phase ledger  (2 of 6, Phase 3)\n- [>] 2'; } > "$T"
   line=$(render "$(build_status_json 10)")
   assert_contains "first heading is found" "(2 of 6, Phase 3)" "$line"
   assert_contains "uptime is shown" "up " "$line"
-  printf '%s\n' '{"type":"assistant","text":"## 0. Phase ledger  (4 of 6, Phase 5)\n- [>] 4"}' >> "$T"
+  reply_line $'## 0. Phase ledger  (4 of 6, Phase 5)\n- [>] 4' >> "$T"
   line=$(render "$(build_status_json 10)")
   assert_contains "a heading appended after the first render is picked up" "(4 of 6, Phase 5)" "$line"
   line=$(render "$(build_status_json 10)")
   assert_contains "an unchanged transcript keeps the position" "(4 of 6, Phase 5)" "$line"
-  printf '%s\n' '{"type":"user","text":"nothing new"}' >> "$T"
+  reply_line 'nothing new' >> "$T"
   line=$(render "$(build_status_json 10)")
   assert_contains "new bytes without a heading keep the position" "(4 of 6, Phase 5)" "$line"
 }
 
+# A heading quoted in a file or a tool result is never shown, and a reply still being written
+# waits for its line to end instead of being cut or lost.
+test_ledger_position_reads_replies_only() {
+  quoted_line '## 0. Phase ledger  (6 of 6, Phase 6)' >> "$T"
+  line=$(render "$(build_status_json 10)")
+  assert_contains "a quoted heading keeps the position" "(4 of 6, Phase 5)" "$line"
+  assert_missing "and is not shown" "(6 of 6, Phase 6)" "$line"
+  printf '%s' "$(reply_line '## 0. Phase ledger  (5 of 6, Phase 6)')" >> "$T"
+  line=$(render "$(build_status_json 10)")
+  assert_contains "a reply still being written waits" "(4 of 6, Phase 5)" "$line"
+  printf '\n' >> "$T"
+  line=$(render "$(build_status_json 10)")
+  assert_contains "and is shown once its line is whole" "(5 of 6, Phase 6)" "$line"
+}
+
 test_replaced_transcript() {
-  printf '%s\n' '{"timestamp":"2026-09-05T01:00:00.000Z"}' '{"type":"assistant","text":"## 0. Phase ledger  (1 of 6, Phase 1)"}' > "$T"
+  { printf '%s\n' '{"timestamp":"2026-09-05T01:00:00.000Z"}'; reply_line '## 0. Phase ledger  (1 of 6, Phase 1)'; } > "$T"
   line=$(render "$(build_status_json 10)")
   assert_contains "a transcript that shrank resets the cursor" "(1 of 6, Phase 1)" "$line"
   assert_missing "and forgets the old position" "(4 of 6, Phase 5)" "$line"
@@ -146,7 +161,7 @@ test_compaction_cursor_resets() {
 
 test_two_rows() {
   full="$WORK/full.jsonl"
-  { printf '%s\n' '{"timestamp":"2026-09-05T00:00:00.000Z"}' '{"type":"assistant","text":"## 0. Phase ledger  (5 of 6, Phase 6)"}'; compact_boundary auto; } > "$full"
+  { printf '%s\n' '{"timestamp":"2026-09-05T00:00:00.000Z"}'; reply_line '## 0. Phase ledger  (5 of 6, Phase 6)'; compact_boundary auto; } > "$full"
   json="{\"cwd\":\"$WORK\",\"transcript_path\":\"$full\",\"model\":{\"display_name\":\"Fable 5.1\"},\"context_window\":{\"used_percentage\":42},\"rate_limits\":{\"five_hour\":{\"used_percentage\":23.4}}}"
   line=$(render "$json")
   assert_eq "exactly two rows" "2" "$(count_rows "$json")"
@@ -158,6 +173,7 @@ test_two_rows() {
 test_bare_render
 test_context_meter
 test_ledger_position
+test_ledger_position_reads_replies_only
 test_replaced_transcript
 test_malformed_input
 test_usage_windows

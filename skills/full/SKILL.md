@@ -1,5 +1,5 @@
 ---
-name: full
+name: engineering-rules:full
 description: "Full mode of the engineering-rules law, picked by your word: quick mode plus a written plan, a spec review and a durable work-doc. Usage: /engineering-rules:full <what you want done>"
 argument-hint: "[what you want done]"
 disable-model-invocation: true
@@ -15,8 +15,9 @@ considered.
 
 In this order, before anything else:
 
-1. **Load the law**, unless its always-on section is already verbatim in this context:
-   invoke the Skill tool with `engineering-rules:engineering-rules`. It binds this session
+1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+   (The always-on law is already in context through CLAUDE.md.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the request.** It is the whole invocation. When it is empty, it is the most recent
    ask in this conversation, in the user's own words; when there is none either, ask for it

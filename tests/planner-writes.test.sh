@@ -65,7 +65,7 @@ test_no_plan_gate_survives() {
   found=""
   for f in "$ROOT"/hooks/*work-doc*; do [ -e "$f" ] && found=$f; done
   assert_eq "no hook gates an edit against the work-doc" "" "$found"
-  assert_missing "hooks.json wires no work-doc gate" 'work-doc-gate' "$(cat "$ROOT/hooks/hooks.json")"
+  assert_missing "hooks.json wires no work-doc gate" 'work-doc-gate' "$(cat "$ROOT/settings/hooks.json")"
 }
 
 test_the_read_back_survives() {

@@ -1,5 +1,5 @@
 ---
-name: skill
+name: engineering-rules:skill
 description: "Skill authoring under the engineering-rules law, picked by your word: a new reusable skill, written last, that passes its structural checks. Usage: /engineering-rules:skill <what the skill should do>"
 argument-hint: "[what the skill should do]"
 disable-model-invocation: true
@@ -14,8 +14,9 @@ new reusable skill, invoked by name later, not a one-off script.
 
 In this order, before anything else:
 
-1. **Load the law**, unless its always-on section is already verbatim in this context:
-   invoke the Skill tool with `engineering-rules:engineering-rules`. It binds this session
+1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+   (The always-on law is already in context through CLAUDE.md.) It binds this session
    in full from that moment. Its intake does not fire; the route is already picked (4.4).
 2. **Read the request**: what the skill should do, and for whom. It is the whole invocation.
    When it is empty, it is what this conversation was last discussing; when there is

@@ -1,5 +1,5 @@
 ---
-name: generate-pseudocode
+name: engineering-rules:generate-pseudocode
 description: "Turn 'explain how this code flow works' into one published Artifact page of complete, self-contained pseudocode: every routine read from source and every helper expanded down to real SQL or an external call, file:line citations, shaded phrases that open a note on why a line is the way it is, and a closing analysis of what differs and what to know before changing anything. Use it whenever someone asks for 'pseudocode for X', 'walk me through X as pseudocode', 'explain both endpoints', 'compare these two flows', 'make me a page explaining how X works', 'complete pseudocode', 'all-in-one pseudocode', or wants one or more endpoints, services, pipelines, jobs or algorithms explained end to end as a page they can read rather than a chat answer. Not for a code review or an architecture diagram; a question whose answer is one routine with nothing to expand is answered in chat, in the same conventions, without a page."
 ---
 

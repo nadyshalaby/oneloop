@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/edit-guard.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/edit-guard.sh\"",
             "timeout": 20
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/file-cap.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/file-cap.sh\"",
             "timeout": 10
           }
         ]
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/advisor-cue.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/advisor-cue.sh\"",
             "timeout": 10
           }
         ]
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/re-anchor.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/re-anchor.sh\"",
             "timeout": 10
           }
         ]
@@ -52,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/progress-notify.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/progress-notify.sh\"",
             "timeout": 10
           }
         ]
@@ -63,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/progress-notify.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/progress-notify.sh\"",
             "timeout": 10
           }
         ]
@@ -74,7 +74,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/progress-notify.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/progress-notify.sh\"",
             "timeout": 10
           }
         ]
@@ -85,7 +85,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/progress-notify.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/progress-notify.sh\"",
             "timeout": 10
           }
         ]
@@ -97,11 +97,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/progress-notify.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/progress-notify.sh\"",
             "timeout": 10
           }
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "f=\"$HOME/.claude/engineering-rules/hooks/statusline.sh\"; [ -f \"$f\" ] && exec bash \"$f\"; [ -f \"$HOME/.claude/statusline-command.sh\" ] && exec sh \"$HOME/.claude/statusline-command.sh\"; echo"
   }
 }

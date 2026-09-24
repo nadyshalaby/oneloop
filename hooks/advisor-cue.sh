@@ -1,7 +1,7 @@
 #!/bin/bash
 # engineering-rules advisor cue.
 # Runs on UserPromptSubmit, which fires on every prompt and takes no matcher. The advisor rule
-# (SKILL.md 1.4, reference 5.7) binds every task, including the ones that never load the skill,
+# (the law's 1.4, reference 5.7) binds every task, including the ones that never load the workflow,
 # and a rule that only lives in a file nobody opened is a rule that does not bind. Plain text on
 # stdout is context for this event, so the cue is one short block: what to consult, when, what
 # its answer is worth, and what to do when the tool list holds no advisor. It judges nothing and
