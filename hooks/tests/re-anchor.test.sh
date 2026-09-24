@@ -60,8 +60,8 @@ test_other_starts_and_bad_input_print_nothing() {
 test_source_field_and_plugin_root() {
   out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",source:"resume",cwd:"/tmp/proj",transcript_path:$t}' | bash "$SCRIPT")
   assert_contains "the older source field still starts it" "(session resumed)" "$out"
-  out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",how_started:"compact",cwd:"/tmp/proj",transcript_path:$t}' | CLAUDE_PLUGIN_ROOT=/opt/plugins/er bash "$SCRIPT")
-  assert_contains "the plugin root decides the path" "/opt/plugins/er/skills/engineering-rules/SKILL.md" "$out"
+  out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",how_started:"compact",cwd:"/tmp/proj",transcript_path:$t}' | ENGINEERING_RULES_HOME=/opt/er bash "$SCRIPT")
+  assert_contains "the home variable decides the path" "/opt/er/skills/engineering-rules/SKILL.md" "$out"
 }
 
 test_compact_carries_the_last_position

@@ -3,7 +3,7 @@
 # Each case feeds the guard one edit against a scratch git repo that ignores `.env`, and reads
 # the decision. EDIT_GUARD_SH points the test at another copy of the script, for a watched
 # failure; the copy needs hook-input.sh, progress-log.sh and path-kind.sh beside it, and finds
-# 9.5 through CLAUDE_PLUGIN_ROOT or its own ../skills tree.
+# 9.5 through ENGINEERING_RULES_HOME or its own ../skills tree.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=../../tests/harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/../../tests/harness.sh"
@@ -94,7 +94,7 @@ test_a_lookalike_directory_is_not_a_test_directory() {
 
 # The scout's test-file globs and path-kind's are two copies of one definition; this pins them.
 test_test_globs_match_the_scout() {
-  law="$(cd "$here/../.." && pwd)/skills/engineering-rules/references/09-phase-3-implement/9.5-the-law-scout.md"
+  law="$(cd "$here/../.." && pwd)/references/09-phase-3-implement/9.5-the-law-scout.md"
   scout=$(sed -n "s/^in_tests()  { in_paths \(.*\) | xargs.*/\1/p" "$law" | tr -d "'" | tr ' ' '\n' | sort)
   kind=$(sed -n 's/^    \(.*\)) printf test\(; return\)\{0,1\} ;;$/\1/p' "$here/../path-kind.sh" | tr '|' '\n' | sort)
   assert_eq "path-kind's test globs are the scout's" "$scout" "$kind"
@@ -102,7 +102,7 @@ test_test_globs_match_the_scout() {
 
 # The guard's domain globs are a copy of the scout's in_domain list; this pins them together.
 test_domain_globs_match_the_scout() {
-  law="$(cd "$here/../.." && pwd)/skills/engineering-rules/references/09-phase-3-implement/9.5-the-law-scout.md"
+  law="$(cd "$here/../.." && pwd)/references/09-phase-3-implement/9.5-the-law-scout.md"
   scout=$(sed -n "s/^in_domain() { in_paths \(.*\) | xargs.*/\1/p" "$law" | tr -d "'" | tr ' ' '\n' | sort)
   guard=$(sed -n 's/^    \(\*\.[^)]*\)) printf yes ;;$/\1/p' "$SCRIPT" | tr '|' '\n' | sort)
   assert_eq "the guard's domain globs are the scout's" "$scout" "$guard"
@@ -122,10 +122,10 @@ test_a_climbing_path_stays_inside_the_scratch_dir() {
 # A 9.5 whose block cannot run judges nothing, allows, and says so in the log; the real block
 # never writes that line.
 test_a_broken_block_is_logged_not_trusted() {
-  law=skills/engineering-rules/references/09-phase-3-implement/9.5-the-law-scout.md
+  law=references/09-phase-3-implement/9.5-the-law-scout.md
   root="$WORK/broken" && mkdir -p "$root/${law%/*}"
   awk '/^### HOW/ { h = 1 } { print } h && /^```bash$/ && !done { print "if true; then"; done = 1 }' "$here/../../$law" > "$root/$law"
-  out=$(edit_json "$P/src/q.ts" 'debugger;' | CLAUDE_PLUGIN_ROOT="$root" bash "$SCRIPT")
+  out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME="$root" bash "$SCRIPT")
   assert_eq "a broken block judges nothing" "" "$out"
   assert_contains "and says so in the log" " proj | guard | edit | skipped | 9.5 block failed on the new text (exit 2)" "$(tail -n 1 "$LOG")"
   before=$(wc -l < "$LOG" | tr -d ' ')
@@ -151,11 +151,11 @@ test_unreadable_input_and_missing_law() {
   assert_missing "malformed stdin prints no decision" "permissionDecision" "$out"
   out=$(jq -cn '{hook_event_name:"PreToolUse",tool_name:"Bash",cwd:"/tmp/proj",tool_input:{command:"x"}}' | bash "$SCRIPT")
   assert_missing "a Bash event is not judged here" "permissionDecision" "$out"
-  out=$(edit_json "$P/src/q.ts" 'debugger;' | CLAUDE_PLUGIN_ROOT=/nonexistent bash "$SCRIPT")
+  out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME=/nonexistent bash "$SCRIPT")
   assert_missing "a missing 9.5 refuses nothing" "permissionDecision" "$out"
-  assert_contains "and says so in the log" " proj | guard | edit | skipped | 9.5 not found at /nonexistent/skills" "$(tail -n 1 "$LOG")"
-  out=$(edit_json "$P/src/q.ts" 'debugger;' | CLAUDE_PLUGIN_ROOT="$here/../.." bash "$SCRIPT")
-  assert_contains "9.5 is read from CLAUDE_PLUGIN_ROOT when it is set" '"permissionDecision":"deny"' "$out"
+  assert_contains "and says so in the log" " proj | guard | edit | skipped | 9.5 not found at /nonexistent/references" "$(tail -n 1 "$LOG")"
+  out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME="$here/../.." bash "$SCRIPT")
+  assert_contains "9.5 is read from ENGINEERING_RULES_HOME when it is set" '"permissionDecision":"deny"' "$out"
 }
 
 build_fixture || { printf 'FAIL could not build the fixture repo\n'; exit 1; }

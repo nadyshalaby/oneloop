@@ -11,7 +11,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 SKILL="${SKILL_MD:-$ROOT/skills/engineering-rules/SKILL.md}"
-DELEGATION="${DELEGATION_MD:-$ROOT/skills/engineering-rules/references/05-working-references/5.5-the-phase-agents-what-this-session-keeps.md}"
+DELEGATION="${DELEGATION_MD:-$ROOT/references/05-working-references/5.5-the-phase-agents-what-this-session-keeps.md}"
 SHAPES="reader|planner|spec reviewer|reviewer|builder|mechanic"
 TYPES="fork|Explore|Plan|general-purpose"
 MODELS="sonnet|opus|session"

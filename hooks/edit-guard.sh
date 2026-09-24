@@ -26,7 +26,7 @@ here=${BASH_SOURCE[0]%/*}
 # shellcheck source=./path-kind.sh
 . "$here/path-kind.sh"
 
-LAW_SCOUT="${CLAUDE_PLUGIN_ROOT:-$(cd "$here/.." && pwd)}/skills/engineering-rules/references/09-phase-3-implement/9.5-the-law-scout.md"
+LAW_SCOUT="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}/references/09-phase-3-implement/9.5-the-law-scout.md"
 HOOK_RULES='ban.suppression|ban.empty-catch|ban.bare-error|test.focused|test.skipped|clean.debug-artifact|clean.debt-marker|clean.removed-comment|sec.hardcoded-secret'
 TEST_RULES='ban.suppression|test.focused|test.skipped|sec.hardcoded-secret'
 EVIDENCE_CHARS=120

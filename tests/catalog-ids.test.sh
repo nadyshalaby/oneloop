@@ -1,5 +1,5 @@
 #!/bin/bash
-# Guard: every id cited anywhere in the skill resolves to a row. The perf.*, sec.*, test.*,
+# Guard: every id cited anywhere in the law, the references or the skills resolves to a row. The perf.*, sec.*, test.*,
 # style.* and tell.* catalog schemes are the spine every finding, scout row and review prompt
 # keys on (the tell.* rows live in the design group's 15.24 rather than in group 3), and
 # the coarse rule ids (ban.*, cap.*, clean.* and the rest) are the audit rule catalog's (16.4);
@@ -9,15 +9,16 @@
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
-SKILL="$ROOT/skills/engineering-rules"
-CATALOGS="$SKILL/references/03-catalogs"
-RULES="$SKILL/references/16-other-routes/16.4-the-audit-rule-catalog.md"
-TELLS="$SKILL/references/15-design/15.24-the-ai-tell-catalog.md"
+REFS="$ROOT/references"
+SCAN=("$ROOT/law" "$REFS" "$ROOT/skills")
+CATALOGS="$REFS/03-catalogs"
+RULES="$REFS/16-other-routes/16.4-the-audit-rule-catalog.md"
+TELLS="$REFS/15-design/15.24-the-ai-tell-catalog.md"
 
 # cited_ids <dir>: every distinct <family>.<domain>.<slug> written in a markdown file under
 # the directory, the catalogs themselves included, so a row citing a sibling is checked too.
 cited_ids() {
-  grep -rhoE '(^|[^[:alnum:]_.-])(perf|sec|test|style|tell)\.[a-z0-9-]+\.[a-z0-9-]+' --include='*.md' "$1" \
+  grep -rhoE '(^|[^[:alnum:]_.-])(perf|sec|test|style|tell)\.[a-z0-9-]+\.[a-z0-9-]+' --include='*.md' "$@" \
     | sed -E 's/^[^a-z]*//' | sort -u
 }
 
@@ -29,14 +30,14 @@ catalog_rows() {
 
 # dangling_ids <dir>: the cited ids that head no catalog row, one per line, one set difference.
 dangling_ids() {
-  comm -23 <(cited_ids "$1") <(catalog_rows)
+  comm -23 <(cited_ids "$@") <(catalog_rows)
 }
 
 # cited_rule_ids <dir>: every distinct two-segment <family>.<slug> written under the directory.
 # A third segment, or a trailing `.*`, marks a catalog id, which the check above owns; Jest's
 # own `test.only` / `test.skip` / `test.todo` / `test.each` share the prefix and are not rules.
 cited_rule_ids() {
-  grep -rhoE '(^|[^[:alnum:]_.-])(ban|cap|clean|scope|folder|solid|style|sec|perf|test)\.[a-z0-9-]+(\.[a-z0-9*-]+)*' --include='*.md' "$1" \
+  grep -rhoE '(^|[^[:alnum:]_.-])(ban|cap|clean|scope|folder|solid|style|sec|perf|test)\.[a-z0-9-]+(\.[a-z0-9*-]+)*' --include='*.md' "$@" \
     | sed -E 's/^[^a-z]*//' | grep -vE '\..*\.' | grep -vxE 'test\.(only|skip|todo|each|concurrent|failing)' | sort -u
 }
 
@@ -47,13 +48,13 @@ rule_rows() {
 
 # dangling_rule_ids <dir>: the cited rule ids with no row in 16.4.
 dangling_rule_ids() {
-  comm -23 <(cited_rule_ids "$1") <(rule_rows)
+  comm -23 <(cited_rule_ids "$@") <(rule_rows)
 }
 
 test_every_cited_id_has_a_row() {
   count=$((count + 1))
-  cited=$(cited_ids "$SKILL" | grep -c .)
-  dangling=$(dangling_ids "$SKILL")
+  cited=$(cited_ids "${SCAN[@]}" | grep -c .)
+  dangling=$(dangling_ids "${SCAN[@]}")
   if [ -z "$dangling" ] && [ "$cited" -gt 0 ]; then
     printf 'ok   every cited catalog id has a row (%s ids checked)\n' "$cited"; return
   fi
@@ -88,8 +89,8 @@ test_a_planted_dangling_tell_id_is_named() {
 
 test_every_cited_rule_id_has_a_row() {
   count=$((count + 1))
-  cited=$(cited_rule_ids "$SKILL" | grep -c .)
-  dangling=$(dangling_rule_ids "$SKILL")
+  cited=$(cited_rule_ids "${SCAN[@]}" | grep -c .)
+  dangling=$(dangling_rule_ids "${SCAN[@]}")
   if [ -z "$dangling" ] && [ "$cited" -gt 0 ]; then
     printf 'ok   every cited rule id has a row in 16.4 (%s ids checked)\n' "$cited"; return
   fi

@@ -14,7 +14,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 SKILL="${SKILL_MD:-$ROOT/skills/engineering-rules/SKILL.md}"
-REAL_REFS="${REFS_DIR:-$ROOT/skills/engineering-rules/references}"
+REAL_REFS="${REFS_DIR:-$ROOT/references}"
 REFS=$REAL_REFS
 ADVISOR_LINE='If your tools include an advisor, it is the one tool you may use that this prompt does not name'
 TICK=$(printf '\140')

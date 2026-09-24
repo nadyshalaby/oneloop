@@ -10,7 +10,7 @@
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
-REF=$ROOT/skills/engineering-rules/references
+REF=$ROOT/references
 TEMPLATE="${TEMPLATE_MD:-$REF/07-phase-2-plan/7.2-the-work-doc-template.md}"
 PLAN="${PLAN_MD:-$REF/07-phase-2-plan/7.1-phase-2-plan.md}"
 DELEGATION="${DELEGATION_MD:-$REF/05-working-references/5.5-the-phase-agents-what-this-session-keeps.md}"

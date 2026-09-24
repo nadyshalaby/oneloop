@@ -31,7 +31,7 @@ SCAN_SH="$here/secret-scan.sh"
 VERIFY_JQ="$here/capture-verify.jq"
 # The secret scan runs the law scout's own block over the excerpt lines; LAW_SCOUT_MD points
 # it at another copy of 9.5, for a test.
-LAW_SCOUT=${LAW_SCOUT_MD:-"$here/../../engineering-rules/references/09-phase-3-implement/9.5-the-law-scout.md"}
+LAW_SCOUT=${LAW_SCOUT_MD:-"$here/../../../references/09-phase-3-implement/9.5-the-law-scout.md"}
 EXCERPT_IDS=()
 
 usage() { printf 'usage: build-page.sh <trace.json> <excerpts.json> <out.html> [<assets dir>] [--capture <capture.json>]\n' >&2; exit 2; }

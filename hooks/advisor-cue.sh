@@ -15,7 +15,7 @@ here=${BASH_SOURCE[0]%/*}
 # shellcheck source=./hook-input.sh
 . "$here/hook-input.sh"
 
-ADVISOR_REF="${CLAUDE_PLUGIN_ROOT:-$(cd "$here/.." && pwd)}/skills/engineering-rules/references/05-working-references/5.7-the-advisor.md"
+ADVISOR_REF="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}/references/05-working-references/5.7-the-advisor.md"
 
 read_hook_input || exit 0
 [ "$(hook_field '.hook_event_name // empty')" = UserPromptSubmit ] || exit 0

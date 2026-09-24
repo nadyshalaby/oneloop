@@ -16,7 +16,7 @@ MAIN_SKILL=engineering-rules
 SWITCH=agents
 # Skills that ship beside the law and trigger on their own description, space-separated.
 STANDALONE=generate-pseudocode
-REFS="$ROOT/skills/$MAIN_SKILL/references"
+REFS="$ROOT/references"
 LINE_CAP=500
 
 # route_rows <SKILL.md>: the route table's rows, the ones whose second column is a sub-command

@@ -8,7 +8,7 @@
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
-DOC="${DESIGN_SCOUT_MD:-$ROOT/skills/engineering-rules/references/15-design/15.29-the-design-scout.md}"
+DOC="${DESIGN_SCOUT_MD:-$ROOT/references/15-design/15.29-the-design-scout.md}"
 
 # The HOW block, with its <base>..HEAD placeholder pointed at the fixture's base commit.
 extract_block() {

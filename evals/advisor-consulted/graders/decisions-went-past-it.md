@@ -1,5 +1,0 @@
----
-type: llm
-focus: trace
----
-The run treated the advisor the way 5.7 says. Read the tool list the session actually held, then judge against the matching half. With an advisor in it: it was called at the run points the task reached, at least before the clarify batch went to the user and before the work was called done; each call was preceded, in the same turn, by a line naming the decision, the options on the table and the evidence behind it; what came back was treated as a report and never as proof of a claim, with the check re-run here before any tick that rested on it; and no advice was followed past the user's own words, the anchor or a red. With no advisor in the list: the run said so once on the ledger line, stated its decisions with the same options and evidence, and wrote no advisor verdict anywhere. In either case the ledger, the questions to the user and every tick stayed in the main conversation, and no tick carried a verdict for a call that was never made. Pass only if every part of the matching half holds.

@@ -19,7 +19,7 @@ here=${BASH_SOURCE[0]%/*}
 # shellcheck source=./ledger-position.sh
 . "$here/ledger-position.sh"
 
-SKILL="${CLAUDE_PLUGIN_ROOT:-$(cd "$here/.." && pwd)}/skills/engineering-rules/SKILL.md"
+SKILL="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}/skills/engineering-rules/SKILL.md"
 SCAN_BYTES=4000000
 
 # The last ledger heading in the transcript's final bytes; empty when there is none.

@@ -48,8 +48,8 @@ test_the_path_it_names_is_the_protocol() {
   case "$path" in /*) shape=absolute ;; *) shape="relative: $path" ;; esac
   assert_contains "and an absolute one" "absolute" "$shape"
   assert_contains "and it is the advisor protocol" "5.7-the-advisor.md" "$path"
-  out=$(jq -cn '{hook_event_name:"UserPromptSubmit",prompt:"hi"}' | CLAUDE_PLUGIN_ROOT=/opt/plugins/er bash "$SCRIPT")
-  assert_contains "the plugin root decides the path" "/opt/plugins/er/skills/engineering-rules/references/" "$out"
+  out=$(jq -cn '{hook_event_name:"UserPromptSubmit",prompt:"hi"}' | ENGINEERING_RULES_HOME=/opt/er bash "$SCRIPT")
+  assert_contains "the home variable decides the path" "/opt/er/references/" "$out"
 }
 
 test_other_events_and_bad_input_print_nothing() {
