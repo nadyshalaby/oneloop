@@ -1,14 +1,14 @@
 #!/bin/bash
-# Guard: the demystify skill keeps the shape the user chose for every explanation: the problem,
+# Guard: the explain skill keeps the shape the user chose for every explanation: the problem,
 # what I'd build, the effect and the risks, asked through AskUserQuestion with nothing built
 # before a yes, never about tests, reviews or specs, and read-only until the yes (nothing run to
-# try an idea). Run: bash tests/demystify.test.sh
-# DEMYSTIFY_MD points the test at another copy of the skill, for a watched failure.
+# try an idea). Run: bash tests/explain.test.sh
+# EXPLAIN_MD points the test at another copy of the skill, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
-SKILL="${DEMYSTIFY_MD:-$ROOT/skills/demystify/SKILL.md}"
+SKILL="${EXPLAIN_MD:-$ROOT/skills/explain/SKILL.md}"
 TICK=$(printf '\140')
 PINS="**The problem.**
 **What I'd build.** Pseudocode of the core logic

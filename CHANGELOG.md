@@ -2,6 +2,26 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **7.0.0**: fewer skills, common names. The user: "remove explore feature skill, rename other
+  skills to something technically common", "remove agents skill, "skill" creation skill," and
+  "move the status report skill to the engineering rules"; of the options, "Yes, build it" and
+  "Rename to explain". Removed: `/engineering-rules:explore-feature` with its scripts, page
+  template, capture loaders, their six test files and sections 16.9 to 16.11;
+  `/engineering-rules:skill` with 16.12; and the helper switch `/engineering-rules:agents` (the
+  three helpers stay on, and their work runs in the session only where the agent tool is
+  missing). Renamed, folders and every mention with them: `do` to `build`, `shape` to
+  `brainstorm`, `design` to `design-system`, `log` to `release-notes`, `demystify` to `explain`,
+  and the workflow skill `engineering-rules:engineering-rules` to `engineering-rules:workflow`;
+  `audit`, `triage` and `update-engineering-rules` keep their names. The workflow's description
+  no longer lists its route words, so it starts only when the user names the engineering-rules
+  workflow or types one of its commands, never on an everyday word like build or audit.
+  `status-report` moves into `skills/status-report/` word for word under its own name, so
+  `/status-report` still answers, and the uninstall now takes it out with the rest. **What it
+  removes:** a feature page with every cited line checked against the tree, the switch that
+  kept helpers off for a conversation, and the route that checked a new skill's structure (the
+  skill-creator plugin still makes skills). Fixed on the way: the README's hooks table, broken
+  by the blank line 5.0.0 left where the file-cap row was. Core law 70 lines, 9,639 to 9,596
+  characters (the gate's skill name and the routes line); code rules unchanged at 6,737.
 - **6.0.0**: the lite workflow. The user: "merge quick mode with full mode into default one i
   need only 3 phases plan, implement, verify&deploy. and skip any phase if it was done
   previously or when you have full context to avoid reworking things. i want lite version with

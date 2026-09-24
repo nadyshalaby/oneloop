@@ -41,7 +41,7 @@ did not reach
 `AskUserQuestion`
 `(Recommended)`
 most effective fix
-the `demystify` skill
+the `explain` skill
 get a yes through `AskUserQuestion`
 Nothing changes before that yes
 a changed logic asks again

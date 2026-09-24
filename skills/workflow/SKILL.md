@@ -1,13 +1,13 @@
 ---
-name: engineering-rules:engineering-rules
+name: engineering-rules:workflow
 argument-hint: "[what you want done]"
 description: >-
   The engineering-rules workflow: three phases (plan, implement, verify and deploy), the phase
   ledger, the slim work-doc, three capped helpers and the routes. The always-on engineering law
   already binds every session through the user-global CLAUDE.md; this skill adds the phases. Use
-  it only when the user names the engineering-rules workflow or one of its routes (do, shaping,
-  explore a feature, audit, triage, skill authoring, design spec, update log) in their words, or
-  when a /engineering-rules: command loads it.
+  it only when the user names the engineering-rules workflow in their words, or when a
+  /engineering-rules: command loads it; an everyday word such as build, audit or triage alone
+  never starts it.
 ---
 
 # Engineering rules: the workflow
@@ -21,10 +21,10 @@ description: >-
 
 - **Whole invocation:** `$ARGUMENTS`
 
-**Ways in.** `/engineering-rules:do <request>` is the default. `/engineering-rules:engineering-rules
+**Ways in.** `/engineering-rules:build <request>` is the default. `/engineering-rules:workflow
 <request>`, or naming the workflow in words, runs the same flow. Bare, with no request anywhere in
 the conversation, ask through `AskUserQuestion` what they want done (and which route, when it is not
-`do`), and nothing else. The other routes are in the table at the end. The flow never starts on its
+`build`), and nothing else. The other routes are in the table at the end. The flow never starts on its
 own because a task touches code; the law covers that. A trivial ask (the law's definition) ends
 after the answer or the one-line edit.
 
@@ -41,11 +41,11 @@ print the ledger at the start, at every phase boundary and after each task's com
 - [ ] 3 Verify & Deploy
 ```
 
-The first print adds one line: `Helpers: on | off by user | unavailable. Advisor: yes | no.` A tick
+The first print adds one line: `Helpers: on | unavailable. Advisor: yes | no.` A tick
 carries a one-line reflection (what changed, did it pass, what is next) and lands in the work-doc
 before the chat re-print; a deferred write is no tick. After each re-print, one `PushNotification`
 line under 200 characters. At each boundary, restate the goal in one line and run the drift check
-(law 1.9). **Check-in** (every ten minutes, the user's `loop.md`): a `do` task counts as full mode
+(law 1.9). **Check-in** (every ten minutes, the user's `loop.md`): a `build` task counts as full mode
 and its work-doc is the one to update: its Plan boxes are the Sprint Backlog, its Done-when boxes
 the Acceptance Criteria, a Log line the Daily Update, and frontmatter `status` and `next` the
 phase ledger. After context loss, re-read the law, the code rules, this skill and the in-flight
@@ -62,7 +62,7 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
 - **Fully known.** The user's own message gives the goal, the done-when checks and the steps: Plan
   takes the work-doc from their words, with no exploration and no question but the logic gate, and
   the advisor still checks it unless every task is their words verbatim.
-- **The logic gate never skips.** A skipped Plan still shows the logic (the `demystify` skill) and
+- **The logic gate never skips.** A skipped Plan still shows the logic (the `explain` skill) and
   waits for the yes, unless the work-doc's `Logic confirmed:` line holds the user's yes to this
   same logic; only the user can waive it (law 1.4).
 - **Verify & Deploy never skips a check.** The triad, every Done-when check, the ship gate and,
@@ -91,7 +91,7 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    and at most three checks and three tasks is the fast lane (one Goal line, the review done here);
    anything else, or a work-doc with no `Lane:` line, is the careful lane. Then
    the advisor checks the plan.
-8. **Logic gate (law 1.4):** show the logic with the `demystify` skill and ask through
+8. **Logic gate (law 1.4):** show the logic with the `explain` skill and ask through
    `AskUserQuestion`; nothing is written or changed before the yes. Then write the work-doc (below),
    the user's answer in its `Logic confirmed:` line. **Exit:** the work-doc with Goal, Done when and
    Plan, said in chat in two lines.
@@ -162,7 +162,7 @@ row disposed, every task committed.
    checks did not reach; no probe or control the plan did not name.
 2. **Review,** for every diff that changes behaviour: careful lane, one `er-reviewer` over
    `git diff <base>..HEAD`, handed the Evidence lines and the scout's `not run:` lines; fast lane or
-   helpers off, the same review here, from `~/.claude/agents/er-reviewer.md`. It returns a
+   helpers unavailable, the same review here, from `~/.claude/agents/er-reviewer.md`. It returns a
    coverage row per touched path and findings tagged `introduced` or `present at base`, graded
    Critical, Important or Minor.
 3. **Challenge, then decide:** a finding stands unless a `file:line` refutes it (doubt is not a
@@ -204,8 +204,8 @@ Law self-audit
 
 Three custom agents, each with its own model and turn cap, and nothing else is sent (no fork, no
 built-in type): `er-reader` (read-only, a wide sweep), `er-builder` (one task of two or more
-parallel ones) and `er-reviewer` (read-only, the review). `/engineering-rules:agents off` runs their
-work here for the conversation, from the same files. This session keeps the ledger and every tick,
+parallel ones) and `er-reviewer` (read-only, the review). Where the agent tool is missing, their
+work runs here, from the same files. This session keeps the ledger and every tick,
 every question and answer, the verification a tick rests on, every fix decision, what gets
 committed, the gate, the self-audit and every claim; a helper's output is a report until re-run.
 
@@ -219,16 +219,14 @@ the fix of a Critical finding.
 
 | Route | Sub-command | Right when | Section |
 |---|---|---|---|
-| **Do** | `/engineering-rules:do` | The default for any substantive request: the three phases above. | this page |
-| **Shaping** | `/engineering-rules:shape` | The idea is not a task yet: one or two forking questions per turn. | 16.1 |
-| **Explore a feature** | `/engineering-rules:explore-feature` | How one feature runs, hop by hop, on a browsable page with every line verified. | 16.9 |
+| **Build** | `/engineering-rules:build` | The default for any substantive request: the three phases above. | this page |
+| **Brainstorm** | `/engineering-rules:brainstorm` | The idea is not a task yet: one or two forking questions per turn. | 16.1 |
 | **Codebase audit** | `/engineering-rules:audit` | A whole codebase against its rules, not one diff. | 16.3 |
 | **Review triage** | `/engineering-rules:triage` | A batch of review findings needs a decision each. | 16.2 |
-| **Skill authoring** | `/engineering-rules:skill` | A new reusable skill that must pass structural checks. | 16.12 |
-| **Design spec** | `/engineering-rules:design` | Authoring, extracting or refreshing the design spec. | 15.19 |
-| **Update log** | `/engineering-rules:log` | The plain summary of the task in flight. | 16.13 |
+| **Design system** | `/engineering-rules:design-system` | Authoring, extracting or refreshing the design spec. | 15.19 |
+| **Release notes** | `/engineering-rules:release-notes` | The plain summary of the task in flight. | 16.13 |
 
-`/engineering-rules:agents` is the helper switch, not a route. A section number is the file under
-`references/` whose name starts with it: 2.2 placement, 3.1 to 3.4 the catalogs (look up an id),
-6.3 to 6.11 the question banks, 10.1 the root cause, 11.3 the ship gate, 12.2 to 12.8 the review, 13.2 the
-sweep in detail, 14.1 worked anti-patterns, 15.x the design law for UI-bearing work, 16.x the routes.
+A section number is the file under `references/` whose name starts with it: 2.2 placement, 3.1 to
+3.4 the catalogs (look up an id), 6.3 to 6.11 the question banks, 10.1 the root cause, 11.3 the ship
+gate, 12.2 to 12.8 the review, 13.2 the sweep in detail, 14.1 worked anti-patterns, 15.x the design
+law for UI-bearing work, 16.x the routes.

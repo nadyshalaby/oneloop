@@ -24,7 +24,7 @@ here=${BASH_SOURCE[0]%/*}
 ER_HOME="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}"
 LAW="$ER_HOME/law/engineering-law.md"
 RULES="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/rules/engineering-code.md"
-WORKFLOW="$ER_HOME/skills/engineering-rules/SKILL.md"
+WORKFLOW="$ER_HOME/skills/workflow/SKILL.md"
 SCAN_BYTES=4000000
 
 # The last ledger heading Claude printed in the transcript's final bytes; empty when there is

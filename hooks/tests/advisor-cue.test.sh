@@ -31,7 +31,7 @@ test_every_prompt_carries_the_rule() {
   assert_contains "ranks the answer under the evidence" "a report, never proof" "$out"
   assert_contains "keeps a session without one working" "No advisor in the tool list is not an error" "$out"
   assert_contains "forbids a verdict for a call never made" "never write a verdict for a call you did not make" "$out"
-  assert_contains "carries the logic-first gate" "Logic first (law 1.4): before changing anything for a new task, explain it with the demystify skill and wait for the user's yes" "$out"
+  assert_contains "carries the logic-first gate" "Logic first (law 1.4): before changing anything for a new task, explain the logic (the explain skill) and wait for the user's yes" "$out"
   assert_contains "a complete-sounding ask is not a yes" "a detailed or fixed ask, or one that says to commit when done, is not a yes" "$out"
   count=$((count + 1))
   bytes=$(printf '%s' "$out" | wc -c | tr -d ' ')

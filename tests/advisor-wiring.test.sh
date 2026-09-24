@@ -12,7 +12,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 LAW="${LAW_MD:-$ROOT/law/engineering-law.md}"
-WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/engineering-rules/SKILL.md}"
+WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/workflow/SKILL.md}"
 REFS="${REFS_DIR:-$ROOT/references}"
 TICK=$(printf '\140')
 

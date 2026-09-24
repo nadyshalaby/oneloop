@@ -10,7 +10,7 @@
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
-WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/engineering-rules/SKILL.md}"
+WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/workflow/SKILL.md}"
 HOOK="${RE_ANCHOR_SH:-$ROOT/hooks/re-anchor.sh}"
 KEYS="status base branch next"
 HEADINGS="Goal|Done when|Plan|Log|Evidence|Follow-ups"

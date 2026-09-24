@@ -12,14 +12,14 @@ batch of review findings becomes one decision per finding.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
-   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+1. **Load the workflow**, unless the `engineering-rules:workflow` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:workflow`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
    the first code file read.)
 2. **Read the findings.** They are the whole invocation or, when it is empty, the batch
    pasted most recently in this conversation; when there is neither, ask for them through
    `AskUserQuestion`, one question, and nothing else.
 3. **Read 16.2 from disk and run it.** A finding accepted for a fix runs as
-   `/engineering-rules:do` when the user says go.
+   `/engineering-rules:build` when the user says go.
 
 A sub-command picks the route; it waives no check, and the law binds throughout.

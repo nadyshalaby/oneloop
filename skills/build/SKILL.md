@@ -1,18 +1,18 @@
 ---
-name: engineering-rules:do
-description: "The engineering-rules workflow on a request: plan, implement, verify and deploy, skipping what is already done or fully known. Usage: /engineering-rules:do <what you want done>"
+name: engineering-rules:build
+description: "The engineering-rules workflow on a request: plan, implement, verify and deploy, skipping what is already done or fully known. Usage: /engineering-rules:build <what you want done>"
 argument-hint: "[what you want done]"
 disable-model-invocation: true
 ---
 
-# Do, by the user's word
+# Build, by the user's word
 
-The user typed `/engineering-rules:do`, the default route.
+The user typed `/engineering-rules:build`, the default route.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
-   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+1. **Load the workflow**, unless the `engineering-rules:workflow` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:workflow`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
    the first code file read.)
 2. **Read the request.** It is the whole invocation. When it is empty, it is the most recent

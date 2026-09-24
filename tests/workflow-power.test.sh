@@ -13,7 +13,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 POWER="${POWER:-$ROOT/tests/fixtures/workflow-power.txt}"
-WORKFLOW="$ROOT/skills/engineering-rules/SKILL.md"
+WORKFLOW="$ROOT/skills/workflow/SKILL.md"
 CHAR_CAP=16000
 
 # rows: the list's rows, comments and blank lines left out.
@@ -53,8 +53,8 @@ test_the_check_can_fail() {
   planted="$WORK/power.txt"
   {
     rows | head -n 3
-    printf 'the old spec review :: dropped :: skills/engineering-rules/SKILL.md :: spec review\n'
-    printf 'a rule nobody wrote :: kept :: skills/engineering-rules/SKILL.md :: words that are nowhere\n'
+    printf 'the old spec review :: dropped :: skills/workflow/SKILL.md :: spec review\n'
+    printf 'a rule nobody wrote :: kept :: skills/workflow/SKILL.md :: words that are nowhere\n'
     printf 'a missing home :: kept :: agents/nobody.md :: anything\n'
   } > "$planted"
   out=$(POWER="$planted" homeless)

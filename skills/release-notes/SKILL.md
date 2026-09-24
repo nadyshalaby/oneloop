@@ -1,16 +1,16 @@
 ---
-name: engineering-rules:log
-description: "Prints the engineering-rules update log for the task in flight: the plain-language summary, on demand, mid-flight (16.13). Usage: /engineering-rules:log"
+name: engineering-rules:release-notes
+description: "Prints the engineering-rules release notes (the update log) for the task in flight: the plain-language summary, on demand, mid-flight (16.13). Usage: /engineering-rules:release-notes"
 disable-model-invocation: true
 ---
 
-# The update log, on demand
+# Release notes, on demand
 
-The user typed `/engineering-rules:log`. That picks the update log (16.13) outright. It takes
+The user typed `/engineering-rules:release-notes`. That picks the update log (16.13) outright. It takes
 no request: printing a summary is not a task, and it sends no helper.
 
-1. **Load the workflow**, unless the `engineering-rules:engineering-rules` skill is already
-   loaded in this conversation: invoke the Skill tool with `engineering-rules:engineering-rules`.
+1. **Load the workflow**, unless the `engineering-rules:workflow` skill is already
+   loaded in this conversation: invoke the Skill tool with `engineering-rules:workflow`.
    (The always-on law is already in context through CLAUDE.md; its code rules load with
    the first code file read.)
 2. **Read 16.13 from disk** and print the log with `{{invocation_phase}}` set to

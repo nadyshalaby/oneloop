@@ -12,7 +12,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 AGENTS="${AGENTS_DIR:-$ROOT/agents}"
-WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/engineering-rules/SKILL.md}"
+WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/workflow/SKILL.md}"
 EXPECTED="er-builder er-reader er-reviewer"
 READ_ONLY="er-reader er-reviewer"
 DECIDING="er-builder er-reviewer"

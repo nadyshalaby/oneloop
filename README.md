@@ -2,7 +2,7 @@
 
 The engineering law and working method for Claude Code, as a folder that plugs into
 `~/.claude` with no plugin. A short core law binds every session through the user-global
-`CLAUDE.md`, and the code rules join it the first time a session reads a code file; the workflow (`/engineering-rules:do`: plan, implement, verify and deploy) and its routes are skills that load only when you call them, with three capped helper agents;
+`CLAUDE.md`, and the code rules join it the first time a session reads a code file; the workflow (`/engineering-rules:build`: plan, implement, verify and deploy) and its routes are skills that load only when you call them, with three capped helper agents;
 hooks enforce the parts of the law a machine can see; and `install.sh` wires it all in, checks
 it, and takes it back out. Clone it on any machine, run the installer, and every project gets
 the same rules.
@@ -22,11 +22,11 @@ the code rules. The first short law, one file, measured 6,756.)
 |---|---|---|
 | The core law: definitions, precedence, the caps and bans in one line, 1.2, 1.4, 1.5, 1.7 to 1.11 | `law/engineering-law.md` | every session and every helper that loads `CLAUDE.md`, from the first prompt; capped at 90 lines and 10,000 characters by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, copied to `~/.claude/rules/` | the first time a session or a helper reads a file its `paths:` globs match (the common code extensions); capped at 60 lines and 7,500 characters |
-| The workflow: three phases, the ledger, the slim work-doc, the self-audit | `skills/engineering-rules/SKILL.md` | only when you call it (`/engineering-rules:do` or a route); capped at 16,000 characters by `tests/workflow-power.test.sh` |
+| The workflow: three phases, the ledger, the slim work-doc, the self-audit | `skills/workflow/SKILL.md` | only when you call it (`/engineering-rules:build` or a route); capped at 16,000 characters by `tests/workflow-power.test.sh` |
 | The helpers: `er-reader`, `er-builder`, `er-reviewer` | `agents/*.md`, linked into `~/.claude/agents/` | their one-line descriptions in every session's agent list; a body only when the workflow sends one |
-| The routes and the switch | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
-| `demystify`, `update-engineering-rules` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
-| 127 reference sections, the long forms included | `references/**` | only when a rule or a phase names one |
+| The routes | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
+| `explain`, `update-engineering-rules`, `status-report` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
+| 123 reference sections, the long forms included | `references/**` | only when a rule or a phase names one |
 | Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short block per prompt, the advisor rule and the logic-first gate |
 
 The two law files win over everything under `references/`: each long form in
@@ -44,7 +44,7 @@ bash ~/.claude/engineering-rules/install.sh
 
 The clone can live anywhere; the installer links `~/.claude/engineering-rules` to it. It then:
 
-1. links each skill into `~/.claude/skills/` under its command name, so `/engineering-rules:do`
+1. links each skill into `~/.claude/skills/` under its command name, so `/engineering-rules:build`
    and the rest answer to their `/engineering-rules:` names, and each helper agent into
    `~/.claude/agents/`;
 2. appends one managed block to `~/.claude/CLAUDE.md` that imports the core law, below your
@@ -91,7 +91,6 @@ renamed or loosened, minor for a new rule, check, hook or command, patch for wor
 | Event | Script | What it does |
 |---|---|---|
 | `PreToolUse` on edits | `edit-guard.sh` | refuses an edit that adds a banned token the law scout (9.5) can judge: suppressions, empty catches, bare `Error` throws in domain files, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets; what was already in the file never blocks |
-
 | `UserPromptSubmit` | `advisor-cue.sh` | puts the advisor rule and the logic-first gate (1.4) into every prompt |
 | `SessionStart` after a compaction or resume | `re-anchor.sh` | tells Claude to read the law from disk again, and the code rules before writing code, with the last ledger position Claude printed in a reply, if any |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | one progress-log line per event, and a desktop notification when a turn ends on a ledger re-print, waits on you, or dies on an error |
@@ -104,40 +103,37 @@ you and your work on its own bug.
 
 | Command | What it does |
 |---|---|
-| `/engineering-rules:do <request>` | the default: plan, implement, verify and deploy, skipping a phase that is already done or fully known (a resumed work-doc, or a request that already gives the goal, the checks and the steps) |
-| `/engineering-rules:engineering-rules <request>` | the same flow; bare, it asks what you want done |
-| `/engineering-rules:shape`, `:explore-feature`, `:audit`, `:triage`, `:skill`, `:design`, `:log` | shaping an idea, tracing one feature onto a page, a whole-codebase audit, review triage, skill authoring, a design spec, the update log |
-| `/engineering-rules:agents` | switches the three helpers off for the conversation (their work runs in the chat), and back on |
-| `/engineering-rules:demystify` | explains logic short and plain (the problem, pseudocode, the effect, the risks): before a new task, as the law's logic-first gate, or when you ask how code works |
+| `/engineering-rules:build <request>` | the default: plan, implement, verify and deploy, skipping a phase that is already done or fully known (a resumed work-doc, or a request that already gives the goal, the checks and the steps) |
+| `/engineering-rules:workflow <request>` | the same flow; bare, it asks what you want done |
+| `/engineering-rules:brainstorm`, `:audit`, `:triage`, `:design-system`, `:release-notes` | brainstorming an idea until it is a task, a whole-codebase audit, review triage, the project's design spec, the release notes (update log) of the task in flight |
+| `/engineering-rules:explain` | explains logic short and plain (the problem, pseudocode, the effect, the risks): before a new task, as the law's logic-first gate, or when you ask how code works |
 | `/update-engineering-rules` | changes these rules and ships the change |
+| `/status-report` | where things stand: Doing, Done (each item tagged Shipped, Pushed not verified or Local, checked against git and the live system) and Todo; it also shapes the ten-minute check-in brief |
 
 ## Tests
 
 ```
 find . -name '*.test.sh' -not -path './.git/*' | while read -r t; do bash "$t" | tail -n 1; done
-shellcheck -x -P SCRIPTDIR -S style install.sh scripts/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh \
-  skills/*/scripts/*.sh skills/*/scripts/tests/*.sh skills/*/scripts/tests/fixtures/*.sh \
-  skills/*/capture/tests/*.sh
+shellcheck -x -P SCRIPTDIR -S style install.sh scripts/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh
 ```
 
 Every test file ends with a `N passed, M failed` line and exits non-zero on a failure. Each can
 be pointed at a broken copy of what it checks through an environment variable named in its
 header, which is how every check here was shown to be able to fail. `tests/install.test.sh`
 runs the installer in fake homes only, never against the real `~/.claude`.
-`skills/explore-feature/capture/tests/rewrite.test.sh` needs `typescript@5` in bun's cache.
 
 ## Layout
 
 ```
 law/engineering-law.md          the core law CLAUDE.md imports
 law/engineering-code.md         the code rules install.sh copies into ~/.claude/rules/
-skills/engineering-rules/       the workflow
-skills/<route>/                 one command per route (do is the default), the agents switch, the standalone skills
+skills/workflow/                the workflow
+skills/<route>/                 one command per route (build is the default), and the standalone skills
 agents/                         the three helpers the workflow sends, each with its model and turn cap
 scripts/scout.sh                the perf, law and design scouts in one call over the working tree, every hit tagged introduced or present at base
 scripts/perf-scout.sh           turns the perf scout's tables (9.4) into the block scout.sh runs
 scripts/lane.sh                 picks the fast or careful lane for a planned change, from facts a machine can check
-references/                     127 sections, one file each, numbered as the workflow's map numbers them
+references/                     123 sections, one file each, numbered as the workflow's map numbers them
 hooks/                          the hook scripts, their shared helpers and their tests
 settings/hooks.json             the hooks and the status line the installer merges into settings.json
 settings/claude-md-block.md     the block the installer writes into CLAUDE.md
