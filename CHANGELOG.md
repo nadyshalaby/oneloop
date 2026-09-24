@@ -2,6 +2,36 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **6.0.0**: the lite workflow. The user: "merge quick mode with full mode into default one i
+  need only 3 phases plan, implement, verify&deploy. and skip any phase if it was done
+  previously or when you have full context to avoid reworking things. i want lite version with
+  the same power of original one", then "focus also on development speed". One default route,
+  `/engineering-rules:do`, runs three phases (Plan, Implement, Verify & Deploy) and skips a
+  phase that a resumed work-doc or the user's own words already cover, never the logic-first
+  gate; `/engineering-rules:quick` and `:full` are removed, which makes this a major version.
+  The workflow page is 15,402 characters, from 35,819, with a slim work-doc written once after
+  the user's yes and a ten-row self-audit. Plan runs `scripts/lane.sh`, which gives the fast
+  lane only on checkable facts (a test command, at most 3 code files, no risky kind of file, a
+  test with the code) plus one honest plan line (no money, auth, state machine, migration,
+  concurrency or data-loss code, no deploy); anything else is the careful lane. Implement runs
+  `scripts/scout.sh`: the perf (9.4, its tables turned into commands by
+  `scripts/perf-scout.sh`), law (9.5) and design (15.29) scouts over the working tree against a
+  base, every row tagged introduced or present at base, each scout first proven on a planted hit.
+  Three capped helpers (`er-reader`, `er-builder`, `er-reviewer`) replace the per-phase agents,
+  and `install.sh` links them into `~/.claude/agents/`. Every row of the old checklists keeps a
+  home (`tests/workflow-power.test.sh`). **The places it checks less, by the user's choices,
+  each with the protection it removes:** a fast-lane change is reviewed in the session from the
+  reviewer's checklist, not by the separate reviewer (a mistake the session cannot see in its
+  own work is not caught by fresh eyes); the reviewer takes the session's proven Evidence lines
+  without re-running them and has 10 turns, from 20 (a wrong Evidence line is not re-checked);
+  the intent is confirmed first only when the ask reads two ways (a misread single reading
+  surfaces at the logic gate instead); the spec review becomes the advisor's plan check (no
+  separate reviewer reads the plan); the landing menu appears only when there is a choice; and
+  2.2 and 11.3 are read only when a step needs them (placement or ship-gate detail is not
+  re-read on a task that creates no file or has no build target). Shipped without the timing
+  runs or a live end-to-end run, by the user's choice ("skip tests"): the speed gain is
+  unmeasured, and the last full run was of an earlier build. Core law 70 lines, 9,580 to
+  9,639 characters (the routes line); code rules unchanged at 6,737.
 - **5.0.0**: the two line caps are gone. The user: "i want to remove the lines cap rules", and
   of the options, "the two code caps": 40 lines per function and 500 lines per file. Both law
   files drop them (the 3-parameter and 3-level nesting caps stay), and so do the 1.1 long form,
