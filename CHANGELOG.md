@@ -1,6 +1,37 @@
 # engineering-rules, the history
 
-One entry per version, newest first. The README says what the plugin is now; this file says how it got there.
+One entry per version, newest first. The README says what the setup is now; this file says how it got there.
+
+- **3.0.0**: no plugin. The law now binds every session from the user-global `CLAUDE.md`, with
+  nothing to call: `law/engineering-law.md` is a short form of the always-on law (136 lines,
+  19,329 characters, capped at 200 and 20,000) that a managed `CLAUDE.md` block imports, and a
+  pin list in `tests/short-law.test.sh` holds every cap, ban, guardrail, git rule, banned phrase
+  and deploy proof it must keep. The plugin's long always-on text moved to
+  `references/01-always-on-law/` as long forms the short one wins over. The phase workflow no
+  longer loads on its own whenever code is touched; it runs when the user calls it by name or
+  through a route, and every command keeps its plugin-era name through its skill's `name:`
+  line. `install.sh` wires the folder in: a link home, one link per skill, the `CLAUDE.md`
+  block, the hooks and the status line merged into `settings.json` from `settings/hooks.json`,
+  and the plugin switched off; it checks before it changes, backs each file up to a folder of
+  its own, keeps permissions and links, runs twice with no change, and `--uninstall` puts back
+  what it replaced. The hooks find the repository through `ENGINEERING_RULES_HOME` or their own
+  path instead of the plugin root. **Never chase what you find on the way** (1.9): a bug, a
+  failing check, a law break, dead code or a smell noticed while working is written down with
+  its `file:line` and handed back, never fixed in the task; a serious find is told at once and
+  still not fixed; a check already red at the base commit is filed while a red check still
+  stops a deploy; only the diff's own breakage and a true blocker are fixed on the way, and the
+  rule names the reasons that do not count. That retires the standing removal of old dead code
+  in touched files, and a defect's family is fixed only where the goal names it; the file cap
+  hook names a file already over the cap at the last commit as a follow-up, once per session,
+  instead of asking for a split. The re-anchor hook and the status line read the ledger
+  position only from Claude's own reply text, so a heading quoted in a file or a tool result no
+  longer reports a workflow in flight and asks for a full re-read. `/update-engineering-rules`
+  changes these rules and ships the change: the ethics (the user's words are the
+  specification, nothing loosened quietly or lost by accident, the short law's size reported,
+  one source of truth) and a release that tests in a worktree, merges, installs, verifies in a
+  fresh session, commits and pushes. The plugin packaging (`.claude-plugin/`), its evals and
+  its docs are gone. Major, because the packaging changed, a standing rule was retired and the
+  workflow no longer loads on its own.
 
 - **2.21.0**: a second opinion at every decision. Claude Code's `advisor` tool is a model the
   user pairs with the one that is running, at least as capable, which reads the whole
