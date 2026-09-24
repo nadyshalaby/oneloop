@@ -2,7 +2,7 @@
 
 The engineering law and working method for Claude Code, as a folder that plugs into
 `~/.claude` with no plugin. A short core law binds every session through the user-global
-`CLAUDE.md`, and the code rules join it the first time a session reads a code file; the phase workflow and its routes are skills that load only when you call them;
+`CLAUDE.md`, and the code rules join it the first time a session reads a code file; the workflow (`/engineering-rules:do`: plan, implement, verify and deploy) and its routes are skills that load only when you call them, with three capped helper agents;
 hooks enforce the parts of the law a machine can see; and `install.sh` wires it all in, checks
 it, and takes it back out. Clone it on any machine, run the installer, and every project gets
 the same rules.
@@ -22,7 +22,8 @@ the code rules. The first short law, one file, measured 6,756.)
 |---|---|---|
 | The core law: definitions, precedence, the caps and bans in one line, 1.2, 1.4, 1.5, 1.7 to 1.11 | `law/engineering-law.md` | every session and every helper that loads `CLAUDE.md`, from the first prompt; capped at 90 lines and 10,000 characters by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, copied to `~/.claude/rules/` | the first time a session or a helper reads a file its `paths:` globs match (the common code extensions); capped at 60 lines and 7,500 characters |
-| The phase workflow | `skills/engineering-rules/SKILL.md` | only when you call it by name or through a route |
+| The workflow: three phases, the ledger, the slim work-doc, the self-audit | `skills/engineering-rules/SKILL.md` | only when you call it (`/engineering-rules:do` or a route); capped at 16,000 characters by `tests/workflow-power.test.sh` |
+| The helpers: `er-reader`, `er-builder`, `er-reviewer` | `agents/*.md`, linked into `~/.claude/agents/` | their one-line descriptions in every session's agent list; a body only when the workflow sends one |
 | The routes and the switch | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
 | `demystify`, `update-engineering-rules` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
 | 127 reference sections, the long forms included | `references/**` | only when a rule or a phase names one |
@@ -43,8 +44,9 @@ bash ~/.claude/engineering-rules/install.sh
 
 The clone can live anywhere; the installer links `~/.claude/engineering-rules` to it. It then:
 
-1. links each skill into `~/.claude/skills/` under its command name, so `/engineering-rules:quick`
-   and the rest keep the names they had in the plugin;
+1. links each skill into `~/.claude/skills/` under its command name, so `/engineering-rules:do`
+   and the rest answer to their `/engineering-rules:` names, and each helper agent into
+   `~/.claude/agents/`;
 2. appends one managed block to `~/.claude/CLAUDE.md` that imports the core law, below your
    own lines, which it never touches;
 3. copies the code rules to `~/.claude/rules/engineering-code.md`, a copy and not a link because
@@ -102,10 +104,10 @@ you and your work on its own bug.
 
 | Command | What it does |
 |---|---|
-| `/engineering-rules:engineering-rules <request>` | the phase workflow; bare, it walks you through the routes |
-| `/engineering-rules:full`, `:quick` | full mode (every check, a written plan, a spec review, a work-doc) or quick mode (every check, less ceremony) |
+| `/engineering-rules:do <request>` | the default: plan, implement, verify and deploy, skipping a phase that is already done or fully known (a resumed work-doc, or a request that already gives the goal, the checks and the steps) |
+| `/engineering-rules:engineering-rules <request>` | the same flow; bare, it asks what you want done |
 | `/engineering-rules:shape`, `:explore-feature`, `:audit`, `:triage`, `:skill`, `:design`, `:log` | shaping an idea, tracing one feature onto a page, a whole-codebase audit, review triage, skill authoring, a design spec, the update log |
-| `/engineering-rules:agents` | switches the phase agents off for the conversation, and back on |
+| `/engineering-rules:agents` | switches the three helpers off for the conversation (their work runs in the chat), and back on |
 | `/engineering-rules:demystify` | explains logic short and plain (the problem, pseudocode, the effect, the risks): before a new task, as the law's logic-first gate, or when you ask how code works |
 | `/update-engineering-rules` | changes these rules and ships the change |
 
@@ -113,7 +115,7 @@ you and your work on its own bug.
 
 ```
 find . -name '*.test.sh' -not -path './.git/*' | while read -r t; do bash "$t" | tail -n 1; done
-shellcheck -x -P SCRIPTDIR -S style install.sh hooks/*.sh hooks/tests/*.sh tests/*.sh \
+shellcheck -x -P SCRIPTDIR -S style install.sh scripts/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh \
   skills/*/scripts/*.sh skills/*/scripts/tests/*.sh skills/*/scripts/tests/fixtures/*.sh \
   skills/*/capture/tests/*.sh
 ```
@@ -129,8 +131,10 @@ runs the installer in fake homes only, never against the real `~/.claude`.
 ```
 law/engineering-law.md          the core law CLAUDE.md imports
 law/engineering-code.md         the code rules install.sh copies into ~/.claude/rules/
-skills/engineering-rules/       the phase workflow
-skills/<route>/                 one command per route, the agents switch, the standalone skills
+skills/engineering-rules/       the workflow
+skills/<route>/                 one command per route (do is the default), the agents switch, the standalone skills
+agents/                         the three helpers the workflow sends, each with its model and turn cap
+scripts/scout.sh                the law and design scouts in one call over the working tree, every hit tagged introduced or present at base
 references/                     127 sections, one file each, numbered as the workflow's map numbers them
 hooks/                          the hook scripts, their shared helpers and their tests
 settings/hooks.json             the hooks and the status line the installer merges into settings.json

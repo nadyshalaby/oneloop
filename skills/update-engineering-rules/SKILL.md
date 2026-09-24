@@ -24,6 +24,7 @@ release it in one step, the same way the law's 1.11 ships anything else.
 | The reasons and procedures behind an always-on rule | `references/01-always-on-law/1.x-*.md`, the long forms | only when read |
 | Binds only while the phase workflow runs | `skills/engineering-rules/SKILL.md` | only when the workflow is called |
 | A command the user types | `skills/<route>/SKILL.md` | its description in every session's skill list; the body when called |
+| A helper the workflow sends | `agents/<name>.md`, linked into `~/.claude/agents/` | its description in every session's agent list; the body when sent |
 | Detail one phase or route reads | `references/<nn>-*/<n.n>-*.md` | only when read |
 | Enforced by a machine at the tool boundary | `hooks/<name>.sh`, wired in `settings/hooks.json` | a process on every matching event |
 | How the rules reach Claude Code | `settings/claude-md-block.md`, `settings/hooks.json`, `install.sh` | nothing per turn |
@@ -81,7 +82,7 @@ A hook is for what a machine can judge without a model; a judgment call stays in
    `ADVISOR_CUE_SH` and the like) at `git -C "$ER" show main:<path>` saved to a scratch file.
 6. **Run everything, on the exact commit you will ship.** Every `*.test.sh` in the worktree
    (`find . -name '*.test.sh' -not -path './.git/*'`, each run, each result line pasted), and
-   `shellcheck -x -P SCRIPTDIR -S style install.sh hooks/*.sh hooks/tests/*.sh tests/*.sh skills/*/scripts/*.sh skills/*/scripts/tests/*.sh skills/*/scripts/tests/fixtures/*.sh skills/*/capture/tests/*.sh`.
+   `shellcheck -x -P SCRIPTDIR -S style install.sh scripts/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh skills/*/scripts/*.sh skills/*/scripts/tests/*.sh skills/*/scripts/tests/fixtures/*.sh skills/*/capture/tests/*.sh`.
    Every file green, no finding; a red one sends you back to step 4.
 7. **Write it into the history.** A new top entry in `CHANGELOG.md` with the next version:
    major when a rule or a command is removed, renamed or loosened; minor for a new rule, check,

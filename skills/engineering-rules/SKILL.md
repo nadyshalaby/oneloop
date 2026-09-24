@@ -79,7 +79,7 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    migration, config, jobs, deploy, docs, tests) and what settles it: the ask, a `file:line`, or a
    question. None left open.
 5. **Questions:** one `AskUserQuestion` batch, only for forks the code and the ask cannot settle,
-   recommended option first and most effective; an unfamiliar domain borrows its bank from 6.x.
+   recommended option first and most effective; an unfamiliar domain borrows its bank from 6.3 to 6.11.
 6. Write the work-doc (below): Done-when checks and Plan tasks, each with `→ verify: <command>` and
    the files it may touch. Then the advisor checks the plan. **Exit:** the work-doc with Goal, Done
    when and Plan, said in chat in two lines.
@@ -207,5 +207,5 @@ the fix of a Critical finding.
 
 `/engineering-rules:agents` is the helper switch, not a route. A section number is the file under
 `references/` whose name starts with it: 2.2 placement, 3.1 to 3.4 the catalogs (look up an id),
-6.x the question banks, 10.1 the root cause, 11.3 the ship gate, 12.2 to 12.8 the review, 13.2 the
+6.3 to 6.11 the question banks, 10.1 the root cause, 11.3 the ship gate, 12.2 to 12.8 the review, 13.2 the
 sweep in detail, 14.1 worked anti-patterns, 15.x the design law for UI-bearing work, 16.x the routes.
