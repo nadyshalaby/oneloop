@@ -4,7 +4,7 @@
 # Code's real shape and the closing report line. Source it first:
 #   . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 set -u
-WORK=$(mktemp -d "${TMPDIR:-/tmp}/$(basename "${BASH_SOURCE[1]:-plugin-test}" .sh).XXXXXX")
+WORK=$(mktemp -d "${TMPDIR:-/tmp}/$(basename "${BASH_SOURCE[1]:-engineering-rules-test}" .sh).XXXXXX")
 trap 'rm -rf "$WORK"' EXIT
 failures=0
 count=0

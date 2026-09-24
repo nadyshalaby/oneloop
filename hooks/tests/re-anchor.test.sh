@@ -74,7 +74,7 @@ test_other_starts_and_bad_input_print_nothing() {
   assert_eq "another event prints nothing" "" "$out"
 }
 
-test_source_field_and_plugin_root() {
+test_source_field_and_the_home_variable() {
   out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",source:"resume",cwd:"/tmp/proj",transcript_path:$t}' | bash "$SCRIPT")
   assert_contains "the older source field still starts it" "(session resumed)" "$out"
   out=$(jq -cn --arg t "$T" '{hook_event_name:"SessionStart",how_started:"compact",cwd:"/tmp/proj",transcript_path:$t}' | ENGINEERING_RULES_HOME=/opt/er bash "$SCRIPT")
@@ -85,5 +85,5 @@ test_compact_carries_the_last_position
 test_resume_without_a_position
 test_quoted_headings_are_not_positions
 test_other_starts_and_bad_input_print_nothing
-test_source_field_and_plugin_root
+test_source_field_and_the_home_variable
 report

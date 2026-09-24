@@ -2,7 +2,7 @@
 # engineering-rules installer. Wires this repository into Claude Code with no plugin:
 #   ~/.claude/engineering-rules   a link to this repository, unless it IS this repository
 #   ~/.claude/skills/<name>       one link per skill, named by its `name:` line, so every
-#                                 /engineering-rules:<route> command keeps its plugin-era name
+#                                 /engineering-rules:<route> command keeps its name
 #   ~/.claude/CLAUDE.md           one managed block that imports law/engineering-law.md
 #   ~/.claude/settings.json       the hooks and the status line of settings/hooks.json, and the
 #                                 old engineering-rules plugin switched off

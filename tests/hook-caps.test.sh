@@ -1,5 +1,5 @@
 #!/bin/bash
-# Guard: the law's size caps bind this plugin's own scripts (SKILL.md 1.1): every shell file
+# Guard: the law's size caps bind this repository's own scripts (1.1): every shell file
 # under hooks/, tests/, the skills' scripts/ and capture/tests/ stays under 500 lines and every function in them under 40. A
 # function is a `name() {` or `name() (` line down to the first line that is only `}` or `)`,
 # counted between.

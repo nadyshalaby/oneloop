@@ -3,8 +3,8 @@
 # branch and dirty state, model, and the last phase-ledger position Claude printed this
 # session. The second holds the meters: the context in use, session uptime, the claude.ai
 # plan usage and how often the conversation was compacted; it is left out while all are empty.
-# Receives Claude Code's status-line JSON on stdin. Plugins cannot set statusLine, so
-# the README carries the one-line settings snippet that points here.
+# Receives Claude Code's status-line JSON on stdin; install.sh points settings.json's
+# statusLine here.
 # It is re-rendered continuously, so the ledger and compaction scans each keep a cursor per
 # transcript and read only the bytes added since the last render. Runs on the bash macOS
 # ships (3.2).

@@ -2,8 +2,8 @@
 # Guard: every hook settings/hooks.json runs is a script that exists in hooks/, every command
 # reaches it through the fixed home, $HOME/.claude/engineering-rules/hooks/, which install.sh
 # merges into ~/.claude/settings.json, every hook script that reads Claude Code's event input
-# is wired to an event, the status line runs hooks/statusline.sh (it reads no event), no hook reaches the Bash tool: 2.6.0 took the git guard out, so the
-# shell is not judged at the tool boundary, and the prompt hook carries no matcher, because
+# is wired to an event, the status line runs hooks/statusline.sh (it reads no event), no hook reaches the Bash tool (git safety binds
+# through the law, and the shell is not judged at the tool boundary), and the prompt hook carries no matcher, because
 # UserPromptSubmit takes none. Run: bash tests/hooks-wiring.test.sh
 # HOOKS_JSON points the test at another fragment, for a watched failure.
 # shellcheck source-path=SCRIPTDIR

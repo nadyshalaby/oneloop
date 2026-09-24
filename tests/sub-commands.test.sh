@@ -34,8 +34,8 @@ table_sections() { route_rows "$1" | sed -E 's/.*\| ([0-9]+\.[0-9]+) \|$/\1/'; }
 skill_dirs() { find "$1" -mindepth 1 -maxdepth 1 -type d ! -name "$MAIN_SKILL" | sed 's#.*/##' | sort; }
 
 # command_name <dir>: the name a skill must carry, which install.sh also gives its link in
-# ~/.claude/skills: the plugin-era `engineering-rules:<dir>`, so every command keeps the name it
-# had, except the skills listed in OWN_NAME, which the user named outright.
+# ~/.claude/skills: `engineering-rules:<dir>`, so every command keeps its `/engineering-rules:`
+# name, except the skills listed in OWN_NAME, which the user named outright.
 command_name() {
   case " $OWN_NAME " in *" $1 "*) printf '%s' "$1" ;; *) printf '%s:%s' "$MAIN_SKILL" "$1" ;; esac
 }
