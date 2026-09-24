@@ -11,10 +11,11 @@ description: >-
 A short, plain explanation of logic the user can take in at a glance: plain words and
 pseudocode, never a report.
 
-## Read first, change nothing
+## Read first, run nothing, change nothing
 
-Read just enough code to get the logic right. Nothing that changes anything is edited, created
-or run before the user's yes.
+Read just enough to get the logic right: files, searches and `git` history. Nothing is run to try
+an idea (no scratch code, no experiments, no test runs); that waits until after the user's yes.
+Nothing is edited or created before it.
 
 ## Before a new task: the gate
 

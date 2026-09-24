@@ -2,6 +2,13 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **4.1.0**: the explain step reads, and runs nothing. Two fresh sessions on a one-line isEven ran
+  node experiments before explaining and took 233 s and 348 s to reach the question; the user
+  chose "explain from reading only". `demystify` now reads files, searches and `git` history
+  only until the yes: nothing is run to try an idea (no scratch code, no experiments, no test
+  runs). `tests/demystify.test.sh` pins the skill's shape (the problem, what I'd build, the
+  effect, the risks, the ask, nothing built before a yes, never about tests, reviews or specs)
+  and the new rule. Law files unchanged.
 - **4.0.0**: logic first, and `demystify` replaces `generate-pseudocode`. The user: "before start
   working on a new task. to explain in short the business logic that will be implemented ...
   (law, hard gate, mandatory)", in the shape "SHORT, pseudocode representation, plain words
