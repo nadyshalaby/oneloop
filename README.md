@@ -26,7 +26,7 @@ the code rules. The first short law, one file, measured 6,756.)
 | The routes and the switch | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
 | `demystify`, `update-engineering-rules` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
 | 127 reference sections, the long forms included | `references/**` | only when a rule or a phase names one |
-| Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short block per prompt |
+| Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short block per prompt, the advisor rule and the logic-first gate |
 
 The two law files win over everything under `references/`: each long form in
 `references/01-always-on-law/` keeps the reasons and procedures behind a section of theirs, and
@@ -90,7 +90,7 @@ renamed or loosened, minor for a new rule, check, hook or command, patch for wor
 |---|---|---|
 | `PreToolUse` on edits | `edit-guard.sh` | refuses an edit that adds a banned token the law scout (9.5) can judge: suppressions, empty catches, bare `Error` throws in domain files, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets; what was already in the file never blocks |
 | `PostToolUse` on edits | `file-cap.sh` | a file this change pushed over 500 lines gets a note to split it; one already over at the last commit gets a follow-up note instead, once per session |
-| `UserPromptSubmit` | `advisor-cue.sh` | puts the advisor rule (1.4) into every prompt |
+| `UserPromptSubmit` | `advisor-cue.sh` | puts the advisor rule and the logic-first gate (1.4) into every prompt |
 | `SessionStart` after a compaction or resume | `re-anchor.sh` | tells Claude to read the law from disk again, and the code rules before writing code, with the last ledger position Claude printed in a reply, if any |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | one progress-log line per event, and a desktop notification when a turn ends on a ledger re-print, waits on you, or dies on an error |
 | status line | `statusline.sh` | two rows: folder, branch, model and ledger position; then context, uptime, plan usage and compactions |

@@ -46,7 +46,8 @@ get a yes through `AskUserQuestion`
 Nothing changes before that yes
 a changed logic asks again
 a helper builds only logic the user confirmed
-only the user can skip it, for one task
+a detailed or fixed ask, or "commit when done", is not a yes
+only the user's own words can skip it, for one task
 `advisor`
 never by a number
 # one goal, pace, principles

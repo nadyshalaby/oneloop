@@ -2,6 +2,19 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **4.2.0**: the logic-first gate is cued on every prompt. A timing run gave a plain session a
+  fully specified ask ("the intent is exactly this and fixed ... commit on the current branch
+  when done") in a real project; it planned, built, tested and committed without explaining or
+  asking, and its reasoning never named the gate, while it did follow the advisor rule, the one
+  a hook repeats on every prompt (one run, cause not proven). The advisor cue now opens with the
+  gate: explain with `demystify` and wait for the user's yes, and a detailed or fixed ask, or one
+  that says to commit when done, is not a yes. The core law's gate says the same and that only
+  the user's own words can skip it, for one task (two pins). The cue grows from 623 to 881 bytes
+  (about 60 tokens a prompt, the cost the user approved), so its cap in
+  `hooks/tests/advisor-cue.test.sh` goes from 700 to 900 bytes. Shipped without live proof runs,
+  by the user's choice ("skip tests"): the local suite is green and the installed hook prints
+  the new cue, but no fresh session was run to show the gate now holds on such an ask. Core law
+  70 lines, 9,546 to 9,620 characters; code rules unchanged.
 - **4.1.0**: the explain step reads, and runs nothing. Two fresh sessions on a one-line isEven ran
   node experiments before explaining and took 233 s and 348 s to reach the question; the user
   chose "explain from reading only". `demystify` now reads files, searches and `git` history
