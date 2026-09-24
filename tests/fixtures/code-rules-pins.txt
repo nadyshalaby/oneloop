@@ -1,10 +1,8 @@
 # Fixed strings law/engineering-code.md, the code rules that load on a code read, must carry, one
 # per line; read by tests/short-law.test.sh. A line starting with # is a comment.
 # caps
-40 lines per function
 3 parameters
 3 levels of nesting
-500 lines per file
 # bans
 `biome-ignore`
 `eslint-disable`

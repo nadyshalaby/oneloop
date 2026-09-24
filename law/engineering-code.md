@@ -16,7 +16,7 @@ write. Long forms: `~/.claude/engineering-rules/references/01-always-on-law/`.
 
 ## 1.1 Caps, bans, one thing per file
 
-**Caps.** At most 40 lines per function or method, 3 parameters (group more into a named type), 3 levels of nesting (guard clauses, early returns), 500 lines per file (split by responsibility).
+**Caps.** At most 3 parameters (group more into a named type) and 3 levels of nesting (guard clauses, early returns).
 
 **Bans in production code, zero tolerance:**
 - No lint, type or coverage suppressions: `biome-ignore`, `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, `istanbul ignore`, `c8 ignore`, `v8 ignore`, or another language's equivalent (9.5, 16.7). This one holds in tests too; the sole exception is `@ts-expect-error` over deliberately invalid test input, with a comment saying why.

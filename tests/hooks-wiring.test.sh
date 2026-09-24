@@ -57,9 +57,9 @@ test_no_hook_reaches_bash() {
   assert_contains "no hook reaches Bash" "<none>" "${reaching:-<none>}"
 }
 
-test_the_nine_events_are_wired() {
+test_the_eight_events_are_wired() {
   events=$(jq -r '.hooks | keys[]' "$HOOKS_JSON" | sort | tr '\n' ' ')
-  assert_contains "the nine events" "Notification PostToolUse PreToolUse SessionStart Stop StopFailure SubagentStart SubagentStop UserPromptSubmit " "$events"
+  assert_contains "the eight events" "Notification PreToolUse SessionStart Stop StopFailure SubagentStart SubagentStop UserPromptSubmit " "$events"
 }
 
 # UserPromptSubmit takes no matcher and fires on every prompt, so a matcher written there is
@@ -79,7 +79,7 @@ test_planted_breaches_are_named() {
   assert_contains "a planted unwired script is named" "ghost-hook.sh" "$ghost"
   jq '.hooks.PreToolUse += [{matcher: "Bash", hooks: [{type: "command", command: "bash \"$HOME/.claude/engineering-rules/hooks/edit-guard.sh\""}]}]' "$HOOKS_JSON" > "$WORK/bash.json"
   assert_contains "a planted PreToolUse hook on Bash is named" "Bash" "$(bash_matchers "$WORK/bash.json")"
-  jq '.hooks.PostToolUse += [{matcher: "^Bash$", hooks: [{type: "command", command: "bash \"$HOME/.claude/engineering-rules/hooks/file-cap.sh\""}]}]' "$HOOKS_JSON" > "$WORK/post-bash.json"
+  jq '.hooks.PostToolUse += [{matcher: "^Bash$", hooks: [{type: "command", command: "bash \"$HOME/.claude/engineering-rules/hooks/edit-guard.sh\""}]}]' "$HOOKS_JSON" > "$WORK/post-bash.json"
   assert_contains "a planted PostToolUse regex on Bash is named" "^Bash$" "$(bash_matchers "$WORK/post-bash.json")"
 }
 
@@ -88,7 +88,7 @@ test_every_event_script_is_wired
 test_every_command_goes_through_the_home
 test_the_status_line_runs_the_script
 test_no_hook_reaches_bash
-test_the_nine_events_are_wired
+test_the_eight_events_are_wired
 test_the_prompt_hook_carries_no_matcher
 test_planted_breaches_are_named
 report

@@ -2,6 +2,21 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **5.0.0**: the two line caps are gone. The user: "i want to remove the lines cap rules", and
+  of the options, "the two code caps": 40 lines per function and 500 lines per file. Both law
+  files drop them (the 3-parameter and 3-level nesting caps stay), and so do the 1.1 long form,
+  the file-cap hook (unwired and deleted in one step, since Claude Code's docs and this setup's
+  own install show settings hooks reload in running sessions), the law scout's `cap.file-lines`
+  row (9.5, so the edit guard and scout.sh no longer report it), the audit's `cap.file-lines`
+  and `cap.fn-lines` rows with their scanner flag, carve-outs, judgment check, report
+  placeholders and porting notes (16.3 to 16.8), the review's length checks (12.7) and the
+  repository's own cap test (`tests/hook-caps.test.sh`). The skill-page and explore-feature
+  template limits stay, by the user's choice. **The protection removed:** nothing measures or
+  flags the length of a function or a file any more, so either can grow unchecked; one thing
+  per file and the clean-code floor still push toward small units. The removed wording is on
+  `tests/fixtures/short-law-absent.txt`, so it cannot come back unseen. The hackify
+  `lawkeeper` plugin, outside this repository, still enforces the old caps. Core law 70 lines,
+  9,620 to 9,580 characters; code rules 48 lines, 6,813 to 6,737.
 - **4.2.0**: the logic-first gate is cued on every prompt. A timing run gave a plain session a
   fully specified ask ("the intent is exactly this and fixed ... commit on the current branch
   when done") in a real project; it planned, built, tested and committed without explaining or

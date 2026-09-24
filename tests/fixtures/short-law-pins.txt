@@ -71,10 +71,8 @@ Not reasons:
 it cuts tokens or drift
 the members the goal names get fixed
 # code in one line
-40 lines per function
 3 parameters
 3 levels of nesting
-500 lines per file
 no suppressions
 non-null `!`
 empty catches

@@ -45,7 +45,6 @@ plant_equivalents() {
   printf 'const n = count!+1\n' > src/nn-op.ts
   printf 'debugger;\n' > src/dbg.ts
   printf '<!-- TODO fix me -->\n' > src/todo-html.html
-  seq 1 501 > 'src/big file.ts'
 }
 
 # Rules whose domain is a role or a test file, planted inside and outside that domain.
@@ -185,7 +184,6 @@ test_finds_every_equivalent() {
   assert_contains "non-null before an operator" "ban.non-null src/nn-op.ts:1:" "$out"
   assert_contains "debugger statement" "clean.debug-artifact src/dbg.ts:1:" "$out"
   assert_contains "html debt marker" "clean.debt-marker src/todo-html.html:1:" "$out"
-  assert_contains "file cap names the whole path" "cap.file-lines src/big file.ts: 501 lines" "$out"
   assert_contains "inline interface in a service" "ban.inline-type src/users/users.service.ts:1:" "$out"
   assert_contains "inline type literal in a controller signature" "ban.inline-type src/users/users.controller.ts:1:" "$out"
   assert_contains "console in a domain role" "clean.debug-artifact src/orders/orders.service.ts:1:" "$out"

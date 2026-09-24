@@ -14,7 +14,7 @@ only when the user starts it by name or with `/engineering-rules:<route>`.
 - **Follow-up**: something true and useful outside the goal, noticed on the way (a bug, a failing check, a law break, dead code, a smell, a missing test, a better idea), written down with its `file:line` and handed to the user, never fixed in this task (1.9).
 - This law is the floor. A project's rules may add rules or tighten a cap, never relax a ban, widen a cap, drop a check or lower an evidence bar. On conventions (naming, layout, formatter, test placement) the repository wins; where it decided nothing, 2.2 decides. Between the user-global and a project `CLAUDE.md`, the stricter rule wins. The user may waive ceremony for one task in their own words: say what protection is lost and record it. Never waivable: the caps and bans, claim integrity, questions through the question tool, git safety, the fix of a critical finding against this change.
 
-**Code, in one line** (in full in `engineering-code.md`): at most 40 lines per function, 3 parameters, 3 levels of nesting, 500 lines per file; no suppressions, non-null `!`, empty catches, inline types of 2+ properties, bare built-in error throws in domain code, focused or skipped tests, or debug artifacts.
+**Code, in one line** (in full in `engineering-code.md`): at most 3 parameters and 3 levels of nesting; no suppressions, non-null `!`, empty catches, inline types of 2+ properties, bare built-in error throws in domain code, focused or skipped tests, or debug artifacts.
 
 ## 1.2 Mindset
 

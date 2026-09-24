@@ -89,7 +89,7 @@ renamed or loosened, minor for a new rule, check, hook or command, patch for wor
 | Event | Script | What it does |
 |---|---|---|
 | `PreToolUse` on edits | `edit-guard.sh` | refuses an edit that adds a banned token the law scout (9.5) can judge: suppressions, empty catches, bare `Error` throws in domain files, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets; what was already in the file never blocks |
-| `PostToolUse` on edits | `file-cap.sh` | a file this change pushed over 500 lines gets a note to split it; one already over at the last commit gets a follow-up note instead, once per session |
+
 | `UserPromptSubmit` | `advisor-cue.sh` | puts the advisor rule and the logic-first gate (1.4) into every prompt |
 | `SessionStart` after a compaction or resume | `re-anchor.sh` | tells Claude to read the law from disk again, and the code rules before writing code, with the last ledger position Claude printed in a reply, if any |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | one progress-log line per event, and a desktop notification when a turn ends on a ledger re-print, waits on you, or dies on an error |

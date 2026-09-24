@@ -7,7 +7,7 @@
 # in domain-role files, focused and unowned skipped tests, debug artifacts, ownerless debt
 # markers, removed-code comments and hardcoded secrets. What is already in the file never
 # blocks: the block runs over the text being replaced too, and only a count that grows
-# refuses. The judgment rows (non-null `!`, inline types, the file cap) stay with the scout,
+# refuses. The judgment rows (non-null `!`, inline types) stay with the scout,
 # and 9.5 stays the one source of the patterns; this file holds none of them.
 # Exempt, by the law's own definitions: prose, generated files and migrations; test files,
 # except for the suppression, test-hygiene and secret rows, which bind there too; and the

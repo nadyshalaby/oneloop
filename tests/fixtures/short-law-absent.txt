@@ -5,3 +5,6 @@ Dead code already in a file you touched is removed
 fix every member
 dead code in touched files removed
 dead code in a file this task touched
+# The line caps 5.0.0 removed, at the user's word ("i want to remove the lines cap rules"):
+40 lines per function
+500 lines per file
