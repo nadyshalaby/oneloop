@@ -8,11 +8,17 @@
 here=$(dirname "${BASH_SOURCE[0]}")
 SCRIPT="${FILE_CAP_SH:-$here/../file-cap.sh}"
 export CLAUDE_CONFIG_DIR="$WORK/config"
+export TMPDIR="$WORK"
 LOG="$WORK/config/progress.log"
 
 # after_write <tool> <path>: what the hook prints once that tool wrote the file.
 after_write() {
   jq -cn --arg t "$1" --arg p "$2" --arg c "$WORK" '{hook_event_name:"PostToolUse",tool_name:$t,cwd:$c,tool_input:{file_path:$p},tool_response:{}}' | bash "$SCRIPT"
+}
+
+# edited <cwd> <path> <session>: what the hook prints after an Edit of that file in that session.
+edited() {
+  jq -cn --arg c "$1" --arg p "$2" --arg s "$3" '{hook_event_name:"PostToolUse",tool_name:"Edit",cwd:$c,session_id:$s,tool_input:{file_path:$p},tool_response:{}}' | bash "$SCRIPT"
 }
 
 test_over_the_cap_is_reported() {
@@ -49,6 +55,23 @@ test_a_project_under_a_docs_directory_is_still_counted() {
   assert_contains "the path is judged relative to the project" "cap.file-lines $WORK/docs/proj/src/big.ts: 501 lines" "$out"
 }
 
+# A file already over the cap at the last commit is a follow-up, never a split for this task
+# (1.9): the line says so once a session, and a file this change pushed over is still told to
+# split.
+test_a_file_already_over_the_cap_is_a_follow_up() {
+  repo="$WORK/repo"; mkdir -p "$repo/src"
+  seq 1 620 > "$repo/src/old.ts"; seq 1 480 > "$repo/src/grown.ts"
+  git -C "$repo" init -q && git -C "$repo" add src && git -C "$repo" -c user.email=t@t -c user.name=t commit -qm base
+  printf 'x\n' >> "$repo/src/old.ts"; seq 1 30 >> "$repo/src/grown.ts"
+  out=$(edited "$repo" "$repo/src/old.ts" s1)
+  assert_contains "an old oversize is named with its size at the last commit" "621 lines, already over the 500-line cap at the last commit (620)" "$out"
+  assert_contains "as a follow-up" "write it down as a follow-up" "$out"
+  assert_missing "not as a split for this task" "split it by responsibility" "$out"
+  assert_eq "it is said once a session" "" "$(edited "$repo" "$repo/src/old.ts" s1)"
+  assert_contains "and again in the next session" "already over the 500-line cap" "$(edited "$repo" "$repo/src/old.ts" s2)"
+  assert_contains "a file this change pushed over the cap is still told to split" "510 lines. The law (1.1) caps a file at 500 lines; split it" "$(edited "$repo" "$repo/src/grown.ts" s1)"
+}
+
 test_nothing_to_count_prints_nothing() {
   assert_eq "a file that is not there" "" "$(after_write Write "$WORK/missing.ts")"
   out=$(jq -cn --arg p "$WORK/big.ts" '{hook_event_name:"PostToolUse",tool_name:"Bash",cwd:"/tmp/proj",tool_input:{file_path:$p}}' | bash "$SCRIPT")
@@ -64,5 +87,6 @@ test_over_the_cap_is_reported
 test_at_or_under_the_cap_is_silent
 test_prose_and_generated_are_not_counted
 test_a_project_under_a_docs_directory_is_still_counted
+test_a_file_already_over_the_cap_is_a_follow_up
 test_nothing_to_count_prints_nothing
 report

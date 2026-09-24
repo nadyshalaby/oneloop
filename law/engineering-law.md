@@ -21,7 +21,7 @@ helpers, ledger, work-doc shape and which phases run.
 - **UI-bearing**: any change to markup, styles, tokens, components, screens, layout, motion, UI copy or visual assets.
 - **The triad**: the project's own test, lint and typecheck commands, verbatim from its manifest, `CLAUDE.md` or README. Never guessed.
 - **Touched scope**: `git diff --name-only <base>..HEAD`, where `<base>` is the commit recorded at task start.
-- **Follow-up**: anything true and useful outside the goal (a pre-existing bug, a smell, a missing test), written down with its `file:line`, fixed in a task of its own.
+- **Follow-up**: anything true and useful outside the goal that you notice on the way (a bug, a failing check, a law break, dead code, a smell, a missing test, a better idea), written down with its `file:line` and handed to the user, never fixed in this task (1.9).
 
 ## Precedence
 
@@ -29,7 +29,7 @@ helpers, ledger, work-doc shape and which phases run.
 2. A project's `CLAUDE.md`, `AGENTS.md` or documented rules may add rules or tighten a cap, never relax a ban, widen a cap, drop a check or lower an evidence bar.
 3. On conventions (naming, layout, formatter, test placement) the repository wins; where it decided nothing, 2.2 decides.
 4. Between the user-global and a project `CLAUDE.md`, the stricter rule wins.
-5. The user may waive ceremony for one task in their own words: say what protection is lost, record it, carry on. Never waivable: the caps and bans, claim integrity, questions through the question tool, git safety, the fix of a critical finding.
+5. The user may waive ceremony for one task in their own words: say what protection is lost, record it, carry on. Never waivable: the caps and bans, claim integrity, questions through the question tool, git safety, the fix of a critical finding against this change.
 
 ## 1.1 Code: caps, bans, one thing per file
 
@@ -55,7 +55,7 @@ The edit guard hook refuses an edit that adds one of these; its refusal is this 
 - DRY with the search shown: before writing a function, type, constant, schema or component, search the repo for one that already does it and reuse or extend it; paste the search that found none (a missed equivalent is `style.reuse` / `style.dry`). The same 3+ lines twice: extract.
 - Any object shape with 2+ properties is a named `interface` or `type`. One function does one thing, one service owns one domain. Explicit over clever: no magic, no code that needs a comment to be understood.
 - Handle null, undefined, empty, concurrent and partial-failure paths; do not hope.
-- Leave nothing behind: a change deletes what it orphans (the callee, import, type, constant, schema, fixture, flag, config key, env var, translation, test and doc line that served only what it replaced). Dead code already in a file you touched is removed in its own cleanup commit, with the zero-reference proof beside it.
+- Leave nothing behind: a change deletes what it orphans (the callee, import, type, constant, schema, fixture, flag, config key, env var, translation, test and doc line that served only what it replaced). Dead code that was there before your change is a follow-up, never part of this diff.
 - Comments: none by default; one only when the WHY is non-obvious.
 
 **Clean-code floor (3.4).** 1 A function does or answers, never both. 2 No flag parameters: a behaviour switch is two functions or a named option. 3 Never mutate inputs; return a new value. 4 Fail fast at the boundary: validate on entry, never carry a bad value inward. 5 One level of abstraction per function. 6 Talk to what you hold: no `a.b().c().d()` into another object's internals. 7 Every error keeps its cause and context: wrap and rethrow with `cause`, never log-and-continue where the caller cannot proceed. 8 Every promise is awaited, returned or handled; no sleep standing in for a signal. 9 Composition before inheritance; no hierarchy deeper than two. 10 A closed set is a type (enum or union), never a bare string; a domain value is never a bare primitive.
@@ -82,7 +82,7 @@ This ships to real users, and small tasks are where broken work hides; careful i
 - Code is the only source of truth about code. Docs, comments, changelogs, work-docs and earlier reports record what someone believed; read them for intent and re-derive every fact from the code this session. When they disagree, the code wins and the doc is the defect.
 - Prove every claim with output run this session and pasted, not summarized or remembered. A number you did not just count is already wrong; print it rather than maintain it.
 - Open every path, line, id and symbol you cite or trust. Anchor a citation that must outlive a step to a symbol or heading, not a line number.
-- Fixing the reported site is not fixing the defect: search for the family and fix every member, or say which you left and why. Before changing a setting, find every reader of it in the code.
+- Fixing the reported site is not fixing the defect: fix it at its root cause and search for the family; the members the goal names get fixed, the rest are listed as follow-ups. Before changing a setting, find every reader of it in the code.
 - A check that can fail silently proves nothing. Before reporting a zero, show the method finding a planted instance; for an absence, name the path your search covered.
 - A safety claim covers this case, not the class. Match depth to the cost of being wrong and name the tier: full re-derivation for money, security, auth, state machines, migrations, concurrency and data loss; a fresh named run where a test already exercises the behaviour; a spot-check for cosmetic claims. No tier skips proof. Say what your checks did not reach.
 - Memory is a hypothesis. A library API, framework behaviour, tool flag, version or platform limit is verified this session (lockfile, installed source or types, the tool's `--help`, docs fetched now) and cited, or labelled `unverified` and not built on.
@@ -93,7 +93,7 @@ This ships to real users, and small tasks are where broken work hides; careful i
 
 - **Think before coding.** State assumptions; when an ask is ambiguous, list at least two readings and pick one with a reason; push back when a request collides with a cap, a prior decision or evidence on screen; ask instead of guessing. Test: can you point at the line in the plan, the file or the user's message that authorized this code?
 - **Simplicity first.** The minimum code that solves the stated problem: no speculative features, "while I'm here" extras, single-use abstractions, handling for cases the contract makes impossible, or tuning knobs. Prefer deletion. Test: remove the line; does the acceptance criterion still pass?
-- **Surgical changes.** Every changed line traces to the request; touch only the files the task names; no refactoring of adjacent code; match the surrounding style; pre-existing smells become follow-ups; clean every orphan your own diff made. Test: can a reviewer trace every hunk to the ask?
+- **Surgical changes.** Every changed line traces to the request; touch only the files the task names; no refactoring of adjacent code; match the surrounding style; pre-existing bugs, smells and dead code become follow-ups, never hunks of this diff; clean every orphan your own diff made. Test: can a reviewer trace every hunk to the ask?
 - **Goal-driven execution.** Turn the ask into verifiable goals; every step carries `→ verify: <the exact command, grep or assertion>`; prefer machine checks, manual smoke only for real UI changes. When a check fails, stop and report; never loosen it to pass.
 
 ## 1.7 Git safety and the words you use
@@ -107,11 +107,13 @@ This ships to real users, and small tasks are where broken work hides; careful i
 
 Outside the workflow, a helper is sent only when it clearly saves the main conversation more than it costs: never a `fork` (it copies the whole conversation), always with a named `model`, a brief of a few lines, and a bounded answer. Inside the workflow, the workflow skill's agent rules govern.
 
-## 1.9 One goal, and everything else is a follow-up
+## 1.9 One goal; what you find on the way is written down, never chased
 
 - A task has exactly one main goal and ends when that goal is delivered and verified, not when the code around it got better.
-- Everything else you notice is a follow-up: one line with its `file:line`, written the moment you see it, fixed in its own task when the user says, however small it looks. The user gets the list at the end.
-- Not follow-ups, because the goal is not delivered without them: what your own diff broke or orphaned; dead code in a file this task touched (its own cleanup commit); a defect that genuinely blocks the goal (say why in one line, fix the smallest thing, carry on); a critical review finding against this diff.
+- Never chase what you find on the way. A bug, a failing check, a law break, dead code, a smell or a better idea you notice while working is a follow-up: one line with its `file:line`, written the moment you see it, then straight back to the goal. It is not investigated, fixed or refactored in this task, however small or cheap it looks; the user decides when. The list goes to the user at the end.
+- A serious find (a security hole, data loss, money, a live outage) is told to the user at once, in one line, and is still not fixed in this task unless they say so.
+- A check that was already red before your change is a follow-up too: show it red at the base commit, file it, and judge your change on everything else. A red check on a commit being shipped still stops the deploy (1.11): tell the user; its fix is a task of its own.
+- Fixed on the way, because the goal is not delivered without them, and nothing else: what your own diff broke, orphaned or got wrong (a critical review finding against this change included), and a true blocker, a defect the goal cannot be delivered or verified around. For a blocker, say in one line whether it blocks delivery or verification, fix the smallest thing that unblocks it, and go straight back. Not reasons: "it serves the goal", "it is related", "it is cheap" or "right there", "it cuts tokens or drift", "while I'm here".
 - Drift check at every step and check-in: does the work since the last one serve the goal? If not, name it, stop it, and file it.
 
 ## 1.10 Quick, never lazy, never approximate

@@ -29,6 +29,8 @@ reads it in its own context and returns the lines that apply (1.8, 5.5); in agen
 always yourself. What the fork returns binds exactly as the file does. Section `0.1` carries the
 full per-section table.
 
+**Nothing found on the way is chased; the law's 1.9 wins over every reference that says otherwise.** Every scout row and every review finding is tagged `introduced` or `present at base`, checked against the base commit, and only an `introduced` one is this task's to fix. Where 9.1's sweep, 9.5's dispositions, the checks of 12.3 to 12.7, 13.2's class 10 or 1.9's long form say to remove dead code that was already there, fix a member of a defect's family the goal does not name, or fix anything `present at base`, the row is disposed as `follow-up, present at base` instead: written down with its `file:line` and handed to the user, never fixed in this task.
+
 | Tag | What it is |
 |---|---|
 | `[law]` / `[rule]` | Binding on every task, always. |
@@ -140,7 +142,7 @@ These three sections bind from the moment this skill loads. The rest of the alwa
 
 **Loop-back, when a later phase sends you back.** A red in Phase 4, a Critical or Important finding in Phase 5, a red re-verify in Phase 6, or a task you cannot finish in Phase 3, sends you back to Phase 3 (or 3b when stuck). Re-open the earlier item as `- [>]` with `reopened: <reason>` appended, leave every later item open, and run forward again through every phase in between. Never patch and skip ahead. Every re-run of a phase produces fresh evidence; nothing from the earlier pass carries over as proof.
 
-**User waivers, what the user may and may not switch off.** The user owns the project and may waive a piece of ceremony for one task, by naming it in their own words. When they do: say in one line what protection is lost, record the waiver in the ledger item (`waived by user: "<their words>"`), and carry on. Nothing else is waivable, whatever the wording: the hard caps and bans, claim integrity, the wizard tool for questions, the ship gate on a blocking leg, the fix of a Critical finding, the scouts, the ledger itself, and git safety below. A user who says "just do it, no questions" gets the clarify round compressed to the questions whose answers you genuinely cannot find in the code, never zero questions when a real fork exists, and the reason is stated. A user who says "skip the review" gets the review with the waiver recorded, because a review is a check, not ceremony; only the *fix* of Important and Minor findings can be deferred with their sign-off.
+**User waivers, what the user may and may not switch off.** The user owns the project and may waive a piece of ceremony for one task, by naming it in their own words. When they do: say in one line what protection is lost, record the waiver in the ledger item (`waived by user: "<their words>"`), and carry on. Nothing else is waivable, whatever the wording: the hard caps and bans, claim integrity, the wizard tool for questions, the ship gate on a blocking leg, the fix of a Critical finding against this change, the scouts, the ledger itself, and git safety below. A user who says "just do it, no questions" gets the clarify round compressed to the questions whose answers you genuinely cannot find in the code, never zero questions when a real fork exists, and the reason is stated. A user who says "skip the review" gets the review with the waiver recorded, because a review is a check, not ceremony; only the *fix* of Important and Minor findings can be deferred with their sign-off.
 
 **Git safety, in every phase.** Never run `git checkout -- <path>`, `git restore`, `git stash`, `git reset --hard`, `git clean`, `git push --force` or anything else that discards uncommitted work or rewrites shared history. Copy a file if you need a backup. Never `git add -A`, `git add .` or `git commit -a`; stage explicit paths. Never `--no-verify` unless the user explicitly said so. Never `--amend` after a hook failed. Branch deletion and worktree removal happen only in Phase 6, only on the option the user chose, and never with `--force` over uncommitted changes.
 
@@ -162,7 +164,7 @@ Law self-audit
 10. Every claim in the update log has a proof row behind it?                   yes / no
 11. Agent availability recorded once at task start, every phase's send made or reasoned? yes / no
 12. Every agent result re-run here before the tick that rests on it?          yes / no
-13. Every stage swept its leftovers both ways, dead code in touched files removed in its own commit, every new symbol's reuse search shown? yes / no
+13. Every stage swept its own leftovers, nothing found on the way fixed (each filed as a follow-up), every new symbol's reuse search shown? yes / no
 14. Phase 1 closed on a coverage map with no holes, the intent confirmed through Q0, every fact and recommendation tagged with a source from this session, none from memory? yes / no
 15. Every phase ran on the agent and model 1.8's map names, or carries its reason? yes / no
 16. The goal delivered and verified, every other finding filed as a follow-up, none silently fixed (1.9)? yes / no

@@ -1,0 +1,7 @@
+# Wording the no-chase rule (1.9) retired. None of it may come back into the short law or the
+# workflow skill: each line sent Claude after something it found on the way instead of the goal.
+own cleanup commit
+Dead code already in a file you touched is removed
+fix every member
+dead code in touched files removed
+dead code in a file this task touched

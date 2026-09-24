@@ -44,7 +44,7 @@ read 2.2 before creating any file or folder
 second caller
 paste the search that found none
 Leave nothing behind
-own cleanup commit
+Dead code that was there before your change is a follow-up
 # clean-code floor
 does or answers, never both
 No flag parameters
@@ -134,3 +134,12 @@ This law is the floor
 the stricter rule wins
 Never waivable
 never a `fork`
+# never chase what you find on the way
+Never chase what you find on the way
+told to the user at once
+already red before your change
+still stops the deploy
+Not reasons:
+it cuts tokens or drift
+the members the goal names get fixed
+never hunks of this diff
