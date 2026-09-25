@@ -11,8 +11,10 @@ One entry per version, newest first. The README says what the setup is now; this
   the release notes, 16.1 brainstorm), and `tests/sub-commands.test.sh` is
   `tests/commands.test.sh`. Section numbers do not change, so every citation still resolves; the
   seven files that named a path (the scout script, the edit guard hook, the reviewer helper and
-  four tests) move with them, and nothing outside the repository names one but an old test
-  folder of a deleted skill. `tests/old-words.test.sh` fails when an old-flow name (a phase
+  four tests) move with them. Nothing outside the repository reads one: a search of
+  `~/.claude`, the memory and the project folders found them only in the old, disabled
+  plugin's source under `~/Code`, which names its own copies, and in saved runs of a deleted
+  skill. `tests/old-words.test.sh` fails when an old-flow name (a phase
   number, the Sprint Backlog, the Retrospective, the wizard tool, the update log, full or quick
   mode, a sub-command, an old folder name) comes back in what the model and the user read,
   and shows itself catching planted ones; it proves names, not rules. Allowed on purpose: the
