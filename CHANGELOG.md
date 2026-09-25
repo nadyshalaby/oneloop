@@ -2,6 +2,15 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.15.0**: the logic-first gate stressed, at the user's word ("keep it reminder but stress on
+  it"): the per-prompt cue now calls it a hard gate in plain chat and the workflow alike, for
+  logic the user hasn't seen (a new task, approach or plan), says why (the user must stay on top
+  of all logic built), names AskUserQuestion for the yes, and says approved logic being carried
+  on, or a trivial edit, needs no new yes. It stays a reminder that never blocks: the user chose
+  that over an edit-blocking hook. The cue grows from 297 to 521 bytes a prompt (its cap from
+  320 to 530), and the law's gate line adds "in plain chat and the workflow alike" (9,343 to
+  9,381 bytes). A scan of this machine's sessions found no real-project session where a new
+  task arrived after the gate went in, so whether it fired there is still unchecked.
 - **9.14.0**: the ship gate, the fourth token-cut release (the user's pick, "Trim + skip on
   docs-only"). A diff of only tests, docs, comments, CI config or editor settings (11.3's own
   skip row, with CI config spelled out as pipeline files only: env, build and startup config
