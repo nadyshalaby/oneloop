@@ -2,6 +2,13 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.12.0**: the review pages, the second token-cut release: what one review reads (12.2,
+  12.3, 12.4, 12.6, 12.7 and the reviewer's own page) drops from 17,650 to 15,864 bytes, and
+  12.5 (UI work only) from 4,590 to 4,529. 12.2 keeps all nine coverage rules and its ledger in
+  2,407 bytes instead of 3,812 (the explanations go); every verification list says "yes / no"
+  once in its heading instead of on each line; 12.3 keeps "reproduce, do not reason" in one line
+  (the reviewer's page carries the rest); 12.7's reuse-search item says the same in fewer
+  words. No rule, check or verification question goes.
 - **9.11.0**: the workflow page cut from 15,413 to 13,307 bytes, the first of the token-cut
   releases the user picked ("Yes, the whole run"): the page loads with every workflow run and
   stays in context for all of it. Only text the always-on law, the code rules or the reviewer's
