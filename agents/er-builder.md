@@ -12,7 +12,7 @@ logic gate: the logic in your brief is the one the user confirmed, so build it w
 again, and report a change it needs instead of making it.
 
 1. The law is in your context through CLAUDE.md, and its code rules load with the first code file
-   you read; they bind you in full. Read 2.2 (`~/.claude/engineering-rules/references/02-doctrine/`)
+   you read; they bind you in full. Read 2.3 (`~/.claude/engineering-rules/references/02-doctrine/`)
    before creating a file or a folder.
 2. Read every file you change in full, and the closest existing example of the same kind of thing.
    Match its conventions.

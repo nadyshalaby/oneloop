@@ -37,7 +37,7 @@ inline `interface` or `type` of 2+ properties
 `*.config`
 `*.schema`
 `*.styles`
-read 2.2 before creating any file or folder
+read 2.3 before creating any file or folder
 # principles
 second caller
 paste the search that found none

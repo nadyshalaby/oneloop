@@ -121,7 +121,7 @@ Lane: <the line lane.sh printed>. Logic confirmed: <the user's answer>
 
 For each task, in order:
 
-1. Read 2.2 only before creating a source or test file or a folder (the work-doc's place is fixed).
+1. Read 2.3 only before creating a source or test file or a folder (the work-doc's place is fixed).
 2. The reuse search (the code rules), pasted; reuse or extend what exists.
 3. Where the project has tests, write the test first and watch it fail for the right reason; that
    red run is the planted instance, and no other control is built.
