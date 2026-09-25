@@ -8,8 +8,10 @@
 # are introduced in full and old ones summarised once with a count, a copy of an old line is
 # introduced, uncommitted work is scanned, a whole-file row is judged against the base file, the
 # design scout runs only when the touched scope has a UI file, a clean change finds nothing, every
-# scout proves itself on its planted hit first and one that misses stops the run, and the usage
-# errors exit 2 with a one-line message.
+# scout proves itself on its planted hit first and one that misses stops the run, --sweep runs
+# the cleanup sweep after the scouts (its hits count toward the exit, a relative work-doc is read
+# from where the run started, and a sweep that stops stops the run), and the usage errors exit 2
+# with a one-line message.
 # Run: bash tests/scout.test.sh
 # SCOUT_SH points the test at another copy of scripts/scout.sh, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
@@ -125,6 +127,14 @@ test_usage_errors_exit_2() {
   assert_contains "no base argument names the usage" "usage: scout.sh <base-commit>" "$out"
   assert_contains "and exits 2" "exit=2" "$out"
 
+  out=$(ENGINEERING_RULES_HOME="$ROOT" "$BASH" "$SCOUT" --sweep 2>&1; printf 'exit=%s\n' "$?")
+  assert_contains "--sweep with no base names its usage" "scout.sh --sweep <base-commit> [<work-doc>]" "$out"
+  assert_contains "and exits 2" "exit=2" "$out"
+
+  out=$(cd "$WORK/repo" && ENGINEERING_RULES_HOME="$ROOT" "$BASH" "$SCOUT" base1 plan.md 2>&1; printf 'exit=%s\n' "$?")
+  assert_contains "a work-doc without --sweep names the usage" "usage: scout.sh <base-commit>" "$out"
+  assert_contains "and exits 2" "exit=2" "$out"
+
   out=$(cd "$WORK/repo" && ENGINEERING_RULES_HOME="$ROOT" "$BASH" "$SCOUT" not-a-real-commit-xyz 2>&1; printf 'exit=%s\n' "$?")
   assert_contains "a base that is not a commit" "is not a commit" "$out"
   assert_contains "and exits 2" "exit=2" "$out"
@@ -179,6 +189,38 @@ test_a_scout_that_misses_its_plant_stops_the_run() {
   done
 }
 
+# run_sweep_mode <scout> [<work-doc>]: the first repo checked out at base4, and the given scout
+# run with --sweep from base3, the work-doc passed as given; the exit code is the last line.
+run_sweep_mode() {
+  ( cd "$WORK/repo" && git checkout -q base4 \
+      && ENGINEERING_RULES_HOME="$ROOT" "$BASH" "$1" --sweep base3 ${2:+"$2"} 2>&1
+    printf 'exit=%s\n' "$?" )
+}
+
+test_sweep_mode_adds_the_sweep() {
+  printf -- '## Plan\n- [ ] 1. change (files: clean.ts) -> verify: true\n' > "$WORK/plan.md"
+  out=$(run_sweep_mode "$SCOUT" ../plan.md)
+  assert_contains "the sweep runs after the scouts" "sweep self-check: 8 classes found their planted hits" "$out"
+  assert_contains "with the relative work-doc read from where the run started" "sweep: 0 hits to judge; by hand" "$out"
+  tally=$(printf '%s\n' "$out" | grep '^scout:')
+  assert_eq "the tally names the sweep" 'scout: 0 introduced, 0 present at base in 0 files; ran: perf law sweep' "$tally"
+  assert_contains "exit 0 when neither finds anything" "exit=0" "$out"
+  out=$(run_sweep_mode "$SCOUT")
+  assert_contains "without a work-doc the sweep's class 8 is not checked" "class 8 not checked" "$out"
+  assert_contains "and that alone makes the exit 1" "exit=1" "$out"
+}
+
+# A sweep that stopped proved nothing, so the scout stops with it rather than print a tally.
+test_a_sweep_that_stops_stops_the_scout() {
+  mkdir -p "$WORK/broken-scripts"
+  cp "$SCOUT" "$ROOT/scripts/perf-scout.sh" "$WORK/broken-scripts/"
+  sed 's/console\\\.|//' "$ROOT/scripts/sweep.sh" > "$WORK/broken-scripts/sweep.sh"
+  out=$(run_sweep_mode "$WORK/broken-scripts/scout.sh")
+  assert_contains "the sweep's own message is kept" "sweep: self-check: class 1 missed its planted hit" "$out"
+  assert_contains "and the scout exits 2" "exit=2" "$out"
+  assert_missing "with no tally" "scout: 0 introduced" "$out"
+}
+
 build_fixture || { printf 'FAIL could not build the fixture repo\n'; exit 1; }
 build_uncommitted_fixture || { printf 'FAIL could not build the uncommitted fixture repo\n'; exit 1; }
 test_introduced_named_present_at_base_summarised
@@ -190,4 +232,6 @@ test_usage_errors_exit_2
 test_a_moved_path_line_stops_the_run
 test_the_self_check_leads_the_output
 test_a_scout_that_misses_its_plant_stops_the_run
+test_sweep_mode_adds_the_sweep
+test_a_sweep_that_stops_stops_the_scout
 report

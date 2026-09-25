@@ -168,12 +168,12 @@ disposed, every task committed.
 4. **One fix pass:** accepted `introduced` findings reopen Implement (`- [>] 2 Implement  reopened:
    <finding>`), are fixed there and re-verified fresh. One review, one fix pass: the fix gets the
    triad and the checks it touches, not a second review.
-5. **Cleanup sweep** over your own changes, one line each with its count, zero included: debug
-   output; commented-out code and `removed:` markers; ownerless TODOs; dead code both ways; unused
-   imports, dependencies and env vars; scratch files and empty dirs; placeholders and stubs;
-   changes outside the plan's files; stale references to what you renamed or removed; leaked
-   processes and ports; branches you made; focused or skipped tests (13.2). Anything that was
-   already there is a follow-up.
+5. **Cleanup sweep** over your own changes (13.2): `bash ~/.claude/engineering-rules/scripts/scout.sh
+   --sweep <base> <work-doc>` reruns the scouts, then sweeps eight mechanical classes, each proven
+   on a planted hit, and prints every hit; judge each. Then by hand, one line each with its count,
+   zero included: dead code both ways; unused imports, dependencies and env vars; stale references
+   to what you renamed or removed; leaked processes and ports. Anything that was already there is
+   a follow-up.
 6. **Land** (13.2's rules): commit; when there is a choice (merge, a pull request, keep the
    branch), ask through `AskUserQuestion`. **Deploy** only when the task deploys (law 1.11).
 7. **Close:** print the self-audit below; any `no` reopens the phase that owns it. Print the

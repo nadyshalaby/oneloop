@@ -27,20 +27,24 @@
 # 1 was edited.
 #
 # Usage: bash <er>/scripts/scout.sh <base-commit>
+#        bash <er>/scripts/scout.sh --sweep <base-commit> [<work-doc>]
 #   Run with the working directory anywhere inside the target git repository. <er> is
 #   $ENGINEERING_RULES_HOME, else this script's own parent directory. A relative
-#   PROJECT_BAN_PATTERNS is read from the directory the script was started in.
+#   PROJECT_BAN_PATTERNS, or a relative work-doc, is read from the directory the script was
+#   started in. --sweep, for the workflow's cleanup step, then runs scripts/sweep.sh over the same
+#   change (13.2's mechanical classes), the work-doc passed on to it.
 #
 # Output: `self-check: perf ok, law ok, design ok`, then every introduced row in full (rule id,
 #   file:line, text), then every present-at-base
 #   rule summarised to one line per file with a count, then the coverage lines the scouts printed
-#   over the change, then one closing line:
-#     scout: <n> introduced, <m> present at base in <k> files; ran: perf law[ design]
+#   over the change, then with --sweep the sweep's own lines, then one closing line:
+#     scout: <n> introduced, <m> present at base in <k> files; ran: perf law[ design][ sweep]
 #
-# Exit: 0 no row is introduced, 1 at least one row is introduced, 2 a usage error (no base, the
-#   base is not a commit, the working directory is not inside a git repository, or a scout's
-#   block could not be extracted, its path line swapped or 9.4's tables turned into commands, or
-#   a scout missed its planted hit), with a one-line message on stderr.
+# Exit: 0 no row is introduced, 1 at least one row is introduced or, with --sweep, the sweep has
+#   something to judge, 2 a usage error (no base, the base is not a commit, the working directory
+#   is not inside a git repository, or a scout's block could not be extracted, its path line
+#   swapped or 9.4's tables turned into commands, or a scout missed its planted hit, or the sweep
+#   stopped), with a one-line message on stderr.
 set -u
 umask 077
 
@@ -69,13 +73,24 @@ HIT_PREFIX='^[a-z]+(\.[a-z0-9-]+)+ '
 # tab, never this byte. Not \1: bash 3.2's `read` silently refuses to split on it.
 SEP=$(printf '\037')
 
-[ $# -eq 1 ] || usage_error 'usage: scout.sh <base-commit>'
+sweep=''
+if [ "${1:-}" = --sweep ]; then sweep=sweep; shift; fi
+# One argument, or with --sweep one or two: the count, suffixed s under --sweep.
+case "$#${sweep:+s}" in
+  1 | 1s | 2s) ;;
+  *) usage_error 'usage: scout.sh <base-commit>, or scout.sh --sweep <base-commit> [<work-doc>]' ;;
+esac
 repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || usage_error 'not inside a git repository'
 base=$(git rev-parse --verify -q "$1^{commit}" 2>/dev/null) || usage_error "'$1' is not a commit"
 # The second pass runs inside a copy of the base tree, where a relative ban list would be gone.
 case "${PROJECT_BAN_PATTERNS:-}" in
   '' | /*) ;;
   *) export PROJECT_BAN_PATTERNS="$PWD/$PROJECT_BAN_PATTERNS" ;;
+esac
+doc=${2:-}
+case "$doc" in
+  '' | /*) ;;
+  *) doc="$PWD/$doc" ;;
 esac
 cd "$repo_root" || usage_error 'could not switch to the repository root'
 
@@ -254,15 +269,25 @@ emit_present_at_base() {
 
 emit_coverage() { cat "$WORK/coverage.log"; }
 
+# run_sweep: with --sweep, sweep.sh over the same change, its lines printed and its exit kept in
+# $swept; a sweep that stopped (exit 2) stops this run too.
+run_sweep() {
+  swept=0
+  if [ -z "$sweep" ]; then return 0; fi
+  "$BASH" "$SCRIPTS/sweep.sh" "$base" ${doc:+"$doc"}
+  swept=$?
+  if [ "$swept" -eq 2 ]; then exit 2; fi
+}
+
 # print_tally: the closing line, counting raw hit occurrences (not the present-at-base groups)
 # for n and m, and distinct files among the present-at-base hits for k; then the exit, 1 for any
-# introduced row, 0 otherwise.
+# introduced row or a sweep with something to judge, 0 otherwise.
 print_tally() {
   n=$(awk -F "$SEP" '$2 == "introduced"' "$WORK/resolved.tsv" | wc -l | tr -d ' ')
   m=$(awk -F "$SEP" '$2 == "present-at-base"' "$WORK/resolved.tsv" | wc -l | tr -d ' ')
   k=$(awk -F "$SEP" '$2 == "present-at-base" { print $4 }' "$WORK/resolved.tsv" | sort -u | wc -l | tr -d ' ')
-  printf 'scout: %s introduced, %s present at base in %s files; ran: %s\n' "$n" "$m" "$k" "$ran"
-  if [ "$n" -gt 0 ]; then exit 1; fi
+  printf 'scout: %s introduced, %s present at base in %s files; ran: %s\n' "$n" "$m" "$k" "$ran${sweep:+ $sweep}"
+  if [ "$n" -gt 0 ] || [ "$swept" -eq 1 ]; then exit 1; fi
   exit 0
 }
 
@@ -289,4 +314,5 @@ resolve_candidates
 emit_introduced
 emit_present_at_base
 emit_coverage
+run_sweep
 print_tally

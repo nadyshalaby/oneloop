@@ -2,6 +2,27 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.19.0**: the cleanup sweep's eight mechanical classes as one proven script, the last task of
+  the token-cut series (the user's pick, "Yes, build it"). `scripts/sweep.sh` runs classes 1, 2,
+  3, 6, 7, 8, 12 and 13 of 13.2's Step D (debug output, `removed:` markers, ownerless debt
+  markers, scratch files and empty folders, placeholders and stubs, changes outside the Plan's
+  files, branches made during the task, focused or skipped tests) with the patterns 13.2's table
+  held, now kept only there. Before it reads the change it proves every check on a planted
+  repository (ten planted hits: one per class, two for classes 6 and 7) and stops with exit 2
+  when one misses; then it prints every hit for the session to judge. `scout.sh --sweep <base>
+  <work-doc>` runs it after the scouts, whose rows classes 10 and 13 already asked for, so the
+  workflow's cleanup step is one command; the other classes (4, 5, 9, 11 and the rest of 10) stay
+  by hand, their rows word for word. The sweep reads more than the old commands did: uncommitted
+  and untracked work as well as commits, a rename as both of its paths (so a folder a move
+  emptied is found), paths with spaces or brackets taken literally, a Plan's folder and glob
+  entries, and branches from their reflog since the task's branch was made (a first push
+  included) where the old row asked for a cross-check by hand. It leaves out only the work-doc
+  itself, and docs/work/ for class 8 as before. Measured on a clean change: the cleanup page 7,147
+  to 6,651 bytes, the workflow page 13,778 to 13,784, the ten commands the eight rows spelled out
+  (1,125 bytes of cells) and the scout run become one 75-byte command, and the sweep prints 462
+  bytes: about 1.1k bytes and ten commands fewer per cleanup. Eight pins moved to the script's
+  report lines and four new ones hold the command; tests/sweep.test.sh is new (56 checks, each
+  guard seen failing on a copy with it broken) and tests/scout.test.sh gains 13.
 - **9.18.0**: the debug page split, the fifth token-cut release (the user's pick, "Split it").
   10.1 keeps the ways in, the trigger conditions and D1, the root-cause investigation (3,614
   bytes); the new 10.2 holds D2 to D4, the hypothesis chain, the circuit breaker, the advisor's

@@ -38,19 +38,19 @@ exit sweep, one line per class, zero included :: kept :: skills/workflow/SKILL.m
 exit archive, status done then the move :: kept :: skills/workflow/SKILL.md :: Write `status: done`, then at once `git mv` the work-doc into `docs/work/done/`
 exit close, the self-audit and the release notes :: kept :: skills/workflow/SKILL.md :: print the self-audit below; any `no` reopens the phase that owns it
 # the cleanup sweep's thirteen classes (13.2)
-sweep 1, debug output :: kept :: skills/workflow/SKILL.md :: zero included: debug output
-sweep 2, commented-out code :: kept :: skills/workflow/SKILL.md :: commented-out code and `removed:` markers
-sweep 3, ownerless markers :: kept :: skills/workflow/SKILL.md :: ownerless TODOs
+sweep 1, debug output :: merged :: scripts/sweep.sh :: report_class 1 'debug output'
+sweep 2, commented-out code :: merged :: scripts/sweep.sh :: report_class 2 'removed: markers (read every added comment block too)'
+sweep 3, ownerless markers :: merged :: scripts/sweep.sh :: report_class 3 'ownerless TODOs'
 sweep 4, dead code both ways :: kept :: skills/workflow/SKILL.md :: dead code both ways
 sweep 5, unused imports, dependencies, env vars :: kept :: skills/workflow/SKILL.md :: unused imports, dependencies and env vars
-sweep 6, scratch files and empty dirs :: kept :: skills/workflow/SKILL.md :: scratch files and empty dirs
-sweep 7, placeholders and stubs :: kept :: skills/workflow/SKILL.md :: placeholders and stubs
-sweep 8, unrelated changes :: kept :: skills/workflow/SKILL.md :: changes outside the plan's files
+sweep 6, scratch files and empty dirs :: merged :: scripts/sweep.sh :: report_class 6 'scratch files and empty dirs'
+sweep 7, placeholders and stubs :: merged :: scripts/sweep.sh :: report_class 7 'placeholders and stubs'
+sweep 8, unrelated changes :: merged :: scripts/sweep.sh :: report_class 8 "changes outside the plan's files"
 sweep 9, stale references :: kept :: skills/workflow/SKILL.md :: stale references to what you renamed or removed
 sweep 10, what was already there is a follow-up :: kept :: skills/workflow/SKILL.md :: Anything that was already there is a follow-up.
 sweep 11, leaked runtime state :: kept :: skills/workflow/SKILL.md :: leaked processes and ports
-sweep 12, branches the task made :: kept :: skills/workflow/SKILL.md :: branches you made
-sweep 13, focused or skipped tests :: kept :: skills/workflow/SKILL.md :: focused or skipped tests (13.2)
+sweep 12, branches the task made :: merged :: scripts/sweep.sh :: report_class 12 'branches you made'
+sweep 13, focused or skipped tests :: merged :: scripts/sweep.sh :: report_class 13 'focused or skipped tests'
 # the review (12.2 to 12.9)
 review 12.2, a coverage row per touched path :: kept :: agents/er-reviewer.md :: one row per touched path, the checks that read it, its verdict
 review 12.3, security and correctness :: kept :: agents/er-reviewer.md :: 12.3 (security and correctness)
@@ -88,3 +88,8 @@ helpers, the user picks them or this chat before one is sent :: kept :: skills/w
 helpers, the recommendation fits the task :: kept :: skills/workflow/SKILL.md :: Recommend helpers for a wide unfamiliar tree, independent tasks or a likely careful lane; else this chat.
 helpers, the pick is kept and a resume asks when it is missing :: kept :: skills/workflow/SKILL.md :: Helpers: <on | off>.
 helpers, off runs their work here :: kept :: skills/workflow/SKILL.md :: Where the agent tool is missing or helpers are off, their work runs here
+# the cleanup sweep's one command, added with it
+sweep command, the scouts then the eight mechanical classes :: kept :: skills/workflow/SKILL.md :: `bash ~/.claude/engineering-rules/scripts/scout.sh --sweep <base> <work-doc>` reruns the scouts, then sweeps eight mechanical classes
+sweep command, every hit printed and judged :: kept :: skills/workflow/SKILL.md :: prints every hit; judge each.
+sweep command, the scouts serve classes 10 and 13 :: kept :: references/13-cleanup-and-landing/13.2-the-cleanup-sweep-and-landing-rules.md :: their rows serve classes 10 and 13, so they are not run again
+sweep command, each check proven on its plant :: kept :: scripts/sweep.sh :: usage_error "self-check: class $class missed its planted hit"

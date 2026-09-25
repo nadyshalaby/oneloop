@@ -129,7 +129,8 @@ law/engineering-code.md         the code rules install.sh copies into ~/.claude/
 skills/workflow/                the workflow
 skills/<route>/                 one command per route (build is the default), and the standalone skills
 agents/                         the three helpers the workflow sends, each with its model and turn cap
-scripts/scout.sh                the perf, law and design scouts in one call over the working tree, every hit tagged introduced or present at base
+scripts/scout.sh                the perf, law and design scouts in one call over the working tree, every hit tagged introduced or present at base; --sweep adds the cleanup sweep
+scripts/sweep.sh                the cleanup sweep's eight mechanical classes (13.2), each proven on a planted hit, every hit printed to judge
 scripts/perf-scout.sh           turns the perf scout's tables (9.4) into the block scout.sh runs
 scripts/lane.sh                 picks the fast or careful lane for a planned change, from facts a machine can check
 references/                     101 sections, one file each, numbered as the law and the workflow cite them
