@@ -9,8 +9,9 @@ One entry per version, newest first. The README says what the setup is now; this
   become that one run; run-point ids go from `stage-<n>` and `phase-5` to `task-<n>`. The safety
   net is kept, by the user's pick ("Keep the net"): a Critical perf candidate, a hard-coded secret
   or a row in doubt is never dismissed after a task but staged into the work-doc's Evidence, which
-  the reviewer is handed and re-judges (12.3, 12.4, 12.7); the workflow's Implement step 5 now
-  says so (the page goes from 15,215 to 15,368 bytes). A pre-existing finding in a touched file
+  the reviewer is handed and re-judges (12.4, 12.7), and a staged row makes the review run even
+  on a diff that changes no behaviour; the workflow's Implement and Verify steps now say so (the
+  page goes from 15,215 to 15,400 bytes). A pre-existing finding in a touched file
   goes to Follow-ups, never fixed here, as law 1.9 says, where the law scout's page still offered
   to fix it. The scan blocks the tests run are unchanged apart from their comments.
 - **9.5.0**: cleanup release 3a, the verify, review, debug, finish and catalog pages in the

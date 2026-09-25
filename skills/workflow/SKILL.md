@@ -164,7 +164,7 @@ row disposed, every task committed.
    the manifest has a build or start script or the task deploys); on UI-bearing work the design
    pre-flight (15.30). One Evidence line each, `command → result line`, and one line on what the
    checks did not reach; no probe or control the plan did not name.
-2. **Review,** for every diff that changes behaviour: careful lane, one `er-reviewer` over
+2. **Review,** for every diff that changes behaviour or carries a `staged` scout row: careful lane, one `er-reviewer` over
    `git diff <base>..HEAD`, handed the Evidence lines and the scout's `not run:` lines; fast lane or
    helpers unavailable, the same review here, from `~/.claude/agents/er-reviewer.md`. It returns a
    coverage row per touched path and findings tagged `introduced` or `present at base`, graded
