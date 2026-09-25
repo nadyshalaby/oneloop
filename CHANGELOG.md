@@ -2,6 +2,14 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **8.0.0**: the old workflow's leftovers go, the first of four cleanup releases. The user:
+  "quick and full old skills still have menyions and leftovers" and "check other names too, we
+  don't want discrapences in the rules"; of the options, "Yes, build it" (four small releases),
+  "Yes, build it" (one name per thing) and "Rename to design-spec". Old dead code is written
+  down, never deleted: 3.0.0's never-chase rule (1.9) retired its removal, but 1.1, 1.6, 2.1,
+  3.4, 9.3, 9.5, 12.7, 13.2 (class 10) and 16.13 still sent it to a cleanup commit of its own;
+  each now files it as a follow-up with its `file:line` and zero-reference proof, and 12.7 makes
+  old dead code that a diff removed a finding.
 - **7.0.0**: fewer skills, common names. The user: "remove explore feature skill, rename other
   skills to something technically common", "remove agents skill, "skill" creation skill," and
   "move the status report skill to the engineering rules"; of the options, "Yes, build it" and
