@@ -139,7 +139,9 @@ For each task, in order:
    (it reads the working tree, committed or not; its `self-check:` line is its own planted
    instance). Every `introduced` row is fixed now, or
    dismissed with a one-line reason tied to that row's guard (a perf row is a candidate, not a
-   verdict); every `present at base` row goes to Follow-ups as the scout summarises it, never
+   verdict); a Critical perf row, a secret or a row you doubt is never dismissed here: it goes
+   to the Evidence as `staged`, for the review to judge (9.4, 9.5); every `present at base` row
+   goes to Follow-ups as the scout summarises it, never
    fixed here; its `not run:` lines go to the review.
 6. Sweep your own leftovers: debug lines, commented-out code, unused imports, symbols your change
    orphaned, scratch files.

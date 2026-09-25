@@ -2,6 +2,17 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.6.0**: cleanup release 3b, the perf and law scout pages (9.4, 9.5) in the workflow's words,
+  and their rules aligned to what runs. `scripts/scout.sh` runs the scouts once after every task
+  (the workflow's Implement step 5) over the whole change against the base, committed or not, so
+  the pages' two run points (each stage's own files, then the whole scope at the review's start)
+  become that one run; run-point ids go from `stage-<n>` and `phase-5` to `task-<n>`. The safety
+  net is kept, by the user's pick ("Keep the net"): a Critical perf candidate, a hard-coded secret
+  or a row in doubt is never dismissed after a task but staged into the work-doc's Evidence, which
+  the reviewer is handed and re-judges (12.3, 12.4, 12.7); the workflow's Implement step 5 now
+  says so (the page goes from 15,215 to 15,368 bytes). A pre-existing finding in a touched file
+  goes to Follow-ups, never fixed here, as law 1.9 says, where the law scout's page still offered
+  to fix it. The scan blocks the tests run are unchanged apart from their comments.
 - **9.5.0**: cleanup release 3a, the verify, review, debug, finish and catalog pages in the
   workflow's words, with three rules aligned to the workflow the user runs (the user's picks:
   "Match the live rules", "Test first, like the workflow", "One per task, like the workflow").
