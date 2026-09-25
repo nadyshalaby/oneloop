@@ -21,11 +21,12 @@ One entry per version, newest first. The README says what the setup is now; this
   helper's brief; a test run that ran zero tests is a fail; a task branch off the default
   branch, and a worktree only in a folder git ignores; a bug fix starts 10.1's root-cause
   investigation at Plan by reading only, its reproduction and boundary logging waiting for the
-  logic gate's yes, since nothing runs before it. **What it removes:** of
-  the 30 rules the old pages held with no home in the workflow, 5 already live in a page that
-  stays, 3 come back whole, 3 in part, and 19 stay out, among them the pause checkpoint, the
-  plan's rejected alternatives, the verbatim ask in the work-doc and the reviewer's read of each
-  file's untouched neighbour. The
+  logic gate's yes, since nothing runs before it. **What it removes:** of the 30 rules a read of
+  the old pages found missing, whole or in part, from the workflow, its helpers and the law, 10
+  already live in pages that stay, some minus a detail, and 1 in the user's `loop.md`; 6 come
+  back by the user's picks, 1 whole and 5 in part; and 13 stay out, among them the pause
+  checkpoint, the plan's rejected alternatives, the verbatim ask in the work-doc and the
+  reviewer's read of each file's untouched neighbour. The
   brainstorm (16.1) hands its distillation to Build's Plan and writes no work-doc, since a
   graduation signal is not the logic gate's yes; the release notes (16.13) read the new
   work-doc, older labels still read, and run on demand only, the Close step printing its own.
