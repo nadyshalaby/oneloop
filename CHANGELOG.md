@@ -8,8 +8,10 @@ One entry per version, newest first. The README says what the setup is now; this
   - **The finish page (13.2)** goes from 16,336 to 6,907 bytes: the cleanup sweep (Step D, its
     thirteen classes and their check commands unchanged) and four landing rules the user kept
     ("Typed 'discard' first", "Tests after a local merge", "Worktree goes last", "Leave
-    worktrees properly"). Its other steps repeated the workflow page's Verify & Deploy steps and
-    are gone; the release notes' field guide and voice move to 16.13 (5.3 re-pointed), and the
+    worktrees properly"). Its other steps are gone: they repeated the workflow page's Verify &
+    Deploy steps, apart from two old habits the workflow had already dropped (the closing
+    summary's offer of a scheduled follow-up, and leaving the work-doc open when the branch is
+    kept); the release notes' field guide and voice move to 16.13 (5.3 re-pointed), and the
     rule for a session that died mid-close moves into the workflow's resume check. The workflow
     page grows from 15,043 to 15,215 bytes for that rule and the pointer to the landing rules.
   - **Rules aligned, not words only (9.2, 9.3).** Tests are written first and seen failing before
