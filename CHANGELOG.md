@@ -2,6 +2,17 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.0.0**: one way in. The user: "build vs workflow. what's the different keep only one", then
+  "Keep workflow, drop build". `/engineering-rules:build` was a 1 KB doorway that only loaded the
+  workflow skill, so it goes, and `/engineering-rules:workflow <request>` is the default route,
+  running the same flow. The law's route line, the README, the audit, brainstorm, design-spec and
+  triage skills, the workflow page's ways in and route table, and the brainstorm (16.1), audit
+  (16.3) and research (6.11) pages name the workflow; a brainstorm or research handoff goes to a
+  new task's Plan. `tests/sub-commands.test.sh` holds the doorway shape to the doorways only,
+  since the default row is now the workflow skill itself, and `tests/install.test.sh` uses the
+  workflow link for its conflict and missing-link cases. The installer drops the stale
+  `engineering-rules:build` link; open sessions list it until they restart. A command goes away,
+  so a major version. Workflow page 15,689 to 15,654 bytes; core law 9,594 to 9,597 bytes.
 - **8.1.0**: the question banks speak the workflow's words, the second of four cleanup releases.
   The user, of the options: "Retire it" (the repo brief), "One list, deeper on risk" (coverage),
   "Yes, build it" (the logic) and "Keep it, make it real" (the debug check-back). The question

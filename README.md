@@ -2,7 +2,7 @@
 
 The engineering law and working method for Claude Code, as a folder that plugs into
 `~/.claude` with no plugin. A short core law binds every session through the user-global
-`CLAUDE.md`, and the code rules join it the first time a session reads a code file; the workflow (`/engineering-rules:build`: plan, implement, verify and deploy) and its routes are skills that load only when you call them, with three capped helper agents;
+`CLAUDE.md`, and the code rules join it the first time a session reads a code file; the workflow (`/engineering-rules:workflow`: plan, implement, verify and deploy) and its routes are skills that load only when you call them, with three capped helper agents;
 hooks enforce the parts of the law a machine can see; and `install.sh` wires it all in, checks
 it, and takes it back out. Clone it on any machine, run the installer, and every project gets
 the same rules.
@@ -22,7 +22,7 @@ the code rules. The first short law, one file, measured 6,756.)
 |---|---|---|
 | The core law: definitions, precedence, the caps and bans in one line, 1.2, 1.4, 1.5, 1.7 to 1.11 | `law/engineering-law.md` | every session and every helper that loads `CLAUDE.md`, from the first prompt; capped at 90 lines and 10,000 characters by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, copied to `~/.claude/rules/` | the first time a session or a helper reads a file its `paths:` globs match (the common code extensions); capped at 60 lines and 7,500 characters |
-| The workflow: three phases, the ledger, the slim work-doc, the self-audit | `skills/workflow/SKILL.md` | only when you call it (`/engineering-rules:build` or a route); capped at 16,000 characters by `tests/workflow-power.test.sh` |
+| The workflow: three phases, the ledger, the slim work-doc, the self-audit | `skills/workflow/SKILL.md` | only when you call it (`/engineering-rules:workflow` or a route); capped at 16,000 characters by `tests/workflow-power.test.sh` |
 | The helpers: `er-reader`, `er-builder`, `er-reviewer` | `agents/*.md`, linked into `~/.claude/agents/` | their one-line descriptions in every session's agent list; a body only when the workflow sends one |
 | The routes | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
 | `explain`, `update-engineering-rules`, `status-report` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
@@ -44,7 +44,7 @@ bash ~/.claude/engineering-rules/install.sh
 
 The clone can live anywhere; the installer links `~/.claude/engineering-rules` to it. It then:
 
-1. links each skill into `~/.claude/skills/` under its command name, so `/engineering-rules:build`
+1. links each skill into `~/.claude/skills/` under its command name, so `/engineering-rules:workflow`
    and the rest answer to their `/engineering-rules:` names, and each helper agent into
    `~/.claude/agents/`;
 2. appends one managed block to `~/.claude/CLAUDE.md` that imports the core law, below your
@@ -103,8 +103,7 @@ you and your work on its own bug.
 
 | Command | What it does |
 |---|---|
-| `/engineering-rules:build <request>` | the default: plan, implement, verify and deploy, skipping a phase that is already done or fully known (a resumed work-doc, or a request that already gives the goal, the checks and the steps) |
-| `/engineering-rules:workflow <request>` | the same flow; bare, it asks what you want done |
+| `/engineering-rules:workflow <request>` | the default: plan, implement, verify and deploy, skipping a phase that is already done or fully known (a resumed work-doc, or a request that already gives the goal, the checks and the steps); bare, it asks what you want done |
 | `/engineering-rules:brainstorm`, `:audit`, `:triage`, `:design-spec`, `:release-notes` | brainstorming an idea until it is a task, a whole-codebase audit, review triage, the project's design spec, the release notes (update log) of the task in flight |
 | `/engineering-rules:explain` | explains logic short and plain (the problem, pseudocode, the effect, the risks): before a new task, as the law's logic-first gate, or when you ask how code works |
 | `/update-engineering-rules` | changes these rules and ships the change |

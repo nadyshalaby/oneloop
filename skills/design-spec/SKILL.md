@@ -20,6 +20,6 @@ outright: author, extract or refresh the project's design spec.
    from the library (15.4) when the user named one. It is the whole invocation. Empty means
    15.19 detects the mode from the repository; nothing is asked before it has looked.
 3. **Read 15.19 from disk and run it**, with 15.1 to 15.6 as it names them, as a
-   `/engineering-rules:build` task: writing or changing the spec is substantive.
+   `/engineering-rules:workflow` task: writing or changing the spec is substantive.
 
 A sub-command picks the route; it waives no check, and the law binds throughout.

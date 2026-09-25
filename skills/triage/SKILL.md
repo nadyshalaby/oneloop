@@ -20,6 +20,6 @@ batch of review findings becomes one decision per finding.
    pasted most recently in this conversation; when there is neither, ask for them through
    `AskUserQuestion`, one question, and nothing else.
 3. **Read 16.2 from disk and run it.** A finding accepted for a fix runs as
-   `/engineering-rules:build` when the user says go.
+   `/engineering-rules:workflow` when the user says go.
 
 A sub-command picks the route; it waives no check, and the law binds throughout.

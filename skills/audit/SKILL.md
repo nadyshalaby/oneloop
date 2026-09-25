@@ -21,6 +21,6 @@ codebase against its rules, never a per-diff review.
    it has looked.
 3. **Read 16.3 from disk and run it**; it reaches 16.4 to 16.8 as it goes. The remediation
    proposes and confirms per finding through `AskUserQuestion`, and every fix taken runs as
-   `/engineering-rules:build`.
+   `/engineering-rules:workflow`.
 
 A sub-command picks the route; it waives no check, and the law binds throughout.

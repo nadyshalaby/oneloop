@@ -21,10 +21,10 @@ description: >-
 
 - **Whole invocation:** `$ARGUMENTS`
 
-**Ways in.** `/engineering-rules:build <request>` is the default. `/engineering-rules:workflow
-<request>`, or naming the workflow in words, runs the same flow. Bare, with no request anywhere in
-the conversation, ask through `AskUserQuestion` what they want done (and which route, when it is not
-`build`), and nothing else. The other routes are in the table at the end. The flow never starts on its
+**Ways in.** `/engineering-rules:workflow <request>` is the default; naming the workflow in words
+runs the same flow. Bare, with no request anywhere in the conversation, ask through
+`AskUserQuestion` what they want done (and which route, when it is not this one), and nothing
+else. The other routes are in the table at the end. The flow never starts on its
 own because a task touches code; the law covers that. A trivial ask (the law's definition) ends
 after the answer or the one-line edit.
 
@@ -225,7 +225,7 @@ the fix of a Critical finding.
 
 | Route | Sub-command | Right when | Section |
 |---|---|---|---|
-| **Build** | `/engineering-rules:build` | The default for any substantive request: the three phases above. | this page |
+| **Workflow** | `/engineering-rules:workflow` | The default for any substantive request: the three phases above. | this page |
 | **Brainstorm** | `/engineering-rules:brainstorm` | The idea is not a task yet: one or two forking questions per turn. | 16.1 |
 | **Codebase audit** | `/engineering-rules:audit` | A whole codebase against its rules, not one diff. | 16.3 |
 | **Review triage** | `/engineering-rules:triage` | A batch of review findings needs a decision each. | 16.2 |

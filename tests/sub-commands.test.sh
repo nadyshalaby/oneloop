@@ -5,8 +5,9 @@
 # skill) or the removed agents switch cannot linger; each sub-command keeps its shape (a name
 # matching its directory, user-only invocation, a body that loads the main skill, no argument
 # list); a standalone skill names itself, carries the description it triggers on, keeps model
-# invocation on and stays under the cap; and every section a route row cites is a file (the build
-# row cites the workflow page itself). Run: bash tests/sub-commands.test.sh
+# invocation on and stays under the cap; and every section a route row cites is a file. The
+# default row is the main skill itself (it cites its own page), so the doorway shape skips it.
+# Run: bash tests/sub-commands.test.sh
 # SKILLS_DIR points the test at another skills directory, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -86,6 +87,7 @@ stray_dirs() { comm -23 <(skill_dirs "$1") <({ table_routes "$1/$MAIN_SKILL/SKIL
 # all_defects <skills dir>: the shape defects of every sub-command that is present.
 all_defects() {
   for route in $(table_routes "$1/$MAIN_SKILL/SKILL.md"); do
+    [ "$route" = "$MAIN_SKILL" ] && continue
     [ -f "$1/$route/SKILL.md" ] && shape_defects "$route" "$1/$route/SKILL.md"
   done
   return 0
@@ -134,7 +136,7 @@ test_planted_breaches_are_named() {
   mkdir -p "$WORK/skills/$MAIN_SKILL" "$WORK/skills/ghost" "$WORK/skills/quick" "$WORK/skills/agents" "$WORK/skills/brainstorm" "$WORK/skills/$plant"
   cp "$SKILLS/$MAIN_SKILL/SKILL.md" "$WORK/skills/$MAIN_SKILL/SKILL.md"
   printf -- '---\nname: %s:brainstorm\narguments: [mode]\ndisable-model-invocation: true\n---\nLoads %s:%s.\n' "$PREFIX" "$PREFIX" "$MAIN_SKILL" > "$WORK/skills/brainstorm/SKILL.md"
-  assert_contains "a route with no directory is named" "build" "$(missing_dirs "$WORK/skills")"
+  assert_contains "a route with no directory is named" "audit" "$(missing_dirs "$WORK/skills")"
   assert_contains "a directory with no route is named" "ghost" "$(stray_dirs "$WORK/skills")"
   assert_contains "and so is a leftover quick" "quick" "$(stray_dirs "$WORK/skills")"
   assert_contains "and so is a leftover agents switch" "agents" "$(stray_dirs "$WORK/skills")"

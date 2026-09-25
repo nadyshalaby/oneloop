@@ -21,6 +21,6 @@ idea is not a task yet, and the trigger phrases 16.1 lists no longer matter.
    through `AskUserQuestion`, one question, and nothing else.
 3. **Read 16.1 from disk and run it**: one or two forking questions per turn, every one
    through `AskUserQuestion`, nothing edited, until the user signals intent to build. The
-   task then runs as `/engineering-rules:build`, its Plan starting from the distillation.
+   task then runs as `/engineering-rules:workflow`, its Plan starting from the distillation.
 
 A command picks the route; it waives no check, and the law binds throughout.
