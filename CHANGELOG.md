@@ -7,9 +7,9 @@ One entry per version, newest first. The README says what the setup is now; this
   step 1, the builder helper, 1.1 and 9.3 now send the model to the new 2.3 (1,993 bytes):
   detect the repository's layout, state it, obey it exactly, never migrate as a side effect.
   Only a gap (a new repository, or a kind of file it has never had) reads 2.2 in full, and a
-  review reads 2.3 first, then 2.2 in full (12.7). 2.2 hands its precedence section to 2.3 and drops some explanation
-  (24,991 to 23,288 bytes); it keeps every table and rule, and every section other pages cite by
-  name. A new file in a repository with a settled layout now costs 1,993 bytes of reading
+  review reads 2.3 first, then 2.2 in full (12.7). 2.2 hands its precedence section to 2.3 and
+  drops some explanation (24,991 to 23,288 bytes); it keeps every table and rule, and every
+  section other pages cite by name. A new file in a repository with a settled layout now costs 1,993 bytes of reading
   instead of 24,991. The always-loaded code rules change by one character (2.2 to 2.3), and the
   pin that guards that line moves with it; the two old pointer phrases join the retired-wording
   list, so neither can come back. 102 reference pages.
