@@ -9,9 +9,13 @@ One entry per version, newest first. The README says what the setup is now; this
   the task's declared files; "the wizard tool" becomes `AskUserQuestion`; the drift check runs
   after every task; the route table's "Sub-command" column is "Command". One rule aligned: 2.2
   said to read it at the old Phase 1 as well as before creating a file, and now matches the
-  workflow's Implement step 1 (read it before a source or test file or a folder is created).
-  Kept on purpose: "the short law", "the always-on law" and "the logic-first gate" are live
-  names (the law, the workflow page and the explain skill use them); the hook tests' ledger
+  workflow's Implement step 1 (read it before a source or test file or a folder is created);
+  and 1.6 and 5.4 no longer read the old clarify round as the Plan's rules: the goal is
+  confirmed first only when the ask reads two ways, and the coverage is the one-line list with
+  6.15's full map only on the lane's risk list (the workflow's Plan steps 2 and 4). Kept on
+  purpose, since none is an old-flow name: "the always-on law" (the workflow page's words), "the
+  logic-first gate" (the explain skill's) and "the short law" (the update skill's, 5.4's and the
+  README's name for the one-file law, which calls itself "this short form"); the hook tests' ledger
   samples in the old "(n of 6, Phase m)" shape are data for a parser that takes any "(n of m,
   name)", and a ledger line naming "Verify & Deploy" was read back correctly.
 - **9.8.0**: cleanup release 4b, the route pages (16.2 to 16.8) and the route skills in the
