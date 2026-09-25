@@ -74,14 +74,16 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    two ways, the first question confirms which; otherwise no confirmation is asked.
 3. Read what the goal touches, whole: the files, their tests, the closest existing example, and the
    triad commands from the manifest. A wide sweep of an unfamiliar tree goes to one `er-reader`.
-   UI-bearing work reads 15.1 first.
+   UI-bearing work reads 15.1 first. A bug fix runs 10.1's root-cause investigation (D1) before
+   any task is drafted, not only once stuck twice.
 4. **Coverage, one line:** each aspect the task touches (data, API, UI, auth, permissions, performance,
    migration, config, jobs, deploy, docs, tests) and what settles it: the ask, a `file:line`, or a
    question. None left open.
 5. **Questions:** one `AskUserQuestion` batch, only for forks the code and the ask cannot settle,
    recommended option first and most effective; an unfamiliar domain borrows its bank from 6.3 to 6.11.
 6. Draft the Done-when checks and Plan tasks, each with `→ verify: <command>` and the files it may
-   touch.
+   touch. Each thing that must not change is a Done-when check too; one no command can check
+   names the file to read and what to confirm.
 7. **Lane:** `bash ~/.claude/engineering-rules/scripts/lane.sh --test "<the test command>" <every
    file the tasks name>`, and one plan line: touches no money, auth, state machine, migration,
    concurrency or data-loss code, and does not deploy. `lane: fast` with that line honestly true
@@ -89,12 +91,15 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    anything else, or a work-doc with no `Lane:` line, is the careful lane. Then
    the advisor checks the plan.
 8. **Logic gate (law 1.4):** show the logic with the `explain` skill and ask through
-   `AskUserQuestion`; nothing is written or changed before the yes. Then write the work-doc (below),
-   the user's answer in its `Logic confirmed:` line. **Exit:** the work-doc with Goal, Done when and
-   Plan, said in chat in two lines.
+   `AskUserQuestion`; nothing is written or changed before the yes. Then, on the default branch,
+   make a task branch (`<type>/<slug>`) and say so (a worktree inside the project only in a folder
+   `git check-ignore` confirms is ignored), and write the work-doc (below), the user's answer in
+   its `Logic confirmed:` line. **Exit:** the work-doc with Goal, Done when and Plan, said in chat
+   in two lines.
 
 **The work-doc**, `docs/work/<YYYY-MM-DD>-<slug>.md`, written once after the yes, then only edited
-(ticks, one Log line per task, `status`, `next`):
+(ticks, one Log line per task, `status`, `next`); it holds project-relative paths, never a secret,
+token, credential or customer data:
 
 ```
 ---
@@ -151,7 +156,8 @@ row disposed, every task committed.
 ## 3 Verify & Deploy
 
 1. **Prove it, fresh, on the exact commit** (the committed tree with a clean `git status`; a clean
-   export only when deploying): the triad; every Done-when check; the ship gate when the diff
+   export only when deploying): the triad (a test run that ran zero tests is a fail); every
+   Done-when check; the ship gate when the diff
    touches source the build compiles or config the app reads at startup (rows `ship.build`,
    `ship.boot`, `ship.smoke`, each run or carrying the reason it has no target; read 11.3 only when
    the manifest has a build or start script or the task deploys); on UI-bearing work the design
@@ -161,7 +167,7 @@ row disposed, every task committed.
    `git diff <base>..HEAD`, handed the Evidence lines and the scout's `not run:` lines; fast lane or
    helpers unavailable, the same review here, from `~/.claude/agents/er-reviewer.md`. It returns a
    coverage row per touched path and findings tagged `introduced` or `present at base`, graded
-   Critical, Important or Minor.
+   Critical, Important or Minor; a broken must-not-change check is Critical.
 3. **Challenge, then decide:** a finding stands unless a `file:line` refutes it (doubt is not a
    refutation; a Critical one needs both reproduction and authority to fail, 12.8). Consult the
    advisor, then decide each: accept, push back with the citation, defer with the user's say, or
@@ -178,10 +184,10 @@ row disposed, every task committed.
 6. **Land:** commit with explicit paths; when there is a choice (merge, a pull request, keep the
    branch), ask through `AskUserQuestion`. **Deploy** only when the task deploys: the six proofs
    (law 1.11) pasted before, the live check after.
-7. **Close:** print the self-audit below; any `no` reopens the phase that owns it. Print the update
-   log in plain words (what changed and why, the proof behind every claim, the follow-ups, how
-   to undo it). Write
-   `status: done`, then at once `git mv` the work-doc into `docs/work/done/`; tick the ledger.
+7. **Close:** print the self-audit below; any `no` reopens the phase that owns it. Print the
+   release notes in plain words (what changed and why, the proof behind every claim, the
+   follow-ups, how to undo it). Write `status: done`, then at once `git mv` the work-doc into
+   `docs/work/done/`; tick the ledger.
 
 ```
 Law self-audit
@@ -201,7 +207,8 @@ Law self-audit
 
 Three custom agents, each with its own model and turn cap, and nothing else is sent (no fork, no
 built-in type): `er-reader` (read-only, a wide sweep), `er-builder` (one task of two or more
-parallel ones) and `er-reviewer` (read-only, the review). Where the agent tool is missing, their
+parallel ones) and `er-reviewer` (read-only, the review). A brief never carries a secret, token,
+credential or customer data. Where the agent tool is missing, their
 work runs here, from the same files. This session keeps the ledger and every tick,
 every question and answer, the verification a tick rests on, every fix decision, what gets
 committed, the gate, the self-audit and every claim; a helper's output is a report until re-run.

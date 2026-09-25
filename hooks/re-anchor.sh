@@ -1,14 +1,14 @@
 #!/bin/bash
 # engineering-rules re-anchor.
 # Runs on SessionStart when a session resumes or its context was compacted. A summary of the
-# law is not the law (1.7, step 7): after context loss the always-on law is read again from
-# disk before anything else. This hook prints that instruction into the new context with the
-# path to read, names the code rules to read before writing code (they load with a code
-# read, and the loss may have taken them), adds the last phase-ledger position it finds in the
-# transcript, so the ledger re-opens on the right item, and names every in-flight work-doc of
-# the project with its status and next step, so the task resumes where it stopped. Plain text
-# on stdout is context for a SessionStart hook. Any other start reason, or input that
-# cannot be read, prints nothing and exits 0.
+# law is not the law (the workflow skill, the ledger): after context loss the always-on law is
+# read again from disk before anything else. This hook prints that instruction into the new
+# context with the path to read, names the code rules to read before writing code (they load
+# with a code read, and the loss may have taken them), adds the last phase-ledger position it
+# finds in the transcript, so the ledger re-opens on the right item, and names every in-flight
+# work-doc of the project with its status and next step, so the task resumes where it stopped.
+# Plain text on stdout is context for a SessionStart hook. Any other start reason, or input
+# that cannot be read, prints nothing and exits 0.
 set -u
 umask 077
 
@@ -59,7 +59,7 @@ esac
 transcript=$(hook_field '.transcript_path // empty')
 cwd=$(hook_field '.cwd // empty')
 position=$(last_position)
-printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: if the always-on law is no longer verbatim in your context, read it from disk before the next step (1.7, step 7): %s\n' "$happened" "$LAW"
+printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: if the always-on law is no longer verbatim in your context, read it from disk before the next step (the workflow skill, the ledger): %s\n' "$happened" "$LAW"
 printf 'The code rules are part of it: before writing code, read them from disk unless they are verbatim in your context: %s\n' "$RULES"
 if [ -n "$position" ]; then
   printf 'Last phase-ledger position printed before the loss: %s. A phase-workflow task was in flight: re-read the workflow skill (%s), re-print the ledger with that item open and continue from it; nothing from before carries over as proof.\n' "$position" "$WORKFLOW"
