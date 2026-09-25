@@ -27,7 +27,7 @@ the code rules. The first short law, one file, measured 6,756.)
 | The routes | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
 | `explain`, `update-engineering-rules`, `status-report` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
 | 101 reference sections, the long forms included | `references/**` | only when a rule or a phase names one; `tests/references.test.sh` fails on a cited section with no page and on a page nothing reaches |
-| Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short block per prompt, the advisor rule and the logic-first gate |
+| Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short line per prompt, the advisor rule and the logic-first gate |
 
 The two law files win over everything under `references/`: each long form in
 `references/01-always-on-law/` keeps the reasons and procedures behind a section of theirs, and

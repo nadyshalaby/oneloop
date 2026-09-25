@@ -2,6 +2,15 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.2.0**: the per-prompt advisor cue, one line. The user ticked all four trims offered ("The
+  per-message reminder", "Always-on rules and skill blurbs", "The workflow page's phases",
+  "Repeats in your own CLAUDE.md"), each its own release, the most repeated first. The cue
+  printed into every prompt goes from 863 to 297 bytes: it keeps the logic-first gate with its
+  "a detailed or fixed ask is not a yes" and the advisor's moments, and leaves to the always-on
+  law's 1.4 what the answer is worth, stating the decision first, the no-advisor case, acting on
+  a review or root cause and a change of direction, and the protocol path (the law cites 5.7).
+  Its fixture test pins the new line and caps it at 320 bytes (was 900); the wiring test checks
+  that the cue names law 1.4 instead of the path; 5.7 says what the cue now carries.
 - **9.1.0**: the debug check-back time goes. The user: "drop the timeout thing and focus on the
   todos". The debug bank's Q6 (when to stop and check back) and 10.1's Check-back time rule,
   both from 8.1.0, are removed; Q6's number stays a gap, so Q7 and Q8 keep every reference.

@@ -58,7 +58,7 @@ test_the_cue_is_wired_at_the_prompt_boundary() {
   assert_contains "the cue script is there" present "$present"
   cue=$(cat "$ROOT/hooks/advisor-cue.sh")
   assert_contains "the cue answers only its own event" '= UserPromptSubmit ] || exit 0' "$cue"
-  assert_contains "the cue names the protocol file" '5.7-the-advisor.md' "$cue"
+  assert_contains "the cue names the law section it speaks for" 'law 1.4' "$cue"
   assert_contains "5.7 says the cue refuses nothing" 'It judges
 nothing and refuses nothing.' "$(cat "$(ref_file 5.7)")"
 }
