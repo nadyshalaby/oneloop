@@ -75,7 +75,8 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
 3. Read what the goal touches, whole: the files, their tests, the closest existing example, and the
    triad commands from the manifest. A wide sweep of an unfamiliar tree goes to one `er-reader`.
    UI-bearing work reads 15.1 first. A bug fix runs 10.1's root-cause investigation (D1) before
-   any task is drafted, not only once stuck twice.
+   any task is drafted, by reading only: the error read whole, its `git` history, the bad value
+   traced through the code; the reproduction and boundary logging wait for the logic gate's yes.
 4. **Coverage, one line:** each aspect the task touches (data, API, UI, auth, permissions, performance,
    migration, config, jobs, deploy, docs, tests) and what settles it: the ask, a `file:line`, or a
    question. None left open.

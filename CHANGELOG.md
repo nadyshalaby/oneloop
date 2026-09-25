@@ -19,10 +19,13 @@ One entry per version, newest first. The README says what the setup is now; this
   a Done-when check, one no command can check naming the file to read and what to confirm, and
   a broken one is Critical; no secret, token, credential or customer data in the work-doc or a
   helper's brief; a test run that ran zero tests is a fail; a task branch off the default
-  branch, and a worktree only in a folder git ignores; a bug fix runs 10.1's root-cause
-  investigation before planning. **What it removes:** about twenty smaller process rules of the
-  old pages stay out, among them the pause checkpoint, the plan's rejected alternatives, the
-  verbatim ask in the work-doc and the reviewer's read of each file's untouched neighbour. The
+  branch, and a worktree only in a folder git ignores; a bug fix starts 10.1's root-cause
+  investigation at Plan by reading only, its reproduction and boundary logging waiting for the
+  logic gate's yes, since nothing runs before it. **What it removes:** of
+  the 30 rules the old pages held with no home in the workflow, 5 already live in a page that
+  stays, 3 come back whole, 3 in part, and 19 stay out, among them the pause checkpoint, the
+  plan's rejected alternatives, the verbatim ask in the work-doc and the reviewer's read of each
+  file's untouched neighbour. The
   brainstorm (16.1) hands its distillation to Build's Plan and writes no work-doc, since a
   graduation signal is not the logic gate's yes; the release notes (16.13) read the new
   work-doc, older labels still read, and run on demand only, the Close step printing its own.
@@ -32,9 +35,9 @@ One entry per version, newest first. The README says what the setup is now; this
   written down, never deleted: 3.0.0's never-chase rule (1.9) retired its removal, but 1.1,
   1.6, 2.1, 3.4, 9.3, 9.5, 12.7, 13.2 (class 10) and 16.13 still sent it to a cleanup commit of
   its own; each now files it as a follow-up with its `file:line` and zero-reference proof, and
-  12.7 makes old dead code that a diff removed a finding. Workflow page 14,723 to 15,380
-  characters; core law 70 lines, 9,596 to 9,594 characters (the design command's name); code
-  rules unchanged at 6,737.
+  12.7 makes old dead code that a diff removed a finding. Workflow page 15,024 to
+  15,522 characters; core law 70 lines, 9,596 to 9,594 characters (the design command's
+  name); code rules unchanged at 6,737.
 - **7.0.0**: fewer skills, common names. The user: "remove explore feature skill, rename other
   skills to something technically common", "remove agents skill, "skill" creation skill," and
   "move the status report skill to the engineering rules"; of the options, "Yes, build it" and
