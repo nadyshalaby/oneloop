@@ -2,6 +2,22 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.10.0**: cleanup release 4d, the last: the folders and files named for the old six-phase
+  flow are renamed, and a guard keeps the old names out. `06-phase-1-clarify` is now
+  `06-questions`, `09-phase-3-implement` `09-implement`, `10-phase-3b-debug` `10-debug`,
+  `11-phase-4-verify` `11-verify`, `12-phase-5-review` `12-review` and `13-phase-6-finish`
+  `13-cleanup-and-landing`; six pages take their titles' names (1.4 questions and decisions,
+  1.8 helpers, 10.1 debug when stuck, 13.2 the cleanup sweep and landing rules, 16.13 printing
+  the release notes, 16.1 brainstorm), and `tests/sub-commands.test.sh` is
+  `tests/commands.test.sh`. Section numbers do not change, so every citation still resolves; the
+  seven files that named a path (the scout script, the edit guard hook, the reviewer helper and
+  four tests) move with them, and nothing outside the repository names one but an old test
+  folder of a deleted skill. `tests/old-words.test.sh` fails when an old-flow name (a phase
+  number, the Sprint Backlog, the Retrospective, the wizard tool, the update log, full or quick
+  mode, a sub-command, an old folder name) comes back in what the model and the user read,
+  and shows itself catching planted ones; it proves names, not rules. Allowed on purpose: the
+  changelog and the tests, 16.13's older labels and the two `Phase 01` label examples. A session
+  already open keeps the old paths until it restarts.
 - **9.9.0**: cleanup release 4c, the law's long forms (1.1, 1.3, 1.5, 1.6, 1.9, 1.10, 1.11), the
   doctrine and working pages (2.1, 2.2, 5.4, 6.2, 6.6, 11.3, 12.7, 14.1), the README and the
   workflow's route table in the workflow's words: phase numbers become Plan, Implement, Verify &

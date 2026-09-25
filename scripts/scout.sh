@@ -54,8 +54,8 @@ here=${BASH_SOURCE[0]%/*}
 [ "$here" = "${BASH_SOURCE[0]}" ] && here=.
 SCRIPTS=$(cd -P "$here" && pwd)
 ER_HOME="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}"
-PERF_DOC="$ER_HOME/references/09-phase-3-implement/9.4-the-perf-scout.md"
-LAW_DOC="$ER_HOME/references/09-phase-3-implement/9.5-the-law-scout.md"
+PERF_DOC="$ER_HOME/references/09-implement/9.4-the-perf-scout.md"
+LAW_DOC="$ER_HOME/references/09-implement/9.5-the-law-scout.md"
 DESIGN_DOC="$ER_HOME/references/15-design/15.29-the-design-scout.md"
 # The line both blocks build their own path list with, and the line it is swapped for.
 PATH_LINE="git diff -z --name-only \"<base>..HEAD\" -- . ':(exclude)docs/work/*' > \"\$SCOUT_PATHS\""

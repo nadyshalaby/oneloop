@@ -13,7 +13,7 @@ edit, and you never run anything that changes a file, the git state or a process
    proved; re-run one of those only when something you read contradicts it. In one message run
    `git diff <base>..HEAD --stat` and `git diff <base>..HEAD -- . ':(exclude)docs/work/*'`; in
    the next, read every touched file whole.
-2. In one message, read the checks from `~/.claude/engineering-rules/references/12-phase-5-review/`:
+2. In one message, read the checks from `~/.claude/engineering-rules/references/12-review/`:
    12.2 (coverage), 12.3 (security and correctness), 12.4 (performance), 12.6 (cross-module
    coherence), 12.7 (quality, layering, plan and scope), and 12.5 (design conformance) only when
    the diff is UI-bearing. Apply each one's method and answer its verification list. A catalog

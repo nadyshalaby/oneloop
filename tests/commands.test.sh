@@ -1,13 +1,13 @@
 #!/bin/bash
-# Guard: the route table in SKILL.md and the sub-command skills beside it agree. Every route row
-# names a sub-command whose skill directory exists; every skill directory beside the main one is
+# Guard: the route table in SKILL.md and the command skills beside it agree. Every route row
+# names a command whose skill directory exists; every skill directory beside the main one is
 # a route row or a listed standalone skill, so a removed route (quick, full, explore-feature,
-# skill) or the removed agents switch cannot linger; each sub-command keeps its shape (a name
+# skill) or the removed agents switch cannot linger; each command keeps its shape (a name
 # matching its directory, user-only invocation, a body that loads the main skill, no argument
 # list); a standalone skill names itself, carries the description it triggers on, keeps model
 # invocation on and stays under the cap; and every section a route row cites is a file. The
 # default row is the main skill itself (it cites its own page), so the doorway shape skips it.
-# Run: bash tests/sub-commands.test.sh
+# Run: bash tests/commands.test.sh
 # SKILLS_DIR points the test at another skills directory, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -23,11 +23,11 @@ OWN_NAME="update-engineering-rules status-report"
 REFS="$ROOT/references"
 LINE_CAP=500
 
-# route_rows <SKILL.md>: the route table's rows, the ones whose second column is a sub-command
+# route_rows <SKILL.md>: the route table's rows, the ones whose second column is a command
 # in backticks ([[:punct:]] here, so the pattern carries no backtick of its own).
 route_rows() { grep -E '^\| \*\*[^|]+\*\* \| [[:punct:]]/engineering-rules:[a-z][a-z-]*[[:punct:]] \|' "$1"; }
 
-# table_routes <SKILL.md>: the sub-command name of every route row, in table order.
+# table_routes <SKILL.md>: the command name of every route row, in table order.
 table_routes() { route_rows "$1" | sed -E 's/^\| \*\*[^|]+\*\* \| [[:punct:]]\/engineering-rules:([a-z][a-z-]*)[[:punct:]].*/\1/'; }
 
 # table_sections <SKILL.md>: the section id every route row cites, in table order; a row that
@@ -47,7 +47,7 @@ command_name() {
 # front_value <SKILL.md> <key>: the frontmatter value of the key, empty when absent.
 front_value() { sed -n '2,/^---$/p' "$1" | sed -n -E "s/^$2: *//p" | head -n 1; }
 
-# shape_defects <route> <SKILL.md>: one line per departure from a sub-command's shape.
+# shape_defects <route> <SKILL.md>: one line per departure from a command's shape.
 shape_defects() {
   [ "$(front_value "$2" name)" = "$(command_name "$1")" ] || printf '%s: name is not %s\n' "$1" "$(command_name "$1")"
   [ "$(front_value "$2" disable-model-invocation)" = true ] || printf '%s: model invocation is not disabled\n' "$1"
@@ -84,7 +84,7 @@ missing_dirs() {
 # standalone skill.
 stray_dirs() { comm -23 <(skill_dirs "$1") <({ table_routes "$1/$MAIN_SKILL/SKILL.md"; tr ' ' '\n' <<< "$STANDALONE"; } | sort); }
 
-# all_defects <skills dir>: the shape defects of every sub-command that is present.
+# all_defects <skills dir>: the shape defects of every command that is present.
 all_defects() {
   for route in $(table_routes "$1/$MAIN_SKILL/SKILL.md"); do
     [ "$route" = "$MAIN_SKILL" ] && continue
@@ -113,7 +113,7 @@ test_every_skill_dir_is_a_route() {
 
 test_every_sub_command_has_the_shape() {
   defects=$(all_defects "$SKILLS")
-  assert_contains "every sub-command keeps its shape" "<none>" "${defects:-<none>}"
+  assert_contains "every command keeps its shape" "<none>" "${defects:-<none>}"
 }
 
 test_every_cited_section_exists() {
@@ -128,7 +128,7 @@ test_every_standalone_has_the_shape() {
 }
 
 # The checks have to be able to fail: a route with no directory, a directory with no route (a
-# leftover quick and a leftover agents switch among them), a sub-command that takes an argument
+# leftover quick and a leftover agents switch among them), a command that takes an argument
 # list, a standalone skill that switches model invocation off and a cited section with no file
 # are all named.
 test_planted_breaches_are_named() {
@@ -143,7 +143,7 @@ test_planted_breaches_are_named() {
   printf -- '---\nname: %s\ndescription: "a planted standalone"\ndisable-model-invocation: true\n---\n' "$plant" > "$WORK/skills/$plant/SKILL.md"
   assert_missing "and a listed standalone skill is not" "$plant" "$(stray_dirs "$WORK/skills")"
   assert_contains "a standalone skill that switches model invocation off is named" "$plant: model invocation is disabled" "$(standalone_defects "$WORK/skills")"
-  assert_contains "a sub-command that takes an argument list is named" "brainstorm: takes an argument list" "$(all_defects "$WORK/skills")"
+  assert_contains "a command that takes an argument list is named" "brainstorm: takes an argument list" "$(all_defects "$WORK/skills")"
   tick=$(printf '\140')
   printf '| **Ghost** | %s/engineering-rules:ghost%s | Nothing. | 99.9 |\n' "$tick" "$tick" > "$WORK/table.md"
   assert_contains "a cited section with no file is named" "99.9" "$(missing_sections "$WORK/table.md")"

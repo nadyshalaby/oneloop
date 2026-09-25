@@ -76,7 +76,7 @@ A hook is for what a machine can judge without a model; a judgment call stays in
    form beside the short law included, and keep both law files under their caps.
 5. **Change the tests with it.** New always-on wording gets pins; wording that must never come
    back goes into `tests/fixtures/short-law-absent.txt`; a hook change gets a test beside it
-   (`hooks/tests/`); a new command is listed in `tests/sub-commands.test.sh` (a route through the workflow's route table, a standalone skill in `STANDALONE`). Watch each new
+   (`hooks/tests/`); a new command is listed in `tests/commands.test.sh` (a route through the workflow's route table, a standalone skill in `STANDALONE`). Watch each new
    check fail on the old text: point the test's override (`LAW_MD`, `CODE_MD`, `WORKFLOW_MD`,
    `ADVISOR_CUE_SH` and the like) at `git -C "$ER" show main:<path>` saved to a scratch file.
 6. **Run everything, on the exact commit you will ship.** Every `*.test.sh` in the worktree

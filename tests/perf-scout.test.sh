@@ -14,7 +14,7 @@
 ROOT=$(repo_root) || exit 1
 RUNNER="${PERF_SCOUT_SH:-$ROOT/scripts/perf-scout.sh}"
 SCOUT="${SCOUT_SH:-$ROOT/scripts/scout.sh}"
-DOC="$ROOT/references/09-phase-3-implement/9.4-the-perf-scout.md"
+DOC="$ROOT/references/09-implement/9.4-the-perf-scout.md"
 ID_CMD="^(whole|loop|inverted|via|not_run) 'perf\\.[a-z]+\\.[a-z0-9-]+' "
 TICK=$(printf '\140')
 

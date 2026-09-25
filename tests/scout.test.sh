@@ -143,8 +143,8 @@ test_usage_errors_exit_2() {
 # A block whose path line changed would build its own scope, so the run stops instead.
 test_a_moved_path_line_stops_the_run() {
   home="$WORK/moved-home/references"
-  mkdir -p "$home/09-phase-3-implement" "$home/15-design"
-  sed 's/"<base>..HEAD"/"<base>...HEAD"/' "$ROOT/references/09-phase-3-implement/9.5-the-law-scout.md" > "$home/09-phase-3-implement/9.5-the-law-scout.md"
+  mkdir -p "$home/09-implement" "$home/15-design"
+  sed 's/"<base>..HEAD"/"<base>...HEAD"/' "$ROOT/references/09-implement/9.5-the-law-scout.md" > "$home/09-implement/9.5-the-law-scout.md"
   cp "$ROOT/references/15-design/15.29-the-design-scout.md" "$home/15-design/"
   out=$(cd "$WORK/repo" && ENGINEERING_RULES_HOME="$WORK/moved-home" "$BASH" "$SCOUT" base1 2>&1; printf 'exit=%s\n' "$?")
   assert_contains "the moved path line is named" "law scout: its path line is not there exactly once" "$out"
@@ -159,7 +159,7 @@ test_the_self_check_leads_the_output() {
 # broken_home <name> <doc> <sed program>: a home with the three scout docs, <doc> (a path under
 # references/) edited by the sed program, as $WORK/<name>.
 broken_home() {
-  for d in 09-phase-3-implement/9.4-the-perf-scout.md 09-phase-3-implement/9.5-the-law-scout.md 15-design/15.29-the-design-scout.md; do
+  for d in 09-implement/9.4-the-perf-scout.md 09-implement/9.5-the-law-scout.md 15-design/15.29-the-design-scout.md; do
     mkdir -p "$WORK/$1/references/${d%/*}"
     cp "$ROOT/references/$d" "$WORK/$1/references/$d"
   done
@@ -168,8 +168,8 @@ broken_home() {
 
 # A scout whose doc lost the row for its plant would report a clean change; the run stops instead.
 test_a_scout_that_misses_its_plant_stops_the_run() {
-  broken_home noperf 09-phase-3-implement/9.4-the-perf-scout.md '/perf\.memory\.json-deep-clone/d'
-  broken_home nolaw 09-phase-3-implement/9.5-the-law-scout.md "s/$TOK|//"
+  broken_home noperf 09-implement/9.4-the-perf-scout.md '/perf\.memory\.json-deep-clone/d'
+  broken_home nolaw 09-implement/9.5-the-law-scout.md "s/$TOK|//"
   broken_home nodesign 15-design/15.29-the-design-scout.md '/tag tell\.layout\.h-screen$/d'
   for pair in noperf=perf.memory.json-deep-clone nolaw=ban.suppression nodesign=tell.layout.h-screen; do
     home=${pair%%=*} id=${pair#*=}

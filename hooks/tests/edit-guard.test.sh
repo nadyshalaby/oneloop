@@ -94,7 +94,7 @@ test_a_lookalike_directory_is_not_a_test_directory() {
 
 # The scout's test-file globs and path-kind's are two copies of one definition; this pins them.
 test_test_globs_match_the_scout() {
-  law="$(cd "$here/../.." && pwd)/references/09-phase-3-implement/9.5-the-law-scout.md"
+  law="$(cd "$here/../.." && pwd)/references/09-implement/9.5-the-law-scout.md"
   scout=$(sed -n "s/^in_tests()  { in_paths \(.*\) | xargs.*/\1/p" "$law" | tr -d "'" | tr ' ' '\n' | sort)
   kind=$(sed -n 's/^    \(.*\)) printf test\(; return\)\{0,1\} ;;$/\1/p' "$here/../path-kind.sh" | tr '|' '\n' | sort)
   assert_eq "path-kind's test globs are the scout's" "$scout" "$kind"
@@ -102,7 +102,7 @@ test_test_globs_match_the_scout() {
 
 # The guard's domain globs are a copy of the scout's in_domain list; this pins them together.
 test_domain_globs_match_the_scout() {
-  law="$(cd "$here/../.." && pwd)/references/09-phase-3-implement/9.5-the-law-scout.md"
+  law="$(cd "$here/../.." && pwd)/references/09-implement/9.5-the-law-scout.md"
   scout=$(sed -n "s/^in_domain() { in_paths \(.*\) | xargs.*/\1/p" "$law" | tr -d "'" | tr ' ' '\n' | sort)
   guard=$(sed -n 's/^    \(\*\.[^)]*\)) printf yes ;;$/\1/p' "$SCRIPT" | tr '|' '\n' | sort)
   assert_eq "the guard's domain globs are the scout's" "$scout" "$guard"
@@ -122,7 +122,7 @@ test_a_climbing_path_stays_inside_the_scratch_dir() {
 # A 9.5 whose block cannot run judges nothing, allows, and says so in the log; the real block
 # never writes that line.
 test_a_broken_block_is_logged_not_trusted() {
-  law=references/09-phase-3-implement/9.5-the-law-scout.md
+  law=references/09-implement/9.5-the-law-scout.md
   root="$WORK/broken" && mkdir -p "$root/${law%/*}"
   awk '/^### HOW/ { h = 1 } { print } h && /^```bash$/ && !done { print "if true; then"; done = 1 }' "$here/../../$law" > "$root/$law"
   out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME="$root" bash "$SCRIPT")
