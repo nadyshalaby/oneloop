@@ -1,7 +1,7 @@
 #!/bin/bash
 # Guard: the law's one helper is the read-only reader in agents/, and nothing else is ever sent
 # (10.0.0, the user's words: "No Builder, no Reviewer"). The one agent file names itself after
-# its file, says what it is for, runs on haiku (the law says a Haiku search) with a turn cap,
+# its file, says what it is for, runs on sonnet (the law says a Sonnet search) with a turn cap,
 # holds no editing tool, and its description carries the law's condition: sent only after grep
 # has failed twice, and only to search. The law names it and sends no fork and no built-in agent
 # type. AGENTS_DIR and LAW_MD point the test at other copies, for a watched failure.
@@ -32,7 +32,7 @@ agent_defects() {
     [ -n "$description" ] || printf '%s: no description\n' "$name"
     case "$description" in *"$CONDITION"*) ;; *) printf '%s: the description does not carry the condition (%s)\n' "$name" "$CONDITION" ;; esac
     case "$description" in [Rr]ead-only*|*" read-only "*|*"Read-only "*) ;; *) printf '%s: the description does not say read-only\n' "$name" ;; esac
-    [ "$(front_value "$file" model)" = haiku ] || printf '%s: model is not haiku\n' "$name"
+    [ "$(front_value "$file" model)" = sonnet ] || printf '%s: model is not sonnet\n' "$name"
     turns=$(front_value "$file" maxTurns)
     case "$turns" in ''|*[!0-9]*) printf '%s: no numeric maxTurns\n' "$name" ;; *) [ "$turns" -le "$TURN_CAP" ] || printf '%s: maxTurns %s over %s\n' "$name" "$turns" "$TURN_CAP" ;; esac
     case "$(front_value "$file" tools)" in *Edit*|*Write*) printf '%s: a read-only helper holds %s\n' "$name" "$(front_value "$file" tools)" ;; esac
@@ -52,7 +52,7 @@ test_exactly_the_one_helper() {
 }
 
 test_the_reader_keeps_its_shape() {
-  assert_eq "the reader names itself, runs on haiku with a turn cap, cannot edit, and says when it is sent" "" "$(agent_defects "$AGENTS")"
+  assert_eq "the reader names itself, runs on sonnet with a turn cap, cannot edit, and says when it is sent" "" "$(agent_defects "$AGENTS")"
 }
 
 test_the_law_sends_only_it() {
@@ -60,18 +60,18 @@ test_the_law_sends_only_it() {
 }
 
 # The checks can fail: a second helper file, a reader that can edit, a misnamed agent, a model
-# outside haiku, a missing turn cap, a description without the condition, and a law that names
+# outside sonnet, a missing turn cap, a description without the condition, and a law that names
 # no reader are each named.
 test_planted_breaches_are_named() {
   mkdir -p "$WORK/agents"
-  printf -- '---\nname: er-reader\ndescription: Searches a tree whenever asked.\ntools: Read, Edit\nmodel: haiku\nmaxTurns: 5\n---\nbody\n' > "$WORK/agents/er-reader.md"
-  printf -- '---\nname: builder\ndescription: d\ntools: Read\nmodel: sonnet\n---\nNo cap.\n' > "$WORK/agents/er-builder.md"
+  printf -- '---\nname: er-reader\ndescription: Searches a tree whenever asked.\ntools: Read, Edit\nmodel: sonnet\nmaxTurns: 5\n---\nbody\n' > "$WORK/agents/er-reader.md"
+  printf -- '---\nname: builder\ndescription: d\ntools: Read\nmodel: haiku\n---\nNo cap.\n' > "$WORK/agents/er-builder.md"
   assert_eq "a second helper file is named" "er-builder er-reader" "$(agent_names "$WORK/agents")"
   out=$(agent_defects "$WORK/agents")
   assert_contains "a reader that can edit is named" "er-reader: a read-only helper holds" "$out"
   assert_contains "a description without the condition is named" "er-reader: the description does not carry the condition" "$out"
   assert_contains "a misnamed agent is named" "er-builder: name is not er-builder" "$out"
-  assert_contains "a model outside haiku is named" "er-builder: model is not haiku" "$out"
+  assert_contains "a model outside sonnet is named" "er-builder: model is not sonnet" "$out"
   assert_contains "a missing turn cap is named" "er-builder: no numeric maxTurns" "$out"
   printf 'Helpers: send %ser-builder%s with subagent_type "fork".\n' "$TICK" "$TICK" > "$WORK/law.md"
   out=$(law_defects "$WORK/law.md" "$WORK/agents")

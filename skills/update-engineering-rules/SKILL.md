@@ -105,7 +105,7 @@ hook warns or asks, never blocks (the law, Guards).
     until this runs) and changes nothing else, and `bash "$ER/install.sh" --check`, which must
     print `engineering-rules: installed and wired`.
 11. **Verify it live.** A fresh session that could only answer from the new rules:
-    `env -i HOME="$HOME" PATH="$PATH" USER="$USER" TERM=xterm-256color LANG=en_US.UTF-8 SHELL=/bin/zsh TMPDIR="$TMPDIR" claude -p "<a question only the changed rule answers>" --no-session-persistence --model haiku`,
+    `env -i HOME="$HOME" PATH="$PATH" USER="$USER" TERM=xterm-256color LANG=en_US.UTF-8 SHELL=/bin/zsh TMPDIR="$TMPDIR" claude -p "<a question only the changed rule answers>" --no-session-persistence --model sonnet`,
     its answer pasted; a hook change also gets one real event through the installed hook. If
     it did not take, revert (step 9) and say so.
 12. **Push it.** `git -C "$ER" push origin main`. No remote, or a refused push, is said plainly

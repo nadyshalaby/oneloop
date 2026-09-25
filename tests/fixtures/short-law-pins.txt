@@ -56,6 +56,7 @@ Never read the project
 a note of at most 3 lines: what changes, which files, what could go wrong
 wait for the yes through `AskUserQuestion`
 the word "go" in the user's message is pre-approval
+print it and the note, then proceed without waiting
 # the loop: edit
 One grep for an existing component or util to reuse
 The smallest diff that satisfies the request
@@ -64,6 +65,7 @@ extend it in the same edit; otherwise no test ritual
 **Scope ratchet:**
 more than double the files stated
 never widen silently, never narrow to fit
+a file the change needs is in the scope or the work stops
 **Stuck twice**
 stop editing, state the root cause, ask
 # the loop: check and commit

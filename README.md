@@ -41,7 +41,7 @@ regex becomes a permission prompt, even after "go"), the code-rules warning (a b
 edit adds is named beside the tool result, never blocked), the proof rule (nothing is done
 without a check run this session), git safety (nothing discarded, no force push, files staged
 by name) and side finds (written down for the end list, never chased; a serious one reported
-at once). No helpers by default: the one exception is `er-reader`, a read-only Haiku search,
+at once). No helpers by default: the one exception is `er-reader`, a read-only Sonnet search,
 sent only after grep has failed twice on an unfamiliar codebase.
 
 ## What loads when

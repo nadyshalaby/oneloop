@@ -2,6 +2,17 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **10.0.1**: the reader runs on Sonnet, at the user's word ("replace haiku with sonet"):
+  `agents/er-reader.md` (`model: sonnet`), the law's Helpers line, 1.8, the README, the agents
+  test (which now refuses any other model) and the fresh-session recipe in
+  `/update-engineering-rules` all say Sonnet. And two loop lines tightened after the 10.0.0 dry
+  runs, where Sonnet sessions given "go" printed no scope line, and one, told the file, widened
+  to the caller in a second file and committed both without a stop (another, told "only" that
+  file, renamed it and left the caller broken as a follow-up): "go" is now pre-approval of the
+  printed scope line (print it and the note, then proceed without waiting), and the scope
+  ratchet waits for the yes even after "go" (a file the change needs is in the scope or the work
+  stops, whatever the message named); two new pins hold both. The core law 10,932 to 11,084
+  bytes at 85 lines; the code rules unchanged at 7,598.
 - **10.0.0**: one loop for everything, at the user's word ("Re-engineer my engineering-rules
   plugin into ONE mode for everything. No fast/careful, no tiers, no modes of any kind. Every
   task, from a typo to a new module, runs the same short loop"; the pick, "Yes, build it"). The

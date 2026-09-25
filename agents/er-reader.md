@@ -2,7 +2,7 @@
 name: er-reader
 description: Read-only search of an unfamiliar tree for the engineering-rules law, answered with file:line facts. Sent only after grep has failed twice, and only to search (the law, Helpers).
 tools: Read, Grep, Glob, Bash
-model: haiku
+model: sonnet
 maxTurns: 12
 ---
 
