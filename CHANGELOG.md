@@ -2,6 +2,25 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.5.0**: cleanup release 3a, the verify, review, debug, finish and catalog pages in the
+  workflow's words, with three rules aligned to the workflow the user runs (the user's picks:
+  "Match the live rules", "Test first, like the workflow", "One per task, like the workflow").
+  - **The finish page (13.2)** goes from 16,336 to 6,907 bytes: the cleanup sweep (Step D, its
+    thirteen classes and their check commands unchanged) and four landing rules the user kept
+    ("Typed 'discard' first", "Tests after a local merge", "Worktree goes last", "Leave
+    worktrees properly"). Its other steps repeated the workflow page's Verify & Deploy steps and
+    are gone; the release notes' field guide and voice move to 16.13 (5.3 re-pointed), and the
+    rule for a session that died mid-close moves into the workflow's resume check. The workflow
+    page grows from 15,043 to 15,215 bytes for that rule and the pointer to the landing rules.
+  - **Rules aligned, not words only (9.2, 9.3).** Tests are written first and seen failing before
+    their code (the workflow's Implement step 3); the break-a-line mutation stays as the proof for
+    a test over code already on disk. One commit per task, not one per stage, since the resume
+    check reopens a task whose commit is gone. A user can waive tests for one task in their own
+    words, the protection lost recorded, as the law and the workflow's Waivers already said.
+  - **Words only** in 10.1 (the work-doc's `status` stays `implement` while debugging, as its own
+    close already said), 11.3, 12.2, 12.5, 12.8, 12.9 and the four catalogs: phase numbers,
+    the Evidence Ledger, the Retrospective, the "wizard tool" and the update log become the
+    workflow's own names.
 - **9.4.0**: the workflow page, trimmed; the last of the four trims. Words only: all 64
   `tests/fixtures/workflow-power.txt` rows homed on the page, the coverage line, the route table's
   shape and the work-doc's sections stay, and the page, read on each use, goes from 15,466 to

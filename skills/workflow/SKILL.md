@@ -50,7 +50,9 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
 - **Resume.** An in-flight `docs/work/*.md` (not `done/`) matches this goal (two could: ask). It
   still holds when its `base` commit exists, every commit its Log names is an ancestor of `HEAD`,
   and `git status` shows nothing it does not explain. Plan is skipped (the doc is the plan) and
-  Implement resumes at `next`; a task whose commit is gone is reopened.
+  Implement resumes at `next`; a task whose commit is gone is reopened. A doc at the live path with
+  `status: done`, or one under `done/` with an open box, is a session that died mid-close: finish
+  the step it died in.
 - **Fully known.** The user's own message gives the goal, the done-when checks and the steps: Plan
   takes the work-doc from their words, with no exploration and no question but the logic gate, and
   the advisor still checks it unless every task is their words verbatim.
@@ -178,7 +180,7 @@ row disposed, every task committed.
    changes outside the plan's files; stale references to what you renamed or removed; leaked
    processes and ports; branches you made; focused or skipped tests (13.2). Anything that was
    already there is a follow-up.
-6. **Land:** commit with explicit paths; when there is a choice (merge, a pull request, keep the
+6. **Land** (13.2's rules): commit with explicit paths; when there is a choice (merge, a pull request, keep the
    branch), ask through `AskUserQuestion`. **Deploy** only when the task deploys: the six proofs
    (law 1.11) pasted before, the live check after.
 7. **Close:** print the self-audit below; any `no` reopens the phase that owns it. Print the
@@ -229,5 +231,5 @@ the fix of a Critical finding.
 
 A section number is the file under `references/` whose name starts with it: 2.2 placement, 3.1 to
 3.4 the catalogs (look up an id), 6.3 to 6.11 the question banks, 10.1 the root cause, 11.3 the ship
-gate, 12.2 to 12.8 the review, 13.2 the sweep in detail, 14.1 worked anti-patterns, 15.x the design
+gate, 12.2 to 12.8 the review, 13.2 the sweep and landing rules, 14.1 worked anti-patterns, 15.x the design
 law for UI-bearing work, 16.x the routes.
