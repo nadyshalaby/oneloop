@@ -2,6 +2,17 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.14.0**: the ship gate, the fourth token-cut release (the user's pick, "Trim + skip on
+  docs-only"). A diff of only tests, docs, comments, CI config or editor settings (11.3's own
+  skip row, word for word) now writes its three ship rows as skipped without opening 11.3;
+  anything else still reads it when the manifest has a build or start script or the task
+  deploys (the workflow's Verify & Deploy step 1). 11.3 drops from 9,780 to 8,160 bytes: the
+  explanations and the "Anti-rationalizations" table go, and the two rows of that table that
+  held rules found nowhere else move into the legs (an absent e2e suite means one throwaway
+  request with a real assertion, never a skipped leg; a build warning is checked against the
+  base, pre-existing to the sweep's class 10, new to the review). The skip rule now names both
+  reasons (what was searched, or the diff's scope), and "See also" goes. The old read trigger
+  joins the retired-wording list. The workflow page grows 15 bytes, to 13,322.
 - **9.13.0**: the file-placement page split, the third token-cut release (the user's pick,
   "Split it"). Before any file or folder is created, the code rules, the workflow's Implement
   step 1, the builder helper, 1.1 and 9.3 now send the model to the new 2.3 (1,993 bytes):

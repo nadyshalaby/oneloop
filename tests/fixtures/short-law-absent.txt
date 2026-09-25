@@ -11,3 +11,5 @@ dead code in a file this task touched
 # The read-before-a-new-file pointer 9.13.0 moved to 2.3, the short repo-first page ("Split it"):
 read 2.2 before creating any file or folder
 Read 2.2 only before creating
+# The ship-gate read trigger 9.14.0 replaced (a tests-, docs-, comments-, CI- or editor-only diff now skips the three rows without reading 11.3):
+carrying the reason it has no target; read 11.3 only when
