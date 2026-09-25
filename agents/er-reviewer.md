@@ -1,6 +1,6 @@
 ---
 name: er-reviewer
-description: The fresh-eyes review of the engineering-rules workflow. Reads one diff against the five checks and returns a coverage row per touched path and graded findings, each tagged introduced or present at base. Read-only.
+description: The engineering-rules workflow's read-only fresh-eyes review of one diff against the five checks, returning a coverage row per touched path and graded findings, each tagged introduced or present at base.
 tools: Read, Grep, Glob, Bash
 model: opus
 maxTurns: 10

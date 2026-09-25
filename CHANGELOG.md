@@ -2,6 +2,17 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.3.0**: the always-on law and the listed blurbs, trimmed; the second of the four trims.
+  Words only: all 72 of the law's pins, every rule clause and the 1.4 advisor line the cue leans
+  on stay, and the law, loaded with every request, goes from 9,597 to 9,343 bytes. What went:
+  how the law loads ("through the user-global CLAUDE.md, with nothing to call"), the pointer
+  "The procedures are 1.5's long form." (the header names the long forms' folder), and filler
+  in the precedence line, 1.2, 1.4's first bullet, 1.5, 1.8, 1.10 and 1.11; "questions through
+  the question tool" now names the tool, `AskUserQuestion`. The blurbs every session lists keep
+  every trigger condition (the workflow's everyday-word guard, explain's "before changing
+  anything for a new task", each helper's when) and lose their padding: the frontmatter of the
+  workflow, explain, update-engineering-rules and the three helpers goes from 2,302 to 1,949
+  bytes.
 - **9.2.0**: the per-prompt advisor cue, one line. The user ticked all four trims offered ("The
   per-message reminder", "Always-on rules and skill blurbs", "The workflow page's phases",
   "Repeats in your own CLAUDE.md"), each its own release, the most repeated first. The cue

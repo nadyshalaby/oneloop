@@ -1,6 +1,6 @@
 ---
 name: er-reader
-description: Read-only sweep for the engineering-rules workflow. Finds where things are and how they connect across an unfamiliar tree, and answers with file:line facts. Sent only by the workflow's plan phase for a wide search.
+description: Read-only sweep for the engineering-rules workflow: where things are and how they connect in an unfamiliar tree, answered with file:line facts. Sent only by the workflow's Plan for a wide search.
 tools: Read, Grep, Glob, Bash
 model: haiku
 maxTurns: 12

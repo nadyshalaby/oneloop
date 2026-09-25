@@ -1,6 +1,6 @@
 ---
 name: er-builder
-description: Builds one task of the engineering-rules workflow when two or more independent tasks run in parallel. Works only inside the files the brief allows, proves the task with its verify command, and never commits.
+description: Builds one task of the engineering-rules workflow when two or more independent tasks run in parallel, only in the files its brief allows, proven by its verify command, never committing.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 maxTurns: 30

@@ -1,9 +1,8 @@
 ---
 name: update-engineering-rules
 description: >-
-  Changes the user's engineering rules setup safely and ships it: the always-on law, the
-  workflow and route skills, the references, the hooks, the settings fragment or the installer,
-  in the engineering-rules repo at ~/.claude/engineering-rules. Use it whenever the user asks
+  Changes and ships the user's engineering rules (law, workflow and route skills, references,
+  hooks, settings fragment, installer) in the repo at ~/.claude/engineering-rules. Use it whenever the user asks
   to add, change, remove, loosen or tighten an engineering rule, law, phase, route, hook or
   check, or to update the engineering rules. Ends tested, installed, committed and pushed.
 ---

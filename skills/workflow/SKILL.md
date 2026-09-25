@@ -2,10 +2,8 @@
 name: engineering-rules:workflow
 argument-hint: "[what you want done]"
 description: >-
-  The engineering-rules workflow: three phases (plan, implement, verify and deploy), the phase
-  ledger, the slim work-doc, three capped helpers and the routes. The always-on engineering law
-  already binds every session through the user-global CLAUDE.md; this skill adds the phases. Use
-  it only when the user names the engineering-rules workflow in their words, or when a
+  The engineering-rules workflow: plan, implement, verify and deploy, with its ledger, work-doc,
+  helpers and routes. Use it only when the user names the engineering-rules workflow or a
   /engineering-rules: command loads it; an everyday word such as build, audit or triage alone
   never starts it.
 ---

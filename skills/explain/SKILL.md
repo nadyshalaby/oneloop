@@ -2,8 +2,8 @@
 name: engineering-rules:explain
 description: >-
   Explains logic short and plain: the problem, pseudocode, the effect, the risks. Use it before
-  changing anything for a new task (the law's logic-first gate: explain, then get a yes), and
-  whenever the user asks how existing code, a flow or a feature works.
+  changing anything for a new task (the logic-first gate) and whenever the user asks how code, a
+  flow or a feature works.
 ---
 
 # explain
