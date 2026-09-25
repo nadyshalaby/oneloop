@@ -8,3 +8,6 @@ dead code in a file this task touched
 # The line caps 5.0.0 removed, at the user's word ("i want to remove the lines cap rules"):
 40 lines per function
 500 lines per file
+# The read-before-a-new-file pointer 9.13.0 moved to 2.3, the short repo-first page ("Split it"):
+read 2.2 before creating any file or folder
+Read 2.2 only before creating
