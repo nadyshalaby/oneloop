@@ -6,7 +6,8 @@
 # every one of those files must carry those words. A row is kept or merged, never dropped: a
 # check the workflow stops running is a loosening, which needs the user's words and a changelog
 # line. The workflow page also stays inside its size cap, since every call of the workflow pays
-# for it. POWER points the test at another list, for a watched failure.
+# for it; the cap sits just above the page's size, so a cut stays cut. POWER points the test at
+# another list, for a watched failure.
 # Run: bash tests/workflow-power.test.sh
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -14,7 +15,7 @@
 ROOT=$(repo_root) || exit 1
 POWER="${POWER:-$ROOT/tests/fixtures/workflow-power.txt}"
 WORKFLOW="$ROOT/skills/workflow/SKILL.md"
-CHAR_CAP=16000
+CHAR_CAP=13500
 
 # rows: the list's rows, comments and blank lines left out.
 rows() { grep -vE '^(#|$)' "$POWER"; }

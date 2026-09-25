@@ -71,7 +71,8 @@ ledger, a tick carries its reflection, the doc first :: kept :: skills/workflow/
 ledger, a notification per boundary :: kept :: skills/workflow/SKILL.md :: one `PushNotification` line under 200 characters
 ledger, the check-in and the drift check :: kept :: skills/workflow/SKILL.md :: run the drift check
 loop-back, a red or a finding reopens Implement :: kept :: skills/workflow/SKILL.md :: reopens Implement; run forward again with fresh evidence
-waivers, never the caps, integrity, questions, git, gate, review, Critical fix :: kept :: skills/workflow/SKILL.md :: never the caps and bans, claim integrity, questions through `AskUserQuestion`, git safety, a blocking ship-gate leg, the review, or the fix of a Critical finding
+waivers, never the caps, integrity, questions, git, Critical fix :: merged :: law/engineering-law.md :: Never waivable: the caps and bans, claim integrity, questions through `AskUserQuestion`, git safety, fixing a critical finding against this change.
+waivers, never a blocking ship-gate leg or the review :: kept :: skills/workflow/SKILL.md :: a blocking ship-gate leg and the review are never waived
 what never leaves the session :: kept :: skills/workflow/SKILL.md :: This session keeps the ledger and every tick
 re-anchor after context loss :: kept :: skills/workflow/SKILL.md :: After context loss, re-read the law, the code rules, this skill and the in-flight work-doc
 # the logic-first gate (law 1.4) and the two lanes, added with them

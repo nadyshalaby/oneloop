@@ -6,7 +6,7 @@
 # matching its directory, user-only invocation, a body that loads the main skill, no argument
 # list); a standalone skill names itself, carries the description it triggers on, keeps model
 # invocation on and stays under the cap; and every section a route row cites is a file. The
-# default row is the main skill itself (it cites its own page), so the doorway shape skips it.
+# main skill has no row: the table lists the other routes.
 # Run: bash tests/commands.test.sh
 # SKILLS_DIR points the test at another skills directory, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
@@ -30,8 +30,7 @@ route_rows() { grep -E '^\| \*\*[^|]+\*\* \| [[:punct:]]/engineering-rules:[a-z]
 # table_routes <SKILL.md>: the command name of every route row, in table order.
 table_routes() { route_rows "$1" | sed -E 's/^\| \*\*[^|]+\*\* \| [[:punct:]]\/engineering-rules:([a-z][a-z-]*)[[:punct:]].*/\1/'; }
 
-# table_sections <SKILL.md>: the section id every route row cites, in table order; a row that
-# cites the page itself cites none.
+# table_sections <SKILL.md>: the section id every route row cites, in table order.
 table_sections() { route_rows "$1" | sed -n -E 's/.*\| ([0-9]+\.[0-9]+) \|$/\1/p'; }
 
 # skill_dirs <skills dir>: every skill directory beside the main one, sorted.
@@ -87,7 +86,6 @@ stray_dirs() { comm -23 <(skill_dirs "$1") <({ table_routes "$1/$MAIN_SKILL/SKIL
 # all_defects <skills dir>: the shape defects of every command that is present.
 all_defects() {
   for route in $(table_routes "$1/$MAIN_SKILL/SKILL.md"); do
-    [ "$route" = "$MAIN_SKILL" ] && continue
     [ -f "$1/$route/SKILL.md" ] && shape_defects "$route" "$1/$route/SKILL.md"
   done
   return 0

@@ -2,6 +2,21 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.11.0**: the workflow page cut from 15,413 to 13,307 bytes, the first of the token-cut
+  releases the user picked ("Yes, the whole run"): the page loads with every workflow run and
+  stays in context for all of it. Only text the always-on law, the code rules or the reviewer's
+  own page already carry goes, and every rule stays: the ways-in paragraph and the references
+  path; the restated precedence, recommended option, whole-file read, reuse search, explicit
+  paths, six proofs, helper re-run and present-at-base follow-ups; the reviewer's return format;
+  the self-audit's ten "yes / no" tails (one header now); the route table's row for the workflow
+  itself; and the section-number paragraph (the law says how a number finds its page, and the
+  reach test shows every page it listed is still cited). Parallel work moves into the Helpers
+  paragraph. Kept on purpose: the route table, which 15.19, 16.1, 16.2 and 16.3 route by when
+  the user's words match a route, and every step number, which 82 citations elsewhere use. The
+  waiver line points at the law's never-waivable list and keeps only its two workflow-only items
+  (a blocking ship-gate leg, the review); the power guard's row is split the same way, one row
+  on the law's words. The page's size cap drops from 16,000 to 13,500 bytes, so the cut stays
+  cut; the old page fails it.
 - **9.10.0**: cleanup release 4d, the last: the folders and files named for the old six-phase
   flow are renamed, and a guard keeps the old names out. `06-phase-1-clarify` is now
   `06-questions`, `09-phase-3-implement` `09-implement`, `10-phase-3b-debug` `10-debug`,
