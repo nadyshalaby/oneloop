@@ -104,7 +104,7 @@ you and your work on its own bug.
 | Command | What it does |
 |---|---|
 | `/engineering-rules:workflow <request>` | the default: plan, implement, verify and deploy, skipping a phase that is already done or fully known (a resumed work-doc, or a request that already gives the goal, the checks and the steps); bare, it asks what you want done |
-| `/engineering-rules:brainstorm`, `:audit`, `:triage`, `:design-spec`, `:release-notes` | brainstorming an idea until it is a task, a whole-codebase audit, review triage, the project's design spec, the release notes (update log) of the task in flight |
+| `/engineering-rules:brainstorm`, `:audit`, `:triage`, `:design-spec`, `:release-notes` | brainstorming an idea until it is a task, a whole-codebase audit, review triage, the project's design spec, the release notes of the task in flight |
 | `/engineering-rules:explain` | explains logic short and plain (the problem, pseudocode, the effect, the risks): before a new task, as the law's logic-first gate, or when you ask how code works |
 | `/update-engineering-rules` | changes these rules and ships the change |
 | `/status-report` | where things stand: Doing, Done (each item tagged Shipped, Pushed not verified or Local, checked against git and the live system) and Todo; it also shapes the ten-minute check-in brief |

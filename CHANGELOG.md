@@ -2,6 +2,18 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.9.0**: cleanup release 4c, the law's long forms (1.1, 1.3, 1.5, 1.6, 1.9, 1.10, 1.11), the
+  doctrine and working pages (2.1, 2.2, 5.4, 6.2, 6.6, 11.3, 12.7, 14.1), the README and the
+  workflow's route table in the workflow's words: phase numbers become Plan, Implement, Verify &
+  Deploy and the review; acceptance criteria become Done-when checks; the file allowlist becomes
+  the task's declared files; "the wizard tool" becomes `AskUserQuestion`; the drift check runs
+  after every task; the route table's "Sub-command" column is "Command". One rule aligned: 2.2
+  said to read it at the old Phase 1 as well as before creating a file, and now matches the
+  workflow's Implement step 1 (read it before a source or test file or a folder is created).
+  Kept on purpose: "the short law", "the always-on law" and "the logic-first gate" are live
+  names (the law, the workflow page and the explain skill use them); the hook tests' ledger
+  samples in the old "(n of 6, Phase m)" shape are data for a parser that takes any "(n of m,
+  name)", and a ledger line naming "Verify & Deploy" was read back correctly.
 - **9.8.0**: cleanup release 4b, the route pages (16.2 to 16.8) and the route skills in the
   workflow's words, and the audit aligned with the law on line caps. The whole-codebase audit
   (16.3) still extracted "function lines, params, nesting, file lines" with a default floor of

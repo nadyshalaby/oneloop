@@ -5,7 +5,7 @@
 # is a loosening, which needs the user's words and a CHANGELOG line, not a quiet edit.
 # the old law self-audit, nineteen rows
 audit 1, every phase ticked with its exit, skips reasoned :: kept :: skills/workflow/SKILL.md :: Phases ticked with their exit, skips reasoned
-audit 2, every question through the question tool :: kept :: skills/workflow/SKILL.md :: questions only through AskUserQuestion
+audit 2, every question through AskUserQuestion :: kept :: skills/workflow/SKILL.md :: questions only through AskUserQuestion
 audit 3, every scout run, every row disposed :: kept :: skills/workflow/SKILL.md :: The scout run after every task, every row disposed
 audit 4, an evidence row per task and per acceptance bullet :: kept :: skills/workflow/SKILL.md :: A fresh Evidence row per task and per Done-when check
 audit 5, the three ship-gate rows :: kept :: skills/workflow/SKILL.md :: ship-gate rows present
@@ -36,7 +36,7 @@ exit review, one review and one fix pass, re-verified :: kept :: skills/workflow
 exit land, the landing chosen by the user :: kept :: skills/workflow/SKILL.md :: when there is a choice (merge, a pull request, keep the branch), ask through `AskUserQuestion`
 exit sweep, one line per class, zero included :: kept :: skills/workflow/SKILL.md :: one line each with its count, zero included
 exit archive, status done then the move :: kept :: skills/workflow/SKILL.md :: Write `status: done`, then at once `git mv` the work-doc into `docs/work/done/`
-exit close, the self-audit and the update log :: kept :: skills/workflow/SKILL.md :: print the self-audit below; any `no` reopens the phase that owns it
+exit close, the self-audit and the release notes :: kept :: skills/workflow/SKILL.md :: print the self-audit below; any `no` reopens the phase that owns it
 # the cleanup sweep's thirteen classes (13.2)
 sweep 1, debug output :: kept :: skills/workflow/SKILL.md :: zero included: debug output
 sweep 2, commented-out code :: kept :: skills/workflow/SKILL.md :: commented-out code and `removed:` markers

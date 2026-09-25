@@ -222,7 +222,7 @@ the fix of a Critical finding.
 
 ## Routes and references
 
-| Route | Sub-command | Right when | Section |
+| Route | Command | Right when | Section |
 |---|---|---|---|
 | **Workflow** | `/engineering-rules:workflow` | The default: the three phases above. | this page |
 | **Brainstorm** | `/engineering-rules:brainstorm` | The idea is not a task yet. | 16.1 |
