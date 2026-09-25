@@ -8,8 +8,9 @@
 here=$(dirname "${BASH_SOURCE[0]}")
 SCRIPT="${ADVISOR_CUE_SH:-$here/../advisor-cue.sh}"
 # The cue is printed into every prompt of every session, so its size is part of its contract.
-# 900 from 4.2.0 (the logic-first gate added) until 9.2.0 cut it to one line.
-CUE_BYTE_CAP=320
+# 900 from 4.2.0 (the logic-first gate added) until 9.2.0 cut it to one line; 320 until 9.15.0
+# stressed the gate at the user's word ("keep it reminder but stress on it").
+CUE_BYTE_CAP=530
 
 # submit <prompt>: what the hook prints for a prompt submission.
 submit() {
@@ -19,8 +20,11 @@ submit() {
 test_every_prompt_carries_the_rule() {
   out=$(submit "fix the login bug")
   assert_contains "names itself and the rule it speaks for" "engineering-rules advisor cue (law 1.4):" "$out"
-  assert_contains "carries the logic-first gate" "logic first: explain a new task's logic (the explain skill) and get the user's yes before changing anything" "$out"
-  assert_contains "a complete-sounding ask is not a yes" 'a detailed or fixed ask, or "commit when done", is not a yes' "$out"
+  assert_contains "stresses the gate, in plain chat and the workflow alike" "LOGIC FIRST is a hard gate, in plain chat and the workflow alike" "$out"
+  assert_contains "scopes it to logic the user hasn't seen" "before building logic the user hasn't seen (a new task, approach or plan)" "$out"
+  assert_contains "carries the logic-first gate" "explain it (the explain skill) and get their yes through AskUserQuestion; no edit before it" "$out"
+  assert_contains "says why" "They must stay on top of all logic built." "$out"
+  assert_contains "a complete-sounding ask is not a yes" 'A detailed or fixed ask, or "commit when done", is not a yes' "$out"
   assert_contains "names the advisor's moments" "Advisor (when listed) before a plan, ranked options, anything hard to undo, or done." "$out"
   count=$((count + 1))
   bytes=$(printf '%s' "$out" | wc -c | tr -d ' ')

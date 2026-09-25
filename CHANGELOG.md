@@ -2,7 +2,7 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
-- **9.15.0**: the debug page split, the fifth token-cut release (the user's pick, "Split it").
+- **9.18.0**: the debug page split, the fifth token-cut release (the user's pick, "Split it").
   10.1 keeps the ways in, the trigger conditions and D1, the root-cause investigation (3,614
   bytes); the new 10.2 holds D2 to D4, the hypothesis chain, the circuit breaker, the advisor's
   two later moments, the forbidden patterns and the worked example (7,156). A bug fix's
@@ -11,6 +11,43 @@ One entry per version, newest first. The README says what the setup is now; this
   "read 10.1, then 10.2", and the citers of the moved parts point at 10.2 (5.7's advisor moments
   before a fix and before a halt, 6.10's hypothesis chain). A sentence-by-sentence check found a
   home for every one of the old page's 141 sentences.
+- **9.17.0**: the naming rules back in front of the model, and in more places than before, at the
+  user's pick (the always-loaded code rules over the short placement page). 9.13.0 had left 2.2's
+  symbol table and refused names in the full guide, read only where a repo lacks a kind of file
+  or in a workflow review. The code rules now carry them as one Names paragraph (834 bytes):
+  casing per kind of name, `is`/`has`/`can`/`should` booleans, verb-first functions, the
+  language's own private marker, a file's name agreeing with its primary export, and the refused
+  names, so they are there whenever code is written, new names in existing files included. They
+  apply where the language, its frameworks and the codebase set no convention: the table is
+  JavaScript-flavoured and the code rules load for every language (Python keeps its own style,
+  Express keeps `res`). 2.2 keeps the full table and its examples, with a note that the short
+  form wins where the two differ and a language's, framework's or codebase's own convention
+  comes before both. The code rules grow from 6,737 to 7,572 bytes (cap 7,500 to 7,600); nine
+  new code-rule pins, which fail against the rules before this change. Open sessions keep the
+  copy they loaded until they restart.
+- **9.16.0**: the workflow asks about helpers while planning, at the user's word ("the workflow
+  hasn't asked me whether i should use them or continue on the main chat"). With the agent tool
+  there, Plan step 2 asks, in the round of the which-reading question or on its own and before any
+  helper is sent: helpers where they fit, or all in this chat? It recommends helpers for a wide
+  unfamiliar tree, independent tasks or a likely careful lane, this chat otherwise. The pick goes
+  on the work-doc's Goal line (`Helpers: on | off`). Off runs the sweep, the building and the
+  review here, as a missing agent tool already did; on only allows them where they fit (a
+  fast-lane review still runs here, a one-task plan still gets no builders). A fully known task
+  is asked too; a resumed work-doc keeps its pick and asks only when it has none. The first
+  ledger print now reads `Helpers: available | unavailable` (the tool, not the pick), since it
+  comes before the question. No `:agents` switch comes back. The page grows from 13,395 to
+  13,756 bytes and its cap from 13,500 to 13,800, which also leaves room for the held debug
+  split's 22 bytes; the workflow guard gains four pins and updates two, all six failing against
+  the page before this change.
+- **9.15.0**: the logic-first gate stressed, at the user's word ("keep it reminder but stress on
+  it"): the per-prompt cue now calls it a hard gate in plain chat and the workflow alike, for
+  logic the user hasn't seen (a new task, approach or plan), says why (the user must stay on top
+  of all logic built), names AskUserQuestion for the yes, and says approved logic being carried
+  on, or a trivial edit, needs no new yes. It stays a reminder that never blocks: the user chose
+  that over an edit-blocking hook. The cue grows from 297 to 521 bytes a prompt (its cap from
+  320 to 530), and the law's gate line adds "in plain chat and the workflow alike" (9,343 to
+  9,381 bytes). A scan of this machine's sessions found no real-project session where a new
+  task arrived after the gate went in, so whether it fired there is still unchecked.
 - **9.14.0**: the ship gate, the fourth token-cut release (the user's pick, "Trim + skip on
   docs-only"). A diff of only tests, docs, comments, CI config or editor settings (11.3's own
   skip row, with CI config spelled out as pipeline files only: env, build and startup config

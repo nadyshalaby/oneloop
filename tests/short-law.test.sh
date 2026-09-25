@@ -26,7 +26,7 @@ ABSENT="${ABSENT:-$ROOT/tests/fixtures/short-law-absent.txt}"
 LINE_CAP=90
 CHAR_CAP=10000
 CODE_LINE_CAP=60
-CODE_CHAR_CAP=7500
+CODE_CHAR_CAP=7600
 
 # listed <file>: the lines of a list file, comments and blank lines left out.
 listed() {
