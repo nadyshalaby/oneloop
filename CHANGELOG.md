@@ -2,6 +2,15 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.15.0**: the debug page split, the fifth token-cut release (the user's pick, "Split it").
+  10.1 keeps the ways in, the trigger conditions and D1, the root-cause investigation (3,614
+  bytes); the new 10.2 holds D2 to D4, the hypothesis chain, the circuit breaker, the advisor's
+  two later moments, the forbidden patterns and the worked example (7,156). A bug fix's
+  investigation at Plan now reads 3,614 bytes instead of 11,161; a stuck task reads both
+  (10,770). 10.1 ends by sending debug mode on to 10.2, the workflow's stuck-twice line reads
+  "read 10.1, then 10.2", and the citers of the moved parts point at 10.2 (5.7's advisor moments
+  before a fix and before a halt, 6.10's hypothesis chain). A sentence-by-sentence check found a
+  home for every one of the old page's 141 sentences.
 - **9.14.0**: the ship gate, the fourth token-cut release (the user's pick, "Trim + skip on
   docs-only"). A diff of only tests, docs, comments, CI config or editor settings (11.3's own
   skip row, with CI config spelled out as pipeline files only: env, build and startup config

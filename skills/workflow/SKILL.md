@@ -137,9 +137,10 @@ For each task, in order:
 6. Sweep your own leftovers (debug lines, commented-out code, orphans, scratch files).
 7. Tick the task with its proof line, one Log line, commit, update `next`.
 
-**Stuck twice on one symptom:** stop editing. Write the hypotheses, test the cheapest first, confirm
-the root cause from evidence (10.1), then a regression test, then the fix. **Exit:** every Plan box
-ticked with a fresh proof line, the scout clean or every row disposed, every task committed.
+**Stuck twice on one symptom:** stop editing; read 10.1, then 10.2. Write the hypotheses, test
+the cheapest first, confirm the root cause from evidence (10.1), then a regression test, then the
+fix. **Exit:** every Plan box ticked with a fresh proof line, the scout clean or every row
+disposed, every task committed.
 
 ## 3 Verify & Deploy
 
