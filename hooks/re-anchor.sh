@@ -1,14 +1,11 @@
 #!/bin/bash
 # engineering-rules re-anchor.
-# Runs on SessionStart when a session resumes or its context was compacted. A summary of the
-# law is not the law (the workflow skill, the ledger): after context loss the always-on law is
-# read again from disk before anything else. This hook prints that instruction into the new
-# context with the path to read, names the code rules to read before writing code (they load
-# with a code read, and the loss may have taken them), adds the last phase-ledger position it
-# finds in the transcript, so the ledger re-opens on the right item, and names every in-flight
-# work-doc of the project with its status and next step, so the task resumes where it stopped.
-# Plain text on stdout is context for a SessionStart hook. Any other start reason, or input
-# that cannot be read, prints nothing and exits 0.
+# Runs on SessionStart when a session resumes or its context was compacted. A summary of the law
+# is not the law: after context loss the always-on law is read again from disk before anything
+# else. This hook prints that instruction into the new context with the path to read, and names
+# the code rules to read before writing code (they load with a code read, and the loss may have
+# taken them). Plain text on stdout is context for a SessionStart hook. Any other start reason, or
+# input that cannot be read, prints nothing and exits 0.
 set -u
 umask 077
 
@@ -18,35 +15,10 @@ here=${BASH_SOURCE[0]%/*}
 . "$here/hook-input.sh"
 # shellcheck source=./progress-log.sh
 . "$here/progress-log.sh"
-# shellcheck source=./ledger-position.sh
-. "$here/ledger-position.sh"
 
 ER_HOME="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}"
 LAW="$ER_HOME/law/engineering-law.md"
 RULES="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/rules/engineering-code.md"
-WORKFLOW="$ER_HOME/skills/workflow/SKILL.md"
-SCAN_BYTES=4000000
-
-# The last ledger heading Claude printed in the transcript's final bytes; empty when there is
-# none. Only Claude's reply text counts, never a heading quoted in a file or a tool result.
-last_position() {
-  [ -n "$transcript" ] && [ -f "$transcript" ] || return 0
-  tail -c "$SCAN_BYTES" "$transcript" 2>/dev/null | claude_text | read_ledger_position
-}
-
-# front <file> <key>: the frontmatter value of the key, empty when absent.
-front() { sed -n '2,/^---$/p' "$1" | sed -n -E "s/^$2: *//p" | head -n 1; }
-
-# in_flight <project dir>: one line per work-doc under docs/work/ (done/ left out) whose status
-# is not done.
-in_flight() {
-  [ -n "$1" ] && [ -d "$1/docs/work" ] || return 0
-  for doc in "$1"/docs/work/*.md; do
-    [ -f "$doc" ] && [ "$(front "$doc" status)" != "done" ] || continue
-    printf 'In-flight work-doc: %s (status: %s; next: %s). After the re-read, resume at its next step.\n' \
-      "$doc" "$(front "$doc" status)" "$(front "$doc" next)"
-  done
-}
 
 read_hook_input || exit 0
 [ "$(hook_field '.hook_event_name // empty')" = SessionStart ] || exit 0
@@ -56,16 +28,9 @@ case "$reason" in
   resume) happened="session resumed" ;;
   *) exit 0 ;;
 esac
-transcript=$(hook_field '.transcript_path // empty')
 cwd=$(hook_field '.cwd // empty')
-position=$(last_position)
-printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: if the always-on law is no longer verbatim in your context, read it from disk before the next step (the workflow skill, the ledger): %s\n' "$happened" "$LAW"
+printf 'engineering-rules re-anchor (%s). A summary of the law is not the law: if the always-on law is no longer verbatim in your context, read it from disk before the next step: %s\n' "$happened" "$LAW"
 printf 'The code rules are part of it: before writing code, read them from disk unless they are verbatim in your context: %s\n' "$RULES"
-if [ -n "$position" ]; then
-  printf 'Last phase-ledger position printed before the loss: %s. A phase-workflow task was in flight: re-read the workflow skill (%s), re-print the ledger with that item open and continue from it; nothing from before carries over as proof.\n' "$position" "$WORKFLOW"
-else
-  printf 'No phase-ledger position was found in the transcript. If a task was in flight, re-open its ledger from the last print you can see.\n'
-fi
-in_flight "$cwd"
-append_log "${cwd##*/}" "anchor | $reason | ${position:-no ledger position}"
+printf 'A task that was in flight resumes at the loop step it was in (scope, edit, check or commit); nothing from before the loss counts as proof.\n'
+append_log "${cwd##*/}" "anchor | $reason"
 exit 0

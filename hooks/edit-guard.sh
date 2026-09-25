@@ -1,14 +1,17 @@
 #!/bin/bash
-# engineering-rules edit guard.
+# engineering-rules code-rules hook (the edit guard).
 # Runs on PreToolUse for Edit, Write, MultiEdit and NotebookEdit. The bans in the law's 1.1
 # are zero tolerance in production code. This hook runs the law scout's own shell block (9.5)
-# over the text an edit would write, and refuses the edit when it ADDS a finding under a rule
-# a grep can judge: suppressions and coverage-ignore markers, empty catches, bare Error throws
-# in domain-role files, focused and unowned skipped tests, debug artifacts, ownerless debt
-# markers, removed-code comments and hardcoded secrets. What is already in the file never
-# blocks: the block runs over the text being replaced too, and only a count that grows
-# refuses. The judgment rows (non-null `!`, inline types) stay with the scout,
-# and 9.5 stays the one source of the patterns; this file holds none of them.
+# over the text an edit would write, and WARNS beside the tool result when the edit ADDS a
+# finding under a rule a grep can judge: suppressions and coverage-ignore markers, empty
+# catches, bare Error throws in domain-role files, focused and unowned skipped tests, debug
+# artifacts, ownerless debt markers, removed-code comments and hardcoded secrets. It never
+# blocks and never touches the edit's permission decision (10.0.0, at the user's word: hard
+# blocks caused silent edit-retry loops); the law asks for the warned line to be fixed in the
+# next edit. What is already in the file never warns: the block runs over the text being
+# replaced too, and only a count that grows warns. The judgment rows (non-null `!`, inline
+# types) stay with the audit's scanner, and 9.5 stays the one source of the patterns; this
+# file holds none of them.
 # Exempt, by the law's own definitions: prose, generated files and migrations; test files,
 # except for the suppression, test-hygiene and secret rows, which bind there too; and the
 # secret rows on a path git ignores. Unreadable input, a tool that is not an edit, or a 9.5
@@ -100,23 +103,24 @@ why() {
     clean.debug-artifact) printf 'zero debug artifacts; no debugger, and no console.* in domain code, which logs through the project logger' ;;
     clean.debt-marker) printf 'a TODO with no owner or ticket is refused on sight' ;;
     clean.removed-comment) printf 'a comment marking deleted code is refused on sight' ;;
-    sec.hardcoded-secret) printf 'zero hardcoded secrets; the matched value is redacted here and must not be written' ;;
+    sec.hardcoded-secret) printf 'zero hardcoded secrets; the matched value is redacted here and must not stay in the file' ;;
     *) printf 'zero tolerance for %s in production code' "$1" ;;
   esac
 }
 
-# emit <decision> <reason>: the PreToolUse decision, as the JSON Claude Code reads.
+# emit <context>: the warning as the JSON Claude Code reads: context beside the tool result and
+# no permission decision, so the edit's own permission flow is untouched.
 emit() {
-  jq -cn --arg d "$1" --arg r "$2" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:$d,permissionDecisionReason:$r}}'
+  jq -cn --arg c "$1" '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:$c}}'
 }
 
-# refuse <rule> <finding line>: the finding is `rule path:line:evidence`, the block's own shape.
-refuse() {
+# warn <rule> <finding line>: the finding is `rule path:line:evidence`, the block's own shape.
+warn() {
   detail=${2#"$1 $rel:"}
   line_no=${detail%%:*}
   evidence=$(printf '%s' "${detail#*:}" | cut -c1-"$EVIDENCE_CHARS")
-  append_log "$project" "guard | edit | deny | $1 | $path | line $line_no of the new text"
-  emit deny "engineering law (1.1): $(why "$1"), and this edit adds one. $1 at line $line_no of the new text: $evidence. Remove it before writing; the judgment is the law scout's (9.5), run over the edit."
+  append_log "$project" "guard | edit | warn | $1 | $path | line $line_no of the new text"
+  emit "engineering law (1.1) warning, not a block: this edit adds a $1 at line $line_no of the new text: $evidence. The rule: $(why "$1"). The law asks for that line to be fixed in the next edit; the pattern is the law scout's (9.5), run over the edit."
 }
 
 # first_growth: reads `new <finding>` and `old <finding>` lines; prints the first new finding
@@ -128,14 +132,14 @@ first_growth() {
     END { for (i = 1; i <= k; i++) if (n[order[i]] > o[order[i]]) { print first[order[i]]; exit } }'
 }
 
-# judge: refuse on the first rule whose count grows from the old text to the new.
+# judge: warn on the first rule whose count grows from the old text to the new.
 judge() {
   new_findings=$(scan new)
   [ -n "$new_findings" ] || return 0
   old_findings=$(scan old)
   grown=$({ printf '%s\n' "$new_findings" | sed 's/^/new /'; printf '%s\n' "$old_findings" | sed 's/^/old /'; } | first_growth)
   [ -n "$grown" ] || return 0
-  refuse "${grown%% *}" "$grown"
+  warn "${grown%% *}" "$grown"
 }
 
 read_hook_input || exit 0

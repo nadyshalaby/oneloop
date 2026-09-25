@@ -1,44 +1,37 @@
 #!/bin/bash
-# Guard: the route table in SKILL.md and the command skills beside it agree. Every route row
-# names a command whose skill directory exists; every skill directory beside the main one is
-# a route row or a listed standalone skill, so a removed route (quick, full, explore-feature,
-# skill) or the removed agents switch cannot linger; each command keeps its shape (a name
-# matching its directory, user-only invocation, a body that loads the main skill, no argument
-# list); a standalone skill names itself, carries the description it triggers on, keeps model
-# invocation on and stays under the cap; and every section a route row cites is a file. The
-# main skill has no row: the table lists the other routes.
+# Guard: the skills directory holds exactly the commands the law names and the three standalone
+# skills, and nothing else, so a removed skill (the workflow, quick, full, an agents switch)
+# cannot linger; each command keeps its shape (a name matching its directory under the
+# `engineering-rules:` prefix, user-only invocation, no argument list, under the cap); a
+# standalone skill names itself, carries the description it triggers on, keeps model invocation
+# on and stays under the cap; and the law names every one of them, since the law is where a
+# session learns what it can type. A plain request is the loop, which no skill carries.
 # Run: bash tests/commands.test.sh
-# SKILLS_DIR points the test at another skills directory, for a watched failure.
+# SKILLS_DIR and LAW_MD point the test at other copies, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 SKILLS="${SKILLS_DIR:-$ROOT/skills}"
-# The prefix every command carries, and the main skill's directory, which the routes load.
+LAW="${LAW_MD:-$ROOT/law/engineering-law.md}"
 PREFIX=engineering-rules
-MAIN_SKILL=workflow
-# Skills that ship beside the law and trigger on their own description, space-separated.
+# The commands the user types, each `/engineering-rules:<name>`, space-separated.
+COMMANDS="audit brainstorm design-spec release-notes triage"
+# Skills that ship beside the law and trigger on their own description, and those among them
+# that keep the name the user gave them instead of the prefix.
 STANDALONE="explain update-engineering-rules status-report"
 OWN_NAME="update-engineering-rules status-report"
-REFS="$ROOT/references"
 LINE_CAP=500
+TICK=$(printf '\140')
 
-# route_rows <SKILL.md>: the route table's rows, the ones whose second column is a command
-# in backticks ([[:punct:]] here, so the pattern carries no backtick of its own).
-route_rows() { grep -E '^\| \*\*[^|]+\*\* \| [[:punct:]]/engineering-rules:[a-z][a-z-]*[[:punct:]] \|' "$1"; }
+# skill_dirs <skills dir>: every skill directory, sorted.
+skill_dirs() { find "$1" -mindepth 1 -maxdepth 1 -type d | sed 's#.*/##' | sort; }
 
-# table_routes <SKILL.md>: the command name of every route row, in table order.
-table_routes() { route_rows "$1" | sed -E 's/^\| \*\*[^|]+\*\* \| [[:punct:]]\/engineering-rules:([a-z][a-z-]*)[[:punct:]].*/\1/'; }
-
-# table_sections <SKILL.md>: the section id every route row cites, in table order.
-table_sections() { route_rows "$1" | sed -n -E 's/.*\| ([0-9]+\.[0-9]+) \|$/\1/p'; }
-
-# skill_dirs <skills dir>: every skill directory beside the main one, sorted.
-skill_dirs() { find "$1" -mindepth 1 -maxdepth 1 -type d ! -name "$MAIN_SKILL" | sed 's#.*/##' | sort; }
+# listed: every command and standalone name, one per line, sorted.
+listed() { tr ' ' '\n' <<< "$COMMANDS $STANDALONE" | sort; }
 
 # command_name <dir>: the name a skill must carry, which install.sh also gives its link in
-# ~/.claude/skills: `engineering-rules:<dir>`, so every command keeps its `/engineering-rules:`
-# name, except the skills listed in OWN_NAME, which keep the names the user gave them.
+# ~/.claude/skills: `engineering-rules:<dir>`, except the skills in OWN_NAME.
 command_name() {
   case " $OWN_NAME " in *" $1 "*) printf '%s' "$1" ;; *) printf '%s:%s' "$PREFIX" "$1" ;; esac
 }
@@ -46,20 +39,25 @@ command_name() {
 # front_value <SKILL.md> <key>: the frontmatter value of the key, empty when absent.
 front_value() { sed -n '2,/^---$/p' "$1" | sed -n -E "s/^$2: *//p" | head -n 1; }
 
-# shape_defects <route> <SKILL.md>: one line per departure from a command's shape.
-shape_defects() {
-  [ "$(front_value "$2" name)" = "$(command_name "$1")" ] || printf '%s: name is not %s\n' "$1" "$(command_name "$1")"
-  [ "$(front_value "$2" disable-model-invocation)" = true ] || printf '%s: model invocation is not disabled\n' "$1"
-  grep -q -F "$PREFIX:$MAIN_SKILL" "$2" || printf '%s: does not load the main skill\n' "$1"
-  [ -z "$(front_value "$2" arguments)" ] || printf '%s: takes an argument list\n' "$1"
+# over_cap <name> <SKILL.md>: one line when the skill is over the line cap.
+over_cap() {
   lines=$(wc -l < "$2" | tr -d ' ')
   [ "$lines" -le "$LINE_CAP" ] || printf '%s: %s lines\n' "$1" "$lines"
 }
 
+# command_defects <skills dir>: one line per departure from a command's shape.
+command_defects() {
+  for name in $(tr ' ' '\n' <<< "$COMMANDS"); do
+    file="$1/$name/SKILL.md"
+    [ -f "$file" ] || { printf '%s: no skill directory\n' "$name"; continue; }
+    [ "$(front_value "$file" name)" = "$(command_name "$name")" ] || printf '%s: name is not %s\n' "$name" "$(command_name "$name")"
+    [ "$(front_value "$file" disable-model-invocation)" = true ] || printf '%s: model invocation is not disabled\n' "$name"
+    [ -z "$(front_value "$file" arguments)" ] || printf '%s: takes an argument list\n' "$name"
+    over_cap "$name" "$file"
+  done
+}
 
-# standalone_defects <skills dir>: every listed standalone skill's departures from its shape: it
-# exists, names itself, carries the description it triggers on, keeps model invocation on and
-# stays under the cap.
+# standalone_defects <skills dir>: one line per departure from a standalone skill's shape.
 standalone_defects() {
   for name in $(tr ' ' '\n' <<< "$STANDALONE"); do
     file="$1/$name/SKILL.md"
@@ -67,90 +65,66 @@ standalone_defects() {
     [ "$(front_value "$file" name)" = "$(command_name "$name")" ] || printf '%s: name is not %s\n' "$name" "$(command_name "$name")"
     [ -n "$(front_value "$file" description)" ] || printf '%s: no description\n' "$name"
     [ "$(front_value "$file" disable-model-invocation)" != true ] || printf '%s: model invocation is disabled\n' "$name"
-    lines=$(wc -l < "$file" | tr -d ' ')
-    [ "$lines" -le "$LINE_CAP" ] || printf '%s: %s lines\n' "$name" "$lines"
+    over_cap "$name" "$file"
   done
 }
 
-# missing_dirs <skills dir>: every table route with no skill directory.
-missing_dirs() {
-  for route in $(table_routes "$1/$MAIN_SKILL/SKILL.md"); do
-    [ -f "$1/$route/SKILL.md" ] || printf '%s\n' "$route"
-  done
+# stray_dirs <skills dir>: every skill directory that is neither a command nor a standalone.
+stray_dirs() { comm -23 <(skill_dirs "$1") <(listed); }
+
+# unnamed_in_law <law>: every command or standalone skill the law does not name (a command as
+# `:<name>` in backticks, a standalone by its full name).
+unnamed_in_law() {
+  for name in $(tr ' ' '\n' <<< "$COMMANDS"); do grep -qF -- ":$name\`" "$1" || printf '%s\n' "$name"; done
+  for name in $(tr ' ' '\n' <<< "$STANDALONE"); do grep -qF -- "$(command_name "$name")" "$1" || printf '%s\n' "$name"; done
 }
 
-# stray_dirs <skills dir>: every skill directory that is neither a table route nor a listed
-# standalone skill.
-stray_dirs() { comm -23 <(skill_dirs "$1") <({ table_routes "$1/$MAIN_SKILL/SKILL.md"; tr ' ' '\n' <<< "$STANDALONE"; } | sort); }
-
-# all_defects <skills dir>: the shape defects of every command that is present.
-all_defects() {
-  for route in $(table_routes "$1/$MAIN_SKILL/SKILL.md"); do
-    [ -f "$1/$route/SKILL.md" ] && shape_defects "$route" "$1/$route/SKILL.md"
-  done
-  return 0
+test_every_skill_directory_is_listed() {
+  assert_eq "every skill directory is a command or a standalone skill" "" "$(stray_dirs "$SKILLS")"
 }
 
-# missing_sections <SKILL.md>: every cited section with no reference file.
-missing_sections() {
-  for section in $(table_sections "$1"); do
-    ls "$REFS"/*/"$section"-*.md >/dev/null 2>&1 || printf '%s\n' "$section"
-  done
+test_every_command_has_the_shape() {
+  assert_eq "every command keeps its shape ($COMMANDS)" "" "$(command_defects "$SKILLS")"
 }
-
-test_every_route_has_a_sub_command() {
-  routes=$(table_routes "$SKILLS/$MAIN_SKILL/SKILL.md" | grep -c .)
-  missing=$(missing_dirs "$SKILLS")
-  assert_contains "every route row has a skill directory ($routes routes)" "<none>" "${missing:-<none>}"
-}
-
-test_every_skill_dir_is_a_route() {
-  stray=$(stray_dirs "$SKILLS")
-  assert_contains "every skill directory is a route row or a listed standalone skill" "<none>" "${stray:-<none>}"
-}
-
-test_every_sub_command_has_the_shape() {
-  defects=$(all_defects "$SKILLS")
-  assert_contains "every command keeps its shape" "<none>" "${defects:-<none>}"
-}
-
-test_every_cited_section_exists() {
-  missing=$(missing_sections "$SKILLS/$MAIN_SKILL/SKILL.md")
-  assert_contains "every section a route row cites is a file" "<none>" "${missing:-<none>}"
-}
-
 
 test_every_standalone_has_the_shape() {
-  defects=$(standalone_defects "$SKILLS")
-  assert_contains "every standalone skill has its shape ($STANDALONE)" "<none>" "${defects:-<none>}"
+  assert_eq "every standalone skill has its shape ($STANDALONE)" "" "$(standalone_defects "$SKILLS")"
 }
 
-# The checks have to be able to fail: a route with no directory, a directory with no route (a
-# leftover quick and a leftover agents switch among them), a command that takes an argument
-# list, a standalone skill that switches model invocation off and a cited section with no file
-# are all named.
+test_the_law_names_every_one() {
+  assert_eq "the law names every command and standalone skill" "" "$(unnamed_in_law "$LAW")"
+}
+
+# The checks have to be able to fail: a leftover workflow, quick or agents directory, a command
+# that takes an argument list or is open to the model, a missing command, a standalone skill
+# without its name or with model invocation off, one over the cap, and a law that names only
+# some of them are all named.
 test_planted_breaches_are_named() {
-  plant=${STANDALONE%% *}
-  mkdir -p "$WORK/skills/$MAIN_SKILL" "$WORK/skills/ghost" "$WORK/skills/quick" "$WORK/skills/agents" "$WORK/skills/brainstorm" "$WORK/skills/$plant"
-  cp "$SKILLS/$MAIN_SKILL/SKILL.md" "$WORK/skills/$MAIN_SKILL/SKILL.md"
-  printf -- '---\nname: %s:brainstorm\narguments: [mode]\ndisable-model-invocation: true\n---\nLoads %s:%s.\n' "$PREFIX" "$PREFIX" "$MAIN_SKILL" > "$WORK/skills/brainstorm/SKILL.md"
-  assert_contains "a route with no directory is named" "audit" "$(missing_dirs "$WORK/skills")"
-  assert_contains "a directory with no route is named" "ghost" "$(stray_dirs "$WORK/skills")"
-  assert_contains "and so is a leftover quick" "quick" "$(stray_dirs "$WORK/skills")"
-  assert_contains "and so is a leftover agents switch" "agents" "$(stray_dirs "$WORK/skills")"
-  printf -- '---\nname: %s\ndescription: "a planted standalone"\ndisable-model-invocation: true\n---\n' "$plant" > "$WORK/skills/$plant/SKILL.md"
-  assert_missing "and a listed standalone skill is not" "$plant" "$(stray_dirs "$WORK/skills")"
-  assert_contains "a standalone skill that switches model invocation off is named" "$plant: model invocation is disabled" "$(standalone_defects "$WORK/skills")"
-  assert_contains "a command that takes an argument list is named" "brainstorm: takes an argument list" "$(all_defects "$WORK/skills")"
-  tick=$(printf '\140')
-  printf '| **Ghost** | %s/engineering-rules:ghost%s | Nothing. | 99.9 |\n' "$tick" "$tick" > "$WORK/table.md"
-  assert_contains "a cited section with no file is named" "99.9" "$(missing_sections "$WORK/table.md")"
+  mkdir -p "$WORK/skills/workflow" "$WORK/skills/quick" "$WORK/skills/agents" "$WORK/skills/brainstorm" "$WORK/skills/audit" "$WORK/skills/explain" "$WORK/skills/status-report"
+  printf -- '---\nname: %s:brainstorm\narguments: [mode]\ndisable-model-invocation: true\n---\nbody\n' "$PREFIX" > "$WORK/skills/brainstorm/SKILL.md"
+  printf -- '---\nname: %s:audit\n---\nbody\n' "$PREFIX" > "$WORK/skills/audit/SKILL.md"
+  printf -- '---\nname: explain\ndescription: "a planted standalone"\ndisable-model-invocation: true\n---\n' > "$WORK/skills/explain/SKILL.md"
+  { printf -- '---\nname: status-report\ndescription: d\n---\n'; awk 'BEGIN { for (i = 0; i < 501; i++) print "filler" }'; } > "$WORK/skills/status-report/SKILL.md"
+  stray=$(stray_dirs "$WORK/skills")
+  assert_contains "a leftover workflow directory is named" "workflow" "$stray"
+  assert_contains "and a leftover quick" "quick" "$stray"
+  assert_contains "and a leftover agents switch" "agents" "$stray"
+  assert_missing "a listed command is not" "brainstorm" "$stray"
+  defects=$(command_defects "$WORK/skills")
+  assert_contains "a command that takes an argument list is named" "brainstorm: takes an argument list" "$defects"
+  assert_contains "a command open to the model is named" "audit: model invocation is not disabled" "$defects"
+  assert_contains "a missing command is named" "triage: no skill directory" "$defects"
+  defects=$(standalone_defects "$WORK/skills")
+  assert_contains "a standalone skill without its name is named" "explain: name is not $PREFIX:explain" "$defects"
+  assert_contains "a standalone skill with model invocation off is named" "explain: model invocation is disabled" "$defects"
+  assert_contains "a skill over the cap is named" "status-report: 505 lines" "$defects"
+  printf '%s\n' "Typed commands: ${TICK}/$PREFIX:brainstorm${TICK}, ${TICK}:audit${TICK}; ${TICK}/status-report${TICK}." > "$WORK/law.md"
+  assert_eq "the commands a law does not name are named" "design-spec release-notes triage explain update-engineering-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
 }
 
-test_every_route_has_a_sub_command
-test_every_skill_dir_is_a_route
-test_every_sub_command_has_the_shape
-test_every_cited_section_exists
+test_every_skill_directory_is_listed
+test_every_command_has_the_shape
 test_every_standalone_has_the_shape
+test_the_law_names_every_one
 test_planted_breaches_are_named
 report

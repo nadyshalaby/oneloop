@@ -2,6 +2,58 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **10.0.0**: one loop for everything, at the user's word ("Re-engineer my engineering-rules
+  plugin into ONE mode for everything. No fast/careful, no tiers, no modes of any kind. Every
+  task, from a typo to a new module, runs the same short loop"; the pick, "Yes, build it"). The
+  always-on law now carries the loop. Scope: the project's `CLAUDE.md` first, no discovery when
+  the message names the files, else the symbol, its file, its direct callers and imports within
+  a budget of 10 tool calls, then one `scope:` line, a note of at most 3 lines and the yes
+  through `AskUserQuestion`, with the word "go" as pre-approval. Edit: one grep for something to
+  reuse, the smallest diff, an existing test file extended in the same edit, the scope ratchet
+  (a file outside the scope line, more than double the files, a risk-zone file: stop, restate,
+  wait) and the stuck-twice stop. Check: lint on the changed files, typecheck, the test command,
+  `ui_check` under a UI path, then one read of the diff and no reviewer. Commit: files staged by
+  name, one commit, and a final reply of the files, the check results and the side finds. Deploy
+  is a command (1.11: the checks, the deploy, the live check). The guards: the risk zones (the
+  first edit to a path matching the risk regex needs the user's yes, even after "go") and the
+  code-rules hook, which warns and never blocks ("Hard blocks caused silent edit-retry loops").
+  The map rule: `CLAUDE.md` holds the four check commands, the key directories, the 5 to 10
+  entry files and the conventions under 60 lines; over that is a side find. Helpers: none, but
+  `er-reader`, read-only, after grep has failed twice ("No Builder, no Reviewer"). Plan mode is
+  the user's own to enter, and there Scope is the plan. New files: `settings/loop.json` (the
+  four checks, `discovery_budget`, `risk_regex`, `ui_path_regex`); `hooks/risk-zone.sh`, which
+  turns the first edit to a risk-zone file into a permission prompt (the pick, "Hook turns the
+  first edit into a permission prompt") and records the edit on `PostToolUse`, so a rejected
+  edit asks again and the next edit passes; `hooks/loop-reminder.sh`, exactly one line per
+  prompt, `one loop · wait for yes unless "go" · proof required · risk zones need my yes` (81
+  bytes, where the advisor cue was 521); this repository's own `CLAUDE.md` as a map; and tests
+  for the two hooks, the config, the map, the one helper and the commands, with the edit guard,
+  re-anchor, notify, status-line, hooks-wiring, install, short-law, explain, old-words and
+  references tests rewritten to match. The re-anchor prints three lines (the law, the code
+  rules, resume at the loop step you were in); every turn end notifies; the status line drops
+  the ledger position; `PostToolUse` is the ninth wired event. Removed, at the user's words
+  (section 8 of the request, "DELETE"), each a protection the loop no longer carries: the fast
+  and careful lanes and `scripts/lane.sh`; the Plan, Implement and Verify & Deploy checklist,
+  the phase ledger and the plan note (the work-doc); the six deploy proofs (a boot against a
+  production-like copy, switches that default off, a named rollback and the rest; a deploy now
+  runs the checks, deploys and verifies live); the review pass and the `er-reviewer` and
+  `er-builder` helpers; the ship gate (11.3) and cross-package verification (11.4); the cleanup
+  sweep (13.2, `scripts/sweep.sh`); the perf scout (9.4), the design scout (15.29) and the
+  design pre-flight (15.30) with `scripts/scout.sh` (the pick, "Delete them"); the debug pages
+  (10.1, 10.2; stuck twice is now stop, root cause, ask); the question banks (06-questions);
+  the advisor (5.7 and the advisor cue hook); the logic-first gate, so `explain` explains and
+  gates nothing (the pick, "Drop its gate role"); the trivial-ask carve-out; "done when"
+  authoring, the test-first ritual and task-branch creation; automatic release notes (16.13
+  prints only when asked); the per-step `→ verify:` line of the code rules (a change is proven
+  by a check you ran); and the edit guard's hard block, now a warning. The per-category test
+  table of 9.2 survives as the domains-only table in 3.3. 31 reference pages go (103 to 72),
+  and the 2.x, 3.x, 5.x, 14.1, 15.x and 16.x pages that cited the removed machinery now cite the
+  loop's steps, `ui_check`, the read of the diff, the scope ratchet and side finds. Sizes: the
+  core law 69 lines and 9,381 bytes to 85 and 10,932, and its character cap 10,000 to 11,200,
+  because the loop and the guards now live in the always-on law where the workflow page's
+  13,784 bytes per task and the cue's 521 bytes per prompt used to be; the code rules 7,572 to
+  7,598 bytes at 50 lines. The `/engineering-rules:workflow` command is gone: a plain request
+  is the loop.
 - **9.19.0**: the cleanup sweep's eight mechanical classes as one proven script, the last task of
   the token-cut series (the user's pick, "Yes, build it"). `scripts/sweep.sh` runs classes 1, 2,
   3, 6, 7, 8, 12 and 13 of 13.2's Step D (debug output, `removed:` markers, ownerless debt

@@ -1,18 +1,12 @@
 #!/bin/bash
 # engineering-rules status line, two rows. The first says where you are: directory, git
-# branch and dirty state, model, and the last phase-ledger position Claude printed this
-# session. The second holds the meters: the context in use, session uptime, the claude.ai
-# plan usage and how often the conversation was compacted; it is left out while all are empty.
+# branch and dirty state, and the model. The second holds the meters: the context in use,
+# session uptime, the claude.ai plan usage and how often the conversation was compacted; it is
+# left out while all are empty.
 # Receives Claude Code's status-line JSON on stdin; install.sh points settings.json's
 # statusLine here.
-# It is re-rendered continuously, so the ledger and compaction scans each keep a cursor per
-# transcript and read only the bytes added since the last render. Runs on the bash macOS
-# ships (3.2).
-
-here=${BASH_SOURCE[0]%/*}
-[ "$here" = "${BASH_SOURCE[0]}" ] && here=.
-# shellcheck source=./ledger-position.sh
-. "$here/ledger-position.sh"
+# It is re-rendered continuously, so the compaction scan keeps a cursor per transcript and
+# reads only the bytes added since the last render. Runs on the bash macOS ships (3.2).
 
 ESC=$'\033'
 reset="${ESC}[0m"
@@ -24,7 +18,6 @@ red="${ESC}[0;31m"
 yellow="${ESC}[0;33m"
 bold_magenta="${ESC}[1;35m"
 dim="${ESC}[2m"
-bold="${ESC}[1m"
 gray="${ESC}[0;90m"
 CACHE_DIR="${TMPDIR:-/tmp}"
 # Claude Code writes one transcript line carrying COMPACT_MARKER per compaction. A copy quoted
@@ -122,28 +115,6 @@ ends_on_a_line() {
   [ -z "$(read_bytes $(( $1 - 1 )) 1)" ]
 }
 
-# The last ledger heading Claude printed in a reply, never one quoted in a file or a tool
-# result. The cursor file holds "<bytes scanned> <position>"; each render reads only the whole
-# lines added since and waits while the last line is still being written, so the cursor always
-# sits on a line boundary. A transcript that shrank was replaced, so the cursor resets.
-render_phase_segment() {
-  [ -n "$transcript_path" ] && [ -f "$transcript_path" ] || return 0
-  cache=$(transcript_cache statusline)
-  size=$(wc -c < "$transcript_path" | tr -d ' ')
-  offset=0
-  position=""
-  [ -f "$cache" ] && IFS=' ' read -r offset position < "$cache"
-  case "$offset" in ''|*[!0-9]*) offset=0 ;; esac
-  [ "$size" -lt "$offset" ] && { offset=0; position=""; }
-  if [ "$size" -gt "$offset" ] && ends_on_a_line "$size"; then
-    found=$(read_bytes "$offset" $(( size - offset )) | claude_text | read_ledger_position)
-    [ -n "$found" ] && position="$found"
-    printf '%s %s\n' "$size" "$position" > "$cache" 2>/dev/null
-  fi
-  [ -n "$position" ] && printf '  %s│%s %s%s%s' "$gray" "$reset" "$bold" "$position" "$reset"
-  return 0
-}
-
 # The claude.ai plan's rolling five-hour window and its weekly one. Claude Code sends them for
 # Pro and Max once the first response is in, and may send either window without the other.
 render_usage_segment() {
@@ -193,8 +164,8 @@ input=$(cat)
 } <<< "$(read_status_fields "$input")"
 [ -n "$cwd" ] || cwd=$(pwd)
 project_name=${cwd##*/}
-printf '%s➜%s %s%s%s%s%s%s\n' "$bold_green" "$reset" "$bold_cyan" "$project_name" "$reset" \
-  "$(render_git_segment)" "$(render_model_segment)" "$(render_phase_segment)"
+printf '%s➜%s %s%s%s%s%s\n' "$bold_green" "$reset" "$bold_cyan" "$project_name" "$reset" \
+  "$(render_git_segment)" "$(render_model_segment)"
 # Every meter opens with "  │ "; the row drops the one in front of its first meter.
 meters="$(render_context_segment)$(render_session_segment)$(render_usage_segment)$(render_compact_segment)"
 if [ -n "$meters" ]; then printf '%s\n' "${meters#"  $gray"*"$reset "}"; fi

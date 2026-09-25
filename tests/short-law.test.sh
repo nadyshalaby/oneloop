@@ -4,14 +4,14 @@
 # loads into every session and every helper, and the code rules, which install.sh copies into
 # the user's rules folder so Claude Code loads them the first time a code file is read. Both
 # are compacted; a compaction that drops a banned token, a cap, a guardrail, a git rule, a
-# banned phrase or a deploy proof fails here instead of silently loosening the law. The pins
+# banned phrase or a step of the loop fails here instead of silently loosening the law. The pins
 # are data, one per line, in fixtures/short-law-pins.txt (the core) and
 # fixtures/code-rules-pins.txt (the code rules), because a code file listing banned tokens
-# reads as using them. The wording the no-chase rule (1.9) retired, in
-# fixtures/short-law-absent.txt, must stay out of both law files and the workflow skill, so a
-# later edit cannot bring a chase back.
-# LAW_MD, PINS, CODE_MD, CODE_PINS, WORKFLOW_MD and ABSENT point the test at other copies,
-# which is how it proves it can fail.
+# reads as using them. The wording the law retired (the no-chase rule of 1.9, and 10.0.0's
+# modes, phases, helpers and gates), in fixtures/short-law-absent.txt, must stay out of both
+# law files, so a later edit cannot bring one back.
+# LAW_MD, PINS, CODE_MD, CODE_PINS and ABSENT point the test at other copies, which is how it
+# proves it can fail.
 # Run: bash tests/short-law.test.sh
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -21,10 +21,9 @@ LAW="${LAW_MD:-$ROOT/law/engineering-law.md}"
 PINS="${PINS:-$ROOT/tests/fixtures/short-law-pins.txt}"
 CODE="${CODE_MD:-$ROOT/law/engineering-code.md}"
 CODE_PINS="${CODE_PINS:-$ROOT/tests/fixtures/code-rules-pins.txt}"
-WORKFLOW="${WORKFLOW_MD:-$ROOT/skills/workflow/SKILL.md}"
 ABSENT="${ABSENT:-$ROOT/tests/fixtures/short-law-absent.txt}"
 LINE_CAP=90
-CHAR_CAP=10000
+CHAR_CAP=11200
 CODE_LINE_CAP=60
 CODE_CHAR_CAP=7600
 
@@ -104,7 +103,6 @@ test_no_retired_wording() {
   assert_eq "the retired list is not empty" yes "$(more_than "$(listed "$ABSENT" | grep -c .)" 3)"
   assert_eq "the core law carries none of the retired wording" "" "$(retired_present "$LAW")"
   assert_eq "nor do the code rules" "" "$(retired_present "$CODE")"
-  assert_eq "nor does the workflow skill" "" "$(retired_present "$WORKFLOW")"
 }
 
 test_no_stray_imports() {
@@ -132,13 +130,13 @@ test_the_checks_can_fail() {
   planted="$WORK/planted.md"
   {
     grep -vF 'Batch bulk writes' "$CODE"
-    grep -vF 'booted against a production-like copy' "$LAW"
+    grep -vF 'Never read the project' "$LAW"
     printf 'see @docs/notes.md for more\n'
     printf 'Dead code goes in its own cleanup commit.\n'
     awk 'BEGIN { for (i = 0; i < 250; i++) print "filler" }'
   } > "$planted"
   assert_contains "a dropped code pin is named" "Batch bulk writes" "$(missing_pins "$CODE_PINS" "$planted")"
-  assert_contains "a dropped core pin is named" "booted against a production-like copy" "$(missing_pins "$PINS" "$planted")"
+  assert_contains "a dropped core pin is named" "Never read the project" "$(missing_pins "$PINS" "$planted")"
   assert_contains "a stray import is named" "@docs/notes.md" "$(stray_imports "$planted")"
   assert_contains "retired wording is named" "own cleanup commit" "$(retired_present "$planted")"
   assert_eq "an over-long copy breaks the line cap" no "$(at_most "$(wc -l < "$planted")" "$CODE_LINE_CAP")"

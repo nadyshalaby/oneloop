@@ -1,5 +1,5 @@
-# Wording the no-chase rule (1.9) retired. None of it may come back into the short law or the
-# workflow skill: each line sent Claude after something it found on the way instead of the goal.
+# Wording the law retired. None of it may come back into the short law or the code rules.
+# The no-chase rule (1.9): each line sent Claude after something it found on the way instead of the goal.
 own cleanup commit
 Dead code already in a file you touched is removed
 fix every member
@@ -13,3 +13,29 @@ read 2.2 before creating any file or folder
 Read 2.2 only before creating
 # The ship-gate read trigger 9.14.0 replaced (a tests-, docs-, comments-, CI- or editor-only diff now skips the three rows without reading 11.3):
 carrying the reason it has no target; read 11.3 only when
+# 10.0.0, one loop for everything ("No fast/careful, no tiers, no modes of any kind"): the modes,
+# the phases, the plan note, the advisor, the helpers question, the logic gate and the six proofs.
+fast lane
+careful lane
+lane: fast
+lane: careful
+Lane:
+Phase ledger
+Verify & Deploy
+work-doc
+plan note
+`advisor`
+the advisor
+Logic first, a hard gate
+the `explain` skill
+er-builder
+er-reviewer
+the six proofs
+booted against a production-like copy
+switches that default off
+rolled back cleanly
+the rollback named
+Trivial ask
+→ verify:
+The edit guard hook refuses
+its refusal is this rule speaking

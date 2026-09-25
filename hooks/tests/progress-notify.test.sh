@@ -1,7 +1,9 @@
 #!/bin/bash
 # Fixture tests for progress-notify.sh. Run: bash hooks/tests/progress-notify.test.sh
 # osascript is shimmed on PATH so nothing pops and nothing runs; the shim records its argv so
-# the test can prove the title and the body travel as arguments and never as AppleScript.
+# the test can prove the title and the body travel as arguments and never as AppleScript. Every
+# turn end notifies (10.0.0: in the loop each one is a wait for the user, the scope line, a
+# question or the final reply), with the reply's first prose line as the body.
 # PROGRESS_NOTIFY_SH points the test at another copy of the script, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=../../tests/harness.sh
@@ -19,6 +21,9 @@ export PATH="$WORK/bin:$PATH" CLAUDE_CONFIG_DIR="$WORK/config" OSASCRIPT_ARGV="$
 LOG="$WORK/config/progress.log"
 ARGV="$OSASCRIPT_ARGV"
 SOURCE_LINE='display notification (item 1 of argv) with title (item 2 of argv)'
+# One notification is one osascript call of eight arguments: -e, on run argv, -e, the source
+# line, -e, end run, the body, the title.
+ARGV_PER_CALL=8
 
 run_hook() {
   printf '%s' "$1" | bash "$SCRIPT"
@@ -32,17 +37,22 @@ count_log_lines() {
   if [ -f "$LOG" ]; then wc -l < "$LOG" | tr -d ' '; else printf '0'; fi
 }
 
-test_stop_with_ledger() {
-  run_hook '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"## 0. Phase ledger  (4 of 6, Phase 5)\n- [x] 1  Phase 1. Clarify\n- [>] 4  Phase 5. Review\n\nStage five landed, both scouts clean."}'
-  assert_eq "stop with a ledger logs the position and the first prose line" " proj | stop | (4 of 6, Phase 5) | Stage five landed, both scouts clean." "$(read_log_line 1)"
-  assert_eq "stop with a ledger notifies through argv, body then title" "$(printf '%s\n' "$SOURCE_LINE" '(4 of 6, Phase 5) — Stage five landed, both scouts clean.' 'Claude · proj')" "$(sed -n '4p;7p;8p' "$ARGV")"
+count_argv_lines() {
+  if [ -f "$ARGV" ]; then wc -l < "$ARGV" | tr -d ' '; else printf '0'; fi
 }
 
-test_stop_without_ledger() {
-  before=$(wc -l < "$ARGV" | tr -d ' ')
-  run_hook '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"Just a plain reply with no ledger in it."}'
-  assert_eq "stop without a ledger logs the first line only" " proj | stop | Just a plain reply with no ledger in it." "$(read_log_line 2)"
-  assert_eq "stop without a ledger sends no notification" "$before" "$(wc -l < "$ARGV" | tr -d ' ')"
+test_stop_notifies_with_the_first_prose_line() {
+  run_hook '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"## Done\n\n- [x] lint\n\nTwo files changed; lint, typecheck and 87 tests pass."}'
+  assert_eq "stop logs the first prose line, headings and checklist rows skipped" " proj | stop | Two files changed; lint, typecheck and 87 tests pass." "$(read_log_line 1)"
+  assert_eq "stop notifies through argv, body then title" "$(printf '%s\n' "$SOURCE_LINE" 'Two files changed; lint, typecheck and 87 tests pass.' 'Claude · proj')" "$(sed -n '4p;7p;8p' "$ARGV")"
+}
+
+test_every_turn_end_notifies() {
+  before=$(count_argv_lines)
+  run_hook '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"scope: src/a.ts, src/b.ts"}'
+  assert_eq "a scope line is logged" " proj | stop | scope: src/a.ts, src/b.ts" "$(read_log_line 2)"
+  assert_eq "and notified: every turn end is a wait for the user" "$((before + ARGV_PER_CALL))" "$(count_argv_lines)"
+  assert_eq "with the line as the body" "scope: src/a.ts, src/b.ts" "$(tail -n 2 "$ARGV" | head -n 1)"
 }
 
 test_notification_event() {
@@ -58,8 +68,8 @@ test_quoted_directory_name() {
 }
 
 test_quoted_reply() {
-  run_hook '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"## 0. Phase ledger  (1 of 6, Phase 1)\n\nSaid \"done\" and \\ moved on."}'
-  assert_eq "a quote and a backslash in the reply reach the body intact" '(1 of 6, Phase 1) — Said "done" and \ moved on.' "$(tail -n 2 "$ARGV" | head -n 1)"
+  run_hook '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"Said \"done\" and \\ moved on."}'
+  assert_eq "a quote and a backslash in the reply reach the body intact" 'Said "done" and \ moved on.' "$(tail -n 2 "$ARGV" | head -n 1)"
 }
 
 test_bad_input() {
@@ -80,7 +90,9 @@ test_jq_missing() {
 
 test_notifier_failure() {
   printf '%s' '{"hook_event_name":"Notification","cwd":"/tmp/proj","notification_type":"idle_prompt","message":"waiting"}' | OSASCRIPT_FAIL=1 bash "$SCRIPT"
-  assert_eq "a failing notifier is recorded on the log line" " proj | waiting | idle_prompt | waiting | notify-failed" "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
+  assert_eq "a failing notifier is recorded on the waiting line" " proj | waiting | idle_prompt | waiting | notify-failed" "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
+  printf '%s' '{"hook_event_name":"Stop","cwd":"/tmp/proj","last_assistant_message":"final reply"}' | OSASCRIPT_FAIL=1 bash "$SCRIPT"
+  assert_eq "and on the stop line" " proj | stop | final reply | notify-failed" "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
 }
 
 test_stop_failure() {
@@ -90,16 +102,16 @@ test_stop_failure() {
 }
 
 test_subagent_lines() {
-  run_hook '{"hook_event_name":"SubagentStart","cwd":"/tmp/proj","agent_type":"general-purpose","task_description":"Review base..HEAD with the five checks"}'
-  assert_eq "a helper send logs its shape and brief" " proj | helper | start | general-purpose | Review base..HEAD with the five checks" "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
-  before=$(wc -l < "$ARGV" | tr -d ' ')
-  run_hook '{"hook_event_name":"SubagentStop","cwd":"/tmp/proj","agent_type":"general-purpose","last_assistant_message":"## Report\n\nTwo Important findings, both in hooks/x.sh."}'
-  assert_eq "a helper return logs its first prose line" " proj | helper | stop | general-purpose | Two Important findings, both in hooks/x.sh." "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
-  assert_eq "helper lines raise no desktop notification" "$before" "$(wc -l < "$ARGV" | tr -d ' ')"
+  run_hook '{"hook_event_name":"SubagentStart","cwd":"/tmp/proj","agent_type":"er-reader","task_description":"Search the tree for every caller of loadUser"}'
+  assert_eq "a helper send logs its shape and brief" " proj | helper | start | er-reader | Search the tree for every caller of loadUser" "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
+  before=$(count_argv_lines)
+  run_hook '{"hook_event_name":"SubagentStop","cwd":"/tmp/proj","agent_type":"er-reader","last_assistant_message":"## Report\n\nTwo callers, both in src/users/."}'
+  assert_eq "a helper return logs its first prose line" " proj | helper | stop | er-reader | Two callers, both in src/users/." "$(tail -n 1 "$LOG" | cut -d '|' -f 2-)"
+  assert_eq "helper lines raise no desktop notification" "$before" "$(count_argv_lines)"
 }
 
-test_stop_with_ledger
-test_stop_without_ledger
+test_stop_notifies_with_the_first_prose_line
+test_every_turn_end_notifies
 test_notification_event
 test_quoted_directory_name
 test_quoted_reply

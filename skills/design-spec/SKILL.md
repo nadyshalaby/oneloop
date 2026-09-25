@@ -12,14 +12,11 @@ outright: author, extract or refresh the project's design spec.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-1. **Load the workflow**, unless the `engineering-rules:workflow` skill is already
-   loaded in this conversation: invoke the Skill tool with `engineering-rules:workflow`.
-   (The always-on law is already in context through CLAUDE.md; its code rules load with
-   the first code file read.)
-2. **Read the request**: the mode 15.19 names (author, extract or refresh) and a direction
+1. **Read the request**: the mode 15.19 names (author, extract or refresh) and a direction
    from the library (15.4) when the user named one. It is the whole invocation. Empty means
    15.19 detects the mode from the repository; nothing is asked before it has looked.
-3. **Read 15.19 from disk and run it**, with 15.1 to 15.6 as it names them, as a
-   `/engineering-rules:workflow` task: writing or changing the spec is substantive.
+2. **Read 15.19 from disk and run it**, with 15.1 to 15.6 as it names them, as a task of the
+   loop (the always-on law): writing or changing the spec is an edit, so it gets the scope
+   line, the note and the yes before anything is written.
 
 A command picks the route; it waives no check, and the law binds throughout.

@@ -77,8 +77,11 @@ Think before coding
 Simplicity first
 Surgical changes
 Goal-driven execution
-→ verify:
+never loosened to pass
 never hunks of this diff
+# the hook warns, never blocks
+The code-rules hook warns
+never blocks
 # names (the short form of the placement guide's symbol table and refused names)
 where the language, its frameworks and the codebase set no convention
 `PascalCase` types, classes, interfaces (no `I` prefix), enums and UI components

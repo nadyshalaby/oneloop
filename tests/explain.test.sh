@@ -1,21 +1,20 @@
 #!/bin/bash
 # Guard: the explain skill keeps the shape the user chose for every explanation: the problem,
-# what I'd build, the effect and the risks, asked through AskUserQuestion with nothing built
-# before a yes, never about tests, reviews or specs, and read-only until the yes (nothing run to
-# try an idea). Run: bash tests/explain.test.sh
+# what I'd build, the effect and the risks, then it stops (the build runs the loop, whose yes is
+# still needed before any edit; the skill is no gate of its own since 10.0.0), never about
+# tests, reviews or specs, and read-only (nothing run to try an idea). Run: bash tests/explain.test.sh
 # EXPLAIN_MD points the test at another copy of the skill, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
 SKILL="${EXPLAIN_MD:-$ROOT/skills/explain/SKILL.md}"
-TICK=$(printf '\140')
 PINS="**The problem.**
 **What I'd build.** Pseudocode of the core logic
 **Effect.**
 **Risks.**
-ask through ${TICK}AskUserQuestion${TICK} whether this is the right logic
-Build nothing before a yes.
+Then stop. The build, when the user wants it, runs the loop
+the loop's yes is still needed before any edit
 Never about tests, reviews, specs or process
 Nothing is run to try an idea"
 

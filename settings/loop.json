@@ -1,0 +1,9 @@
+{
+  "lint": "",
+  "typecheck": "",
+  "test": "",
+  "ui_check": "",
+  "discovery_budget": 10,
+  "risk_regex": "auth|login|session|permission|rbac|payment|billing|invoice|migration|schema\\.prisma|migrations/|\\.env|infra/|terraform|Dockerfile|\\.github/workflows|deploy|secret|purge",
+  "ui_path_regex": "src/components|src/app|src/pages|app/|components/"
+}

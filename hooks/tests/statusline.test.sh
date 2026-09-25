@@ -1,6 +1,8 @@
 #!/bin/bash
 # Fixture tests for statusline.sh. Run: bash hooks/tests/statusline.test.sh
-# STATUSLINE_SH points the test at another copy of the script, for a watched failure.
+# Two rows: where you are (folder, branch, model) and the meters (context, uptime, plan usage,
+# compactions). No position is read from the transcript (10.0.0: the phase ledger went with the
+# one loop). STATUSLINE_SH points the test at another copy of the script, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=../../tests/harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/../../tests/harness.sh"
@@ -45,8 +47,7 @@ compact_boundary() {
 
 test_bare_render() {
   line=$(render "{\"cwd\":\"$WORK\"}")
-  assert_contains "renders the directory with nothing else available" "➜ $PROJECT" "$line"
-  assert_missing "no transcript means no ledger segment" "Phase" "$line"
+  assert_eq "renders the directory alone with nothing else available" "➜ $PROJECT" "$(row 1 "$line")"
   assert_missing "no rate_limits means no usage segment" "5h:" "$line"
   assert_missing "no transcript means no compaction segment" "compacted" "$line"
   assert_eq "nothing to measure means no second row, not even a blank one" "1" "$(count_rows "{\"cwd\":\"$WORK\"}")"
@@ -66,41 +67,14 @@ test_context_meter() {
   assert_missing "a context percentage that is not a number is left out" "ctx:" "$line"
 }
 
-test_ledger_position() {
+# The transcript gives the uptime and nothing else: a heading Claude printed in a reply is
+# never shown as a position.
+test_uptime_and_no_position() {
   { printf '%s\n' '{"timestamp":"2026-09-05T00:00:00.000Z"}'; reply_line $'## 0. Phase ledger  (2 of 6, Phase 3)\n- [>] 2'; } > "$T"
   line=$(render "$(build_status_json 10)")
-  assert_contains "first heading is found" "(2 of 6, Phase 3)" "$line"
   assert_contains "uptime is shown" "up " "$line"
-  reply_line $'## 0. Phase ledger  (4 of 6, Phase 5)\n- [>] 4' >> "$T"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "a heading appended after the first render is picked up" "(4 of 6, Phase 5)" "$line"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "an unchanged transcript keeps the position" "(4 of 6, Phase 5)" "$line"
-  reply_line 'nothing new' >> "$T"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "new bytes without a heading keep the position" "(4 of 6, Phase 5)" "$line"
-}
-
-# A heading quoted in a file or a tool result is never shown, and a reply still being written
-# waits for its line to end instead of being cut or lost.
-test_ledger_position_reads_replies_only() {
-  quoted_line '## 0. Phase ledger  (6 of 6, Phase 6)' >> "$T"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "a quoted heading keeps the position" "(4 of 6, Phase 5)" "$line"
-  assert_missing "and is not shown" "(6 of 6, Phase 6)" "$line"
-  printf '%s' "$(reply_line '## 0. Phase ledger  (5 of 6, Phase 6)')" >> "$T"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "a reply still being written waits" "(4 of 6, Phase 5)" "$line"
-  printf '\n' >> "$T"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "and is shown once its line is whole" "(5 of 6, Phase 6)" "$line"
-}
-
-test_replaced_transcript() {
-  { printf '%s\n' '{"timestamp":"2026-09-05T01:00:00.000Z"}'; reply_line '## 0. Phase ledger  (1 of 6, Phase 1)'; } > "$T"
-  line=$(render "$(build_status_json 10)")
-  assert_contains "a transcript that shrank resets the cursor" "(1 of 6, Phase 1)" "$line"
-  assert_missing "and forgets the old position" "(4 of 6, Phase 5)" "$line"
+  assert_missing "no position is read from the transcript" "(2 of 6" "$line"
+  assert_eq "the top row holds the folder and the model only" "➜ $PROJECT  │ Fable 5.1" "$(row 1 "$line")"
 }
 
 test_malformed_input() {
@@ -165,16 +139,14 @@ test_two_rows() {
   json="{\"cwd\":\"$WORK\",\"transcript_path\":\"$full\",\"model\":{\"display_name\":\"Fable 5.1\"},\"context_window\":{\"used_percentage\":42},\"rate_limits\":{\"five_hour\":{\"used_percentage\":23.4}}}"
   line=$(render "$json")
   assert_eq "exactly two rows" "2" "$(count_rows "$json")"
-  assert_eq "the top row holds the folder, the model and the phase" "➜ $PROJECT  │ Fable 5.1  │ (5 of 6, Phase 6)" "$(row 1 "$line")"
+  assert_eq "the top row holds the folder and the model" "➜ $PROJECT  │ Fable 5.1" "$(row 1 "$line")"
   assert_contains "the meters row opens with the context, then the uptime" "ctx:42%  │ up " "$(row 2 "$line")"
   assert_contains "and ends with the usage and the compactions" "  │ 5h:23%  │ compacted 1x (1 auto)" "$(row 2 "$line")"
 }
 
 test_bare_render
 test_context_meter
-test_ledger_position
-test_ledger_position_reads_replies_only
-test_replaced_transcript
+test_uptime_and_no_position
 test_malformed_input
 test_usage_windows
 test_compaction_count

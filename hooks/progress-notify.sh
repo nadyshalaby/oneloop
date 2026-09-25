@@ -3,8 +3,9 @@
 # Runs on Stop (Claude finished a turn), on Notification (Claude is waiting on you), on
 # StopFailure (the turn died on an API error) and on SubagentStart and SubagentStop (a helper
 # was sent, or came back). Appends one line per event to the progress log, and raises a
-# desktop notification when the turn ended on a phase-ledger re-print, when Claude is blocked
-# on input, and when a turn died on an error.
+# desktop notification when a turn ends (in the loop every turn end is a wait for you: the
+# scope line, a question, or the final reply), when Claude is blocked on input, and when a turn
+# died on an error.
 # Every exit is 0: a notifier must never fail the hook that called it. A notifier that could
 # not deliver says so on its own log line instead of failing silently.
 set -u
@@ -16,8 +17,6 @@ here=${BASH_SOURCE[0]%/*}
 . "$here/hook-input.sh"
 # shellcheck source=./progress-log.sh
 . "$here/progress-log.sh"
-# shellcheck source=./ledger-position.sh
-. "$here/ledger-position.sh"
 
 BODY_CHARS=200
 
@@ -34,22 +33,16 @@ notify_desktop() {
   fi
 }
 
-# First line of prose in the message: skips blank lines, headings, ledger rows and fences.
+# First line of prose in the message: skips blank lines, headings, checklist rows and fences.
 read_first_prose_line() {
   printf '%s\n' "$1" | grep -v -E '^[[:space:]]*($|#|-[[:space:]]*\[|```)' | head -n 1 | cut -c1-"$BODY_CHARS"
 }
 
 on_stop() {
-  message=$(hook_field '.last_assistant_message // empty')
-  position=$(printf '%s\n' "$message" | read_ledger_position)
-  summary=$(read_first_prose_line "$message")
-  if [ -z "$position" ]; then
-    append_log "$project" "stop | $summary"
-    return
-  fi
+  summary=$(read_first_prose_line "$(hook_field '.last_assistant_message // empty')")
   outcome=""
-  notify_desktop "Claude · $project" "$position — $summary" || outcome=" | notify-failed"
-  append_log "$project" "stop | $position | $summary$outcome"
+  notify_desktop "Claude · $project" "$summary" || outcome=" | notify-failed"
+  append_log "$project" "stop | $summary$outcome"
 }
 
 on_notification() {

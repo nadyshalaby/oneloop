@@ -1,9 +1,9 @@
 ---
 name: engineering-rules:explain
 description: >-
-  Explains logic short and plain: the problem, pseudocode, the effect, the risks. Use it before
-  changing anything for a new task (the logic-first gate) and whenever the user asks how code, a
-  flow or a feature works.
+  Explains logic short and plain: the problem, pseudocode, the effect, the risks. Use it whenever
+  the user asks how code, a flow or a feature works, or asks you to explain a change before it is
+  built.
 ---
 
 # explain
@@ -14,10 +14,10 @@ pseudocode, never a report.
 ## Read first, run nothing, change nothing
 
 Read just enough to get the logic right: files, searches and `git` history. Nothing is run to try
-an idea (no scratch code, no experiments, no test runs); that waits until after the user's yes.
-Nothing is edited or created before it.
+an idea (no scratch code, no experiments, no test runs), and nothing is edited or created: an
+explanation is not the loop's Scope step, and the loop's yes is still needed before any edit.
 
-## Before a new task: the gate
+## Explaining a change before it is built
 
 Write, in this order and short:
 
@@ -28,9 +28,8 @@ Write, in this order and short:
 - **Effect.** What changes for the user and in the code, in a line or two.
 - **Risks.** What could go wrong for the user or in the code, or is given up, one line each.
 
-Then ask through `AskUserQuestion` whether this is the right logic, "Yes, build it
-(Recommended)" first. Build nothing before a yes. An answer that changes the logic gets a new
-explanation and a new ask, and so does a logic that has to change mid-task.
+Then stop. The build, when the user wants it, runs the loop (the always-on law): the scope
+line, the note and the yes come from its Scope step, not from here.
 
 ## Explaining existing code
 

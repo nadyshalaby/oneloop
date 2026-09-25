@@ -6,8 +6,25 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/risk-zone.sh\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
             "command": "bash \"$HOME/.claude/engineering-rules/hooks/edit-guard.sh\"",
             "timeout": 20
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/risk-zone.sh\"",
+            "timeout": 10
           }
         ]
       }
@@ -17,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/engineering-rules/hooks/advisor-cue.sh\"",
+            "command": "bash \"$HOME/.claude/engineering-rules/hooks/loop-reminder.sh\"",
             "timeout": 10
           }
         ]

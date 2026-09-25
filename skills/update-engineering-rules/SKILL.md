@@ -1,10 +1,11 @@
 ---
 name: update-engineering-rules
 description: >-
-  Changes and ships the user's engineering rules (law, workflow and route skills, references,
-  hooks, settings fragment, installer) in the repo at ~/.claude/engineering-rules. Use it whenever the user asks
-  to add, change, remove, loosen or tighten an engineering rule, law, phase, route, hook or
-  check, or to update the engineering rules. Ends tested, installed, committed and pushed.
+  Changes and ships the user's engineering rules (law, command skills, references, hooks, the
+  loop config, settings fragment, installer) in the repo at ~/.claude/engineering-rules. Use it
+  whenever the user asks to add, change, remove, loosen or tighten an engineering rule, law,
+  step of the loop, guard, command, hook or check, or to update the engineering rules. Ends
+  tested, installed, committed and pushed.
 ---
 
 # Updating the engineering rules
@@ -18,21 +19,22 @@ release it in one step, the same way the law's 1.11 ships anything else.
 
 | The rule | Its file | Who pays for it |
 |---|---|---|
-| Binds every task in every session | `law/engineering-law.md`, the core the `CLAUDE.md` block imports | every session and every helper, on every turn; capped at 90 lines and 10,000 characters |
-| Binds every line of code written | `law/engineering-code.md`, which `install.sh` copies (never links: a linked rules file does not load) into `~/.claude/rules/`, where its `paths:` globs load it the first time a code file is read | every session and helper that reads code, from that read on; capped at 60 lines and 7,500 characters |
+| Binds every task in every session | `law/engineering-law.md`, the core the `CLAUDE.md` block imports | every session and every helper, on every turn; capped at 90 lines and 11,200 characters |
+| Binds every line of code written | `law/engineering-code.md`, which `install.sh` copies (never links: a linked rules file does not load) into `~/.claude/rules/`, where its `paths:` globs load it the first time a code file is read | every session and helper that reads code, from that read on; capped at 60 lines and 7,600 characters |
 | The reasons and procedures behind an always-on rule | `references/01-always-on-law/1.x-*.md`, the long forms | only when read |
-| Binds only while the phase workflow runs | `skills/workflow/SKILL.md` | only when the workflow is called |
-| A command the user types | `skills/<route>/SKILL.md` | its description in every session's skill list; the body when called |
-| A helper the workflow sends | `agents/<name>.md`, linked into `~/.claude/agents/` | its description in every session's agent list; the body when sent |
-| Detail one phase or route reads | `references/<nn>-*/<n.n>-*.md` | only when read |
+| The loop's defaults: the four checks, the discovery budget, the two regexes | `settings/loop.json`, read by the hooks and named by the law | nothing per turn |
+| A command the user types | `skills/<command>/SKILL.md` | its description in every session's skill list; the body when called |
+| The one helper, the read-only reader | `agents/er-reader.md`, linked into `~/.claude/agents/` | its description in every session's agent list; the body when sent |
+| Detail one step or command reads | `references/<nn>-*/<n.n>-*.md` | only when read |
 | Enforced by a machine at the tool boundary | `hooks/<name>.sh`, wired in `settings/hooks.json` | a process on every matching event |
 | How the rules reach Claude Code | `settings/claude-md-block.md`, `settings/hooks.json`, `install.sh` | nothing per turn |
 
 Put a rule on the cheapest layer that still binds when it must: the core only for what every
 task needs, the code rules for what only writing code needs (the core keeps a one-line summary
-of the caps and bans), the workflow skill for what only the phases need, a reference for the
+of the caps and bans), a command's skill for what only that command needs, a reference for the
 detail. A new code language or file type goes into the code rules' `paths:` globs.
-A hook is for what a machine can judge without a model; a judgment call stays in the text.
+A hook is for what a machine can judge without a model; a judgment call stays in the text. A
+hook warns or asks, never blocks (the law, Guards).
 
 ## The ethics, none of them waivable
 
@@ -53,12 +55,12 @@ A hook is for what a machine can judge without a model; a judgment call stays in
 - **Do not chase (1.9).** A problem found while making the change is written down as a
   follow-up and reported, not fixed inside this change unless it blocks it.
 - **A hook must never be the outage.** A hook that cannot judge exits 0 with one log line; it
-  refuses only what the law refuses, and only what the edit adds, never what was already there.
+  warns only about what the law bans, and only about what the edit adds, never what was
+  already there; the risk-zone hook asks, it never denies.
 - **Evidence, safety and questions as the law says.** Every claim in the report has output run
   this session behind it (1.5); git safety holds throughout (1.7); a fork only the user can
   decide (which layer, whether a loosening is wanted, a name) goes through `AskUserQuestion`
-  with the most effective option first (1.4), and the advisor is consulted before the change is
-  settled and before it is called done.
+  with the most effective option first (1.4).
 
 ## The steps
 
@@ -76,12 +78,14 @@ A hook is for what a machine can judge without a model; a judgment call stays in
    form beside the short law included, and keep both law files under their caps.
 5. **Change the tests with it.** New always-on wording gets pins; wording that must never come
    back goes into `tests/fixtures/short-law-absent.txt`; a hook change gets a test beside it
-   (`hooks/tests/`); a new command is listed in `tests/commands.test.sh` (a route through the workflow's route table, a standalone skill in `STANDALONE`). Watch each new
-   check fail on the old text: point the test's override (`LAW_MD`, `CODE_MD`, `WORKFLOW_MD`,
-   `ADVISOR_CUE_SH` and the like) at `git -C "$ER" show main:<path>` saved to a scratch file.
+   (`hooks/tests/`); a new command is listed in `tests/commands.test.sh` (a typed command in
+   `COMMANDS`, a standalone skill in `STANDALONE`); a new loop default is checked in
+   `tests/loop-config.test.sh`. Watch each new check fail on the old text: point the test's
+   override (`LAW_MD`, `CODE_MD`, `LOOP_JSON`, `RISK_ZONE_SH`, `LOOP_REMINDER_SH` and the like)
+   at `git -C "$ER" show main:<path>` saved to a scratch file.
 6. **Run everything, on the exact commit you will ship.** Every `*.test.sh` in the worktree
    (`find . -name '*.test.sh' -not -path './.git/*'`, each run, each result line pasted), and
-   `shellcheck -x -P SCRIPTDIR -S style install.sh scripts/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh`.
+   `shellcheck -x -P SCRIPTDIR -S style install.sh hooks/*.sh hooks/tests/*.sh tests/*.sh`.
    Every file green, no finding; a red one sends you back to step 4.
 7. **Write it into the history.** A new top entry in `CHANGELOG.md` with the next version:
    major when a rule or a command is removed, renamed or loosened; minor for a new rule, check,
@@ -89,12 +93,12 @@ A hook is for what a machine can judge without a model; a judgment call stays in
    what protection a loosening removes, and both law files' sizes before and after.
 8. **Commit in the worktree**, explicit paths only, a message that says what and why, no
    attribution trailer (1.7).
-9. **Prove the release before making it.** The law's six proofs (1.11), read for a harness:
-   the suite green on this commit (step 6); a new refusal in a hook ships behind an environment
-   switch that defaults off when it could block real work, and is turned on only after it ran
-   clean; rule text has no switch, so its rollback is the revert below; there are no migrations;
-   nothing else is in flight (step 1); and the rollback is named: the `main` commit before this
-   one, undone with `git -C "$ER" revert --no-edit <this commit>` and a re-run of the installer.
+9. **Prove the release before making it.** The law's deploy command (1.11), read for a harness:
+   the suite green on this commit (step 6); a new hook warns or asks and never blocks, and is
+   watched on one real event before it is called done; rule text has no switch, so its rollback
+   is the revert below; there are no migrations; nothing else is in flight (step 1); and the
+   rollback is named: the `main` commit before this one, undone with
+   `git -C "$ER" revert --no-edit <this commit>` and a re-run of the installer.
 10. **Release it.** `git -C "$ER" merge --ff-only rules/<slug>` in the live checkout, then
     `bash "$ER/install.sh"`, which re-links renamed skills, re-merges changed hooks and
     re-copies the code rules (a copy, so a change to `law/engineering-code.md` binds nobody

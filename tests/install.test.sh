@@ -141,18 +141,18 @@ test_compact_json_comes_back_as_the_same_json() {
 
 test_what_is_not_ours_is_refused_with_nothing_changed() {
   home=$(fresh_home conflict); seed "$home"; cfg="$home/.claude"
-  mkdir -p "$cfg/skills/engineering-rules:workflow"
+  mkdir -p "$cfg/skills/engineering-rules:brainstorm"
   before="$(cksum < "$cfg/settings.json")$(cksum < "$cfg/CLAUDE.md")"
   out=$(run_install "$home")
   assert_contains "a skill folder that is not ours is refused" "exit=1" "$out"
-  assert_contains "and named" "skills/engineering-rules:workflow" "$out"
+  assert_contains "and named" "skills/engineering-rules:brainstorm" "$out"
   assert_eq "settings.json and CLAUDE.md are untouched" "$before" "$(cksum < "$cfg/settings.json")$(cksum < "$cfg/CLAUDE.md")"
   assert_eq "nothing is linked and no record written" "no no" "$(exists "$cfg/engineering-rules") $(exists "$cfg/backups/engineering-rules/state.json")"
-  rmdir "$cfg/skills/engineering-rules:workflow"
-  mkdir -p "$cfg/agents"; rm -f "$cfg/agents/er-reviewer.md"; printf 'mine\n' > "$cfg/agents/er-reviewer.md"
+  rmdir "$cfg/skills/engineering-rules:brainstorm"
+  mkdir -p "$cfg/agents"; rm -f "$cfg/agents/er-reader.md"; printf 'mine\n' > "$cfg/agents/er-reader.md"
   out=$(run_install "$home")
   assert_contains "an agent file that is not ours is refused" "exit=1" "$out"
-  assert_contains "and named" "agents/er-reviewer.md" "$out"
+  assert_contains "and named" "agents/er-reader.md" "$out"
   rm -r "$cfg/agents"
   printf '<!-- engineering-rules:begin (half)\nno end marker\n' >> "$cfg/CLAUDE.md"
   assert_contains "a block missing its end marker is refused" "missing or doubled marker" "$(run_install "$home")"
@@ -195,10 +195,10 @@ test_stale_links_go_and_check_names_a_missing_one() {
   mkdir -p "$cfg/skills"; ln -s "$cfg/engineering-rules/skills/gone" "$cfg/skills/engineering-rules:gone"
   run_install "$home" > /dev/null
   assert_eq "a link a removed skill left behind is cleared" "no" "$(exists "$cfg/skills/engineering-rules:gone")"
-  rm "$cfg/skills/engineering-rules:workflow"
+  rm "$cfg/skills/engineering-rules:brainstorm"
   out=$(run_install "$home" --check)
   assert_contains "--check fails on a missing skill link" "exit=1" "$out"
-  assert_contains "and names it" "missing: the skill link $cfg/skills/engineering-rules:workflow" "$out"
+  assert_contains "and names it" "missing: the skill link $cfg/skills/engineering-rules:brainstorm" "$out"
   rm "$cfg/agents/er-reader.md"
   assert_contains "--check names a missing agent link" "missing: the agent link $cfg/agents/er-reader.md" "$(run_install "$home" --check)"
 }

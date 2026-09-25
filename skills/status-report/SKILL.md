@@ -45,7 +45,7 @@ Work with no git remote (a change made on a server over ssh, a config edit, a re
 
 Notes, commit messages, PR titles and earlier messages say "deployed" when someone hoped it was. Treat them as claims to test, not as checks.
 
-1. **What's happening.** Read the task list (TaskList) and the conversation for Doing, Done and Todo. If a project keeps in-flight work-docs (`docs/work/*.md`), read them too. If the task list disagrees with reality, fix it with TaskUpdate while you're here.
+1. **What's happening.** Read the task list (TaskList) and the conversation for Doing, Done and Todo. If the task list disagrees with reality, fix it with TaskUpdate while you're here.
 2. **Local versus pushed**, in every repo the work touched:
    ```
    git status --short --branch                      # unfinished edits, ahead/behind
@@ -53,7 +53,7 @@ Notes, commit messages, PR titles and earlier messages say "deployed" when someo
    git branch -r --contains <commit>                # is this one on a remote, and which branch
    ```
    No remote configured means nothing has been pushed, so it is Local.
-3. **Shipped.** Find how this project says "live" gets checked (its CLAUDE.md, README, deploy notes, work-doc) and run that check. Compare what is live against the thing you're claiming, the right version or the right behavior, not just "the site answers".
+3. **Shipped.** Find how this project says "live" gets checked (its CLAUDE.md, README, deploy notes) and run that check. Compare what is live against the thing you're claiming, the right version or the right behavior, not just "the site answers".
 4. **Can't check** (no network, no access, no known check)? Tag at the level you can prove and say in a few words what you couldn't check. Don't round up.
 
 When unsure, go lower. A wrong Shipped makes the user stop watching or tell a customer; a modest tag costs them a five-second question.

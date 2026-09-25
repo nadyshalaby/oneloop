@@ -26,7 +26,7 @@ write. Long forms: `~/.claude/engineering-rules/references/01-always-on-law/`.
 - No focused or skipped tests: `.only`, `fit`, `fdescribe`; `.skip`, `xit`, `xdescribe`, `test.todo` without a ticket or owner on the same line.
 - No debug artifacts: no `debugger`, no `console.*` in domain code (log through the project's logger).
 
-The edit guard hook refuses an edit that adds one of these; its refusal is this rule speaking, never something to route around.
+The code-rules hook warns when an edit adds one of these (its patterns: 9.5) and never blocks; the warning is this rule speaking: fix the line in the next edit, never route around it.
 
 **One thing per file.** One component, one class (its private helpers with it) per file. Types in `*.types`, constants in `*.constants`, config in `*.config`, schemas in `*.schema`, style tokens and class maps in `*.styles`; single-use values stay inline. One documented folder skeleton per repository: read 2.3 before creating any file or folder. A technical exception cites the exact compiler or linter error it prevents.
 
@@ -47,4 +47,4 @@ The edit guard hook refuses an edit that adds one of these; its refusal is this 
 - **Think before coding.** State assumptions; for an ambiguous ask list two readings and pick one with a reason; push back when a request collides with a cap, a prior decision or evidence; ask instead of guessing. Can you point at the line that authorized this code?
 - **Simplicity first.** The minimum code for the stated problem: no speculative features, "while I'm here" extras, single-use abstractions, handling for impossible cases, or tuning knobs. Does the acceptance check still pass without this line?
 - **Surgical changes.** Every changed line traces to the request; touch only the files the task names; no adjacent refactors; match the surrounding style; pre-existing bugs, smells and dead code become follow-ups, never hunks of this diff; clean every orphan your own diff made.
-- **Goal-driven execution.** Every step carries `→ verify: <the exact command, grep or assertion>`, machine checks first; a failing check stops you, and it is never loosened to pass.
+- **Goal-driven execution.** Every change is proven by a check you ran, machine checks first; a failing check stops you, and it is never loosened to pass.
