@@ -2,6 +2,20 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.17.0**: the naming rules back in front of the model, and in more places than before, at the
+  user's pick (the always-loaded code rules over the short placement page). 9.13.0 had left 2.2's
+  symbol table and refused names in the full guide, read only where a repo lacks a kind of file
+  or in a workflow review. The code rules now carry them as one Names paragraph (834 bytes):
+  casing per kind of name, `is`/`has`/`can`/`should` booleans, verb-first functions, the
+  language's own private marker, a file's name agreeing with its primary export, and the refused
+  names, so they are there whenever code is written, new names in existing files included. They
+  apply where the language, its frameworks and the codebase set no convention: the table is
+  JavaScript-flavoured and the code rules load for every language (Python keeps its own style,
+  Express keeps `res`). 2.2 keeps the full table and its examples, with a note that the short
+  form wins where the two differ and a language's, framework's or codebase's own convention
+  comes before both. The code rules grow from 6,737 to 7,572 bytes (cap 7,500 to 7,600); nine
+  new code-rule pins, which fail against the rules before this change. Open sessions keep the
+  copy they loaded until they restart.
 - **9.16.0**: the workflow asks about helpers while planning, at the user's word ("the workflow
   hasn't asked me whether i should use them or continue on the main chat"). With the agent tool
   there, Plan step 2 asks, in the round of the which-reading question or on its own and before any

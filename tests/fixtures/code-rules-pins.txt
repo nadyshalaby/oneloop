@@ -79,3 +79,13 @@ Surgical changes
 Goal-driven execution
 → verify:
 never hunks of this diff
+# names (the short form of the placement guide's symbol table and refused names)
+where the language, its frameworks and the codebase set no convention
+`PascalCase` types, classes, interfaces (no `I` prefix), enums and UI components
+`camelCase` functions, methods, variables and parameters, and `useCamelCase` hooks
+`SCREAMING_SNAKE_CASE` enum members and true module constants (a computed default stays `camelCase`)
+Booleans start with `is`/`has`/`can`/`should`, functions with a verb
+private fields use the language's own marker (a leading `_` only where it has none)
+a file's name and its primary export agree
+Refused as a whole name: `data`, `info`, `item`, `obj`, `temp`, `val`, `res`, `result`, `handle`, `process`, `manager`, `helper`, `util(s)`, `base`, `core`, `MyThing`, `ThingImpl` or `AbstractThing` with one implementation
+any name that needs the body or a comment to explain it
