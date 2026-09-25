@@ -2,6 +2,28 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **8.1.0**: the question banks speak the workflow's words, the second of four cleanup releases.
+  The user, of the options: "Retire it" (the repo brief), "One list, deeper on risk" (coverage),
+  "Yes, build it" (the logic) and "Keep it, make it real" (the debug check-back). The question
+  pages (6.2 to 6.12 and 6.15) name Plan, the Goal line, Done-when checks, the Log, Evidence, the
+  logic gate and follow-ups where they named the old phases, sections and gates. No bank says
+  "always ask" any more: every question yields to 6.2's drop rule, so what the request,
+  `CLAUDE.md` or the code settles is stated with its source instead of asked, and the goal
+  question (6.4, Q0) is asked only when the ask reads two ways. The repo brief (6.13) is retired:
+  its citers point at the project's own manifest, `CLAUDE.md` or README (the core law's triad),
+  and 1.5 points helper briefs at the core law's one line; 101 sections remain. The coverage
+  line (the workflow skill, Plan step 4) and the coverage map (6.15) name the same sixteen
+  aspects, and a task on the lane's risk list walks the full map per deliverable;
+  `tests/coverage-aspects.test.sh` fails when the two drift apart, shown failing before the
+  change and on a planted rename. What had gone with the old phases now points at live steps:
+  the research bank's build answer hands off to a Build task's Plan and its logic gate; the fix
+  bank's bisect waits for the logic gate's yes, and its hotfix fast path gives way to the
+  landing question (Verify & Deploy step 6); the debug bank's check-back time works again, as
+  10.1's new Check-back time rule: the clock noted as the investigation starts, checked at every
+  numbered step, and at the named time a stop, a report and a question (keep going, change
+  direction or stop). **What it removes:** the research depth question's time-box and sandbox
+  worktree, which nothing ran. Workflow page 15,522 to 15,689 bytes (cap 16,000); core
+  law and code rules unchanged.
 - **8.0.0**: the old workflow's leftovers go, the first of four cleanup releases. The user:
   "quick and full old skills still have menyions and leftovers" and "check other names too, we
   don't want discrapences in the rules"; of the options, "Yes, build it" (four small releases),

@@ -26,7 +26,7 @@ the code rules. The first short law, one file, measured 6,756.)
 | The helpers: `er-reader`, `er-builder`, `er-reviewer` | `agents/*.md`, linked into `~/.claude/agents/` | their one-line descriptions in every session's agent list; a body only when the workflow sends one |
 | The routes | `skills/<route>/SKILL.md` | only when you type one; the model cannot invoke them |
 | `explain`, `update-engineering-rules`, `status-report` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
-| 102 reference sections, the long forms included | `references/**` | only when a rule or a phase names one; `tests/references.test.sh` fails on a cited section with no page and on a page nothing reaches |
+| 101 reference sections, the long forms included | `references/**` | only when a rule or a phase names one; `tests/references.test.sh` fails on a cited section with no page and on a page nothing reaches |
 | Hooks | `settings/hooks.json`, `hooks/*.sh` | a short process on each matching event; the advisor cue adds one short block per prompt, the advisor rule and the logic-first gate |
 
 The two law files win over everything under `references/`: each long form in
@@ -133,7 +133,7 @@ agents/                         the three helpers the workflow sends, each with 
 scripts/scout.sh                the perf, law and design scouts in one call over the working tree, every hit tagged introduced or present at base
 scripts/perf-scout.sh           turns the perf scout's tables (9.4) into the block scout.sh runs
 scripts/lane.sh                 picks the fast or careful lane for a planned change, from facts a machine can check
-references/                     102 sections, one file each, numbered as the law and the workflow cite them
+references/                     101 sections, one file each, numbered as the law and the workflow cite them
 hooks/                          the hook scripts, their shared helpers and their tests
 settings/hooks.json             the hooks and the status line the installer merges into settings.json
 settings/claude-md-block.md     the block the installer writes into CLAUDE.md

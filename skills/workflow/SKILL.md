@@ -77,9 +77,10 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
    UI-bearing work reads 15.1 first. A bug fix runs 10.1's root-cause investigation (D1) before
    any task is drafted, by reading only: the error read whole, its `git` history, the bad value
    traced through the code; the reproduction and boundary logging wait for the logic gate's yes.
-4. **Coverage, one line:** each aspect the task touches (data, API, UI, auth, permissions, performance,
-   migration, config, jobs, deploy, docs, tests) and what settles it: the ask, a `file:line`, or a
-   question. None left open.
+4. **Coverage, one line:** each aspect the task touches (value, actors, entry points, inputs, happy
+   path, states, data, failures, integrations, security, volume, observability, rollout, surfaces,
+   tests, operations) and what settles it: the ask, a `file:line`, or a question. None left open. A
+   task touching the lane's risk list (step 7) walks 6.15's full map per deliverable before step 5.
 5. **Questions:** one `AskUserQuestion` batch, only for forks the code and the ask cannot settle,
    recommended option first and most effective; an unfamiliar domain borrows its bank from 6.3 to 6.11.
 6. Draft the Done-when checks and Plan tasks, each with `→ verify: <command>` and the files it may
