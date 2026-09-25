@@ -5,7 +5,7 @@ One entry per version, newest first. The README says what the setup is now; this
 - **9.5.0**: cleanup release 3a, the verify, review, debug, finish and catalog pages in the
   workflow's words, with three rules aligned to the workflow the user runs (the user's picks:
   "Match the live rules", "Test first, like the workflow", "One per task, like the workflow").
-  - **The finish page (13.2)** goes from 16,336 to 6,907 bytes: the cleanup sweep (Step D, its
+  - **The finish page (13.2)** goes from 16,336 to 7,147 bytes: the cleanup sweep (Step D, its
     thirteen classes and their check commands unchanged) and four landing rules the user kept
     ("Typed 'discard' first", "Tests after a local merge", "Worktree goes last", "Leave
     worktrees properly"). Its other steps are gone: they repeated the workflow page's Verify &
