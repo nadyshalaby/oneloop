@@ -21,8 +21,11 @@ One entry per version, newest first. The README says what the setup is now; this
   to 6,651 bytes, the workflow page 13,778 to 13,784, the ten commands the eight rows spelled out
   (1,125 bytes of cells) and the scout run become one 75-byte command, and the sweep prints 462
   bytes: about 1.1k bytes and ten commands fewer per cleanup. Eight pins moved to the script's
-  report lines and four new ones hold the command; tests/sweep.test.sh is new (56 checks, each
-  guard seen failing on a copy with it broken) and tests/scout.test.sh gains 13.
+  report lines and four new ones hold the command. tests/sweep.test.sh is new (56 checks):
+  sixteen of its guards were each seen failing on a copy with that guard broken, all but the
+  one for a path with a space, which no one-line break reaches, and four broken copies show the
+  self-check stopping the run. tests/scout.test.sh gains 13, eight of which fail against the old
+  scout.
 - **9.18.0**: the debug page split, the fifth token-cut release (the user's pick, "Split it").
   10.1 keeps the ways in, the trigger conditions and D1, the root-cause investigation (3,614
   bytes); the new 10.2 holds D2 to D4, the hypothesis chain, the circuit breaker, the advisor's
