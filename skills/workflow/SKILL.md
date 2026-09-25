@@ -33,7 +33,7 @@ print the ledger at the start, at every phase boundary and after each task's com
 - [ ] 3 Verify & Deploy
 ```
 
-The first print adds one line: `Helpers: on | unavailable. Advisor: yes | no.` A tick
+The first print adds one line: `Helpers: available | unavailable. Advisor: yes | no.` A tick
 carries a one-line reflection (what changed, did it pass, what is next) and lands in the work-doc
 before the chat re-print; a deferred write is no tick. After each re-print, one `PushNotification`
 line under 200 characters. At each boundary, restate the goal in one line and run the drift check.
@@ -46,13 +46,13 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
 
 - **Resume.** An in-flight `docs/work/*.md` (not `done/`) matches this goal (two could: ask). It
   still holds when its `base` commit exists, every commit its Log names is an ancestor of `HEAD`,
-  and `git status` shows nothing it does not explain. Plan is skipped (the doc is the plan) and
-  Implement resumes at `next`; a task whose commit is gone is reopened. A doc at the live path with
-  `status: done`, or one under `done/` with an open box, is a session that died mid-close: finish
-  the step it died in.
+  and `git status` shows nothing it does not explain. Plan is skipped (the doc is the plan; a
+  missing `Helpers:` pick is asked) and Implement resumes at `next`; a task whose commit is gone is
+  reopened. A doc at the live path with `status: done`, or one under `done/` with an open box, is a
+  session that died mid-close: finish the step it died in.
 - **Fully known.** The user's own message gives the goal, the done-when checks and the steps: Plan
-  takes the work-doc from their words, with no exploration and no question but the logic gate, and
-  the advisor still checks it unless every task is their words verbatim.
+  takes the work-doc from their words, with no exploration and no question but the helpers pick
+  and the logic gate, and the advisor still checks it unless every task is their words verbatim.
 - **The logic gate never skips.** A skipped Plan still shows the logic and waits for the yes,
   unless the work-doc's `Logic confirmed:` line holds the user's yes to this same logic.
 - **Verify & Deploy never skips a check;** only a review of an unchanged diff (`git rev-parse HEAD`
@@ -63,11 +63,15 @@ A phase ticks as `skipped` with one line naming what covers it, only in these ca
 1. Record the base (`git rev-parse HEAD`) and the branch. Read the project's `CLAUDE.md`, `AGENTS.md`
    and layout. Run the resume check above.
 2. Restate the goal in one line: who it is for, what changes, what is left out. When the ask reads
-   two ways, the first question confirms which; otherwise no confirmation is asked.
+   two ways, the first question confirms which; otherwise no confirmation is asked. **Helpers:**
+   with the agent tool there, ask in that round, or alone: helpers where they fit, or all in this
+   chat? Recommend helpers for a wide unfamiliar tree, independent tasks or a likely careful lane;
+   else this chat.
 3. Read what the goal touches, whole: the files, their tests, the closest existing example, the
-   triad's commands. A wide sweep of an unfamiliar tree goes to one `er-reader`. UI-bearing work
-   reads 15.1 first. A bug fix runs 10.1's root-cause investigation (D1) by reading only, before
-   any task is drafted; its reproduction and boundary logging wait for the logic gate's yes.
+   triad's commands. A wide sweep of an unfamiliar tree goes to one `er-reader` (helpers on).
+   UI-bearing work reads 15.1 first. A bug fix runs 10.1's root-cause investigation (D1) by
+   reading only, before any task is drafted; its reproduction and boundary logging wait for the
+   logic gate's yes.
 4. **Coverage, one line:** each aspect the task touches (value, actors, entry points, inputs, happy
    path, states, data, failures, integrations, security, volume, observability, rollout, surfaces,
    tests, operations) and what settles it: the ask, a `file:line`, or a question. None left open. A
@@ -104,7 +108,7 @@ next: <the step to take next>
 # <the goal in a few words>
 ## Goal
 <one line: who it is for, what changes, what is left out>
-Lane: <the line lane.sh printed>. Logic confirmed: <the user's answer>
+Lane: <the line lane.sh printed>. Helpers: <on | off>. Logic confirmed: <the user's answer>
 ## Done when
 - [ ] <observable check> → verify: `<command>`
 ## Plan
@@ -154,7 +158,7 @@ ticked with a fresh proof line, the scout clean or every row disposed, every tas
    the plan did not name.
 2. **Review,** for every diff that changes behaviour or carries a `staged` scout row: careful lane,
    one `er-reviewer` over `git diff <base>..HEAD`, handed the Evidence lines and the scout's
-   `not run:` lines; fast lane or helpers unavailable, the same review here, from
+   `not run:` lines; the fast lane, or helpers off or unavailable, the same review here, from
    `~/.claude/agents/er-reviewer.md`. A broken must-not-change check is Critical.
 3. **Challenge, then decide:** a finding stands unless a `file:line` refutes it (doubt is not a
    refutation; a Critical one needs both reproduction and authority to fail, 12.8). Consult the
@@ -196,9 +200,9 @@ Three custom agents, each with its own model and turn cap, and nothing else is s
 built-in type): `er-reader` (read-only, a wide sweep), `er-builder` (one per task when two or more
 are independent, all sent in one message, each brief at most fifteen lines: the task, its files,
 its verify command, the base, the confirmed logic) and `er-reviewer` (read-only, the review). A
-brief never carries a secret, token, credential or customer data. Where the agent tool is missing,
-their work runs here, from the same files. This session keeps the ledger and every tick, question,
-verification, fix decision, commit, gate, self-audit and claim.
+brief never carries a secret, token, credential or customer data. Where the agent tool is missing
+or helpers are off, their work runs here, from the same files. This session keeps the ledger and
+every tick, question, verification, fix decision, commit, gate, self-audit and claim.
 
 **Loop-back:** a red in Verify, an accepted Critical or Important finding, or a task you cannot finish
 reopens Implement; run forward again with fresh evidence. **Waivers** are the law's; a blocking

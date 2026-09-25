@@ -15,7 +15,7 @@
 ROOT=$(repo_root) || exit 1
 POWER="${POWER:-$ROOT/tests/fixtures/workflow-power.txt}"
 WORKFLOW="$ROOT/skills/workflow/SKILL.md"
-CHAR_CAP=13500
+CHAR_CAP=13800
 
 # rows: the list's rows, comments and blank lines left out.
 rows() { grep -vE '^(#|$)' "$POWER"; }

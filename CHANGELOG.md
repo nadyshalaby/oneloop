@@ -2,6 +2,20 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.16.0**: the workflow asks about helpers while planning, at the user's word ("the workflow
+  hasn't asked me whether i should use them or continue on the main chat"). With the agent tool
+  there, Plan step 2 asks, in the round of the which-reading question or on its own and before any
+  helper is sent: helpers where they fit, or all in this chat? It recommends helpers for a wide
+  unfamiliar tree, independent tasks or a likely careful lane, this chat otherwise. The pick goes
+  on the work-doc's Goal line (`Helpers: on | off`). Off runs the sweep, the building and the
+  review here, as a missing agent tool already did; on only allows them where they fit (a
+  fast-lane review still runs here, a one-task plan still gets no builders). A fully known task
+  is asked too; a resumed work-doc keeps its pick and asks only when it has none. The first
+  ledger print now reads `Helpers: available | unavailable` (the tool, not the pick), since it
+  comes before the question. No `:agents` switch comes back. The page grows from 13,395 to
+  13,756 bytes and its cap from 13,500 to 13,800, which also leaves room for the held debug
+  split's 22 bytes; the workflow guard gains four pins and updates two, all six failing against
+  the page before this change.
 - **9.15.0**: the logic-first gate stressed, at the user's word ("keep it reminder but stress on
   it"): the per-prompt cue now calls it a hard gate in plain chat and the workflow alike, for
   logic the user hasn't seen (a new task, approach or plan), says why (the user must stay on top

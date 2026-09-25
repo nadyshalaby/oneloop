@@ -14,7 +14,7 @@ audit 7, zero banned tokens, cap breaks, inline types :: kept :: skills/workflow
 audit 8, every new file placed per 2.2 :: kept :: skills/workflow/SKILL.md :: files per 2.2
 audit 9, no discarding git command, no AI attribution :: kept :: skills/workflow/SKILL.md :: No git command that discards work; explicit staging; no AI attribution
 audit 10, every update-log claim has a proof row :: kept :: skills/workflow/SKILL.md :: the proof behind every claim
-audit 11, agent availability recorded once :: merged :: skills/workflow/SKILL.md :: `Helpers: on | unavailable. Advisor: yes | no.`
+audit 11, agent availability recorded once :: merged :: skills/workflow/SKILL.md :: `Helpers: available | unavailable. Advisor: yes | no.`
 audit 12, every agent result re-run before its tick :: kept :: skills/workflow/SKILL.md :: Helper results re-run before their ticks
 audit 13, own leftovers swept, nothing found fixed, reuse search shown :: kept :: skills/workflow/SKILL.md :: Own leftovers swept, reuse searches shown
 audit 14, a coverage map with no holes :: merged :: skills/workflow/SKILL.md :: None left open.
@@ -81,5 +81,10 @@ logic gate, survives a skipped Plan :: kept :: skills/workflow/SKILL.md :: A ski
 logic gate, the yes recorded :: kept :: skills/workflow/SKILL.md :: Logic confirmed: <the user's answer>
 logic gate, a helper builds only confirmed logic :: kept :: agents/er-builder.md :: the logic in your brief is the one the user confirmed
 lanes, fast only by the lane picker and the plan line :: kept :: skills/workflow/SKILL.md :: `lane: fast` with that line honestly true
-lanes, the fast lane is still reviewed :: kept :: skills/workflow/SKILL.md :: fast lane or helpers unavailable, the same review here
+lanes, the fast lane is still reviewed :: kept :: skills/workflow/SKILL.md :: the fast lane, or helpers off or unavailable, the same review here
 review, one reproducing command per finding :: kept :: agents/er-reviewer.md :: each finding gets one command that shows it
+# the helpers pick at Plan, added with it
+helpers, the user picks them or this chat before one is sent :: kept :: skills/workflow/SKILL.md :: with the agent tool there, ask in that round, or alone: helpers where they fit, or all in this chat?
+helpers, the recommendation fits the task :: kept :: skills/workflow/SKILL.md :: Recommend helpers for a wide unfamiliar tree, independent tasks or a likely careful lane; else this chat.
+helpers, the pick is kept and a resume asks when it is missing :: kept :: skills/workflow/SKILL.md :: Helpers: <on | off>.
+helpers, off runs their work here :: kept :: skills/workflow/SKILL.md :: Where the agent tool is missing or helpers are off, their work runs here
