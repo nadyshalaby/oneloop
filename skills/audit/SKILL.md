@@ -23,4 +23,4 @@ codebase against its rules, never a per-diff review.
    proposes and confirms per finding through `AskUserQuestion`, and every fix taken runs as
    `/engineering-rules:workflow`.
 
-A sub-command picks the route; it waives no check, and the law binds throughout.
+A command picks the route; it waives no check, and the law binds throughout.
