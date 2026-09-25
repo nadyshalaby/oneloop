@@ -10,21 +10,18 @@ description: >-
 
 # Engineering rules: the workflow
 
-> The law (`~/.claude/engineering-rules/law/engineering-law.md`) is in context through `CLAUDE.md`, and
-> its code rules (`~/.claude/rules/engineering-code.md`) load with the first code file read. This skill
-> binds from the moment it loads until the task is done. Everything the everyday path needs is on
-> this page; a reference under `~/.claude/engineering-rules/references/` is read only where this page
-> names it, and binds once read. **How** is your call; **what** must be true, in what order and with
-> what evidence, is not.
+> On top of the always-on law, this skill binds from the moment it loads until the task is done.
+> The everyday path is all on this page; a reference under `~/.claude/engineering-rules/references/`
+> is read only where this page names it, and binds once read. **How** is your call; **what** must be
+> true, in what order and with what evidence, is not.
 
 - **Whole invocation:** `$ARGUMENTS`
 
-**Ways in.** `/engineering-rules:workflow <request>` is the default; naming the workflow in words
-runs the same flow. Bare, with no request anywhere in the conversation, ask through
-`AskUserQuestion` what they want done (and which route, when it is not this one), and nothing
-else. The other routes are in the table at the end. The flow never starts on its
-own because a task touches code; the law covers that. A trivial ask (the law's definition) ends
-after the answer or the one-line edit.
+**Ways in:** `/engineering-rules:workflow <request>`, or naming the workflow in words; the other
+routes are in the table at the end. Bare, with no request anywhere in the conversation, ask through
+`AskUserQuestion` what they want done (and which route), and nothing else. The flow never starts
+on its own because a task touches code; the law covers that. A trivial ask (the law's definition)
+ends after the answer or the one-line edit.
 
 ## The ledger
 
@@ -192,15 +189,15 @@ row disposed, every task committed.
 ```
 Law self-audit
 1. Phases ticked with their exit, skips reasoned, the logic confirmed first, questions only through AskUserQuestion?  yes / no
-2. A fresh Evidence row per task and per Done-when check; ship-gate rows present?          yes / no
-3. The scout run after every task, every row disposed?                                     yes / no
-4. Review: a row per touched path, every finding challenged and decided, Critical fixed?   yes / no
-5. Zero banned tokens, cap breaks or inline types in the touched scope; files per 2.2?      yes / no
-6. Nothing found on the way fixed; every follow-up filed with its file:line?                yes / no
-7. Own leftovers swept, reuse searches shown, files read whole, numbers counted?            yes / no
-8. No git command that discards work; explicit staging; no AI attribution?                  yes / no
+2. A fresh Evidence row per task and per Done-when check; ship-gate rows present?  yes / no
+3. The scout run after every task, every row disposed?  yes / no
+4. Review: a row per touched path, every finding challenged and decided, Critical fixed?  yes / no
+5. Zero banned tokens, cap breaks or inline types in the touched scope; files per 2.2?  yes / no
+6. Nothing found on the way fixed; every follow-up filed with its file:line?  yes / no
+7. Own leftovers swept, reuse searches shown, files read whole, numbers counted?  yes / no
+8. No git command that discards work; explicit staging; no AI attribution?  yes / no
 9. Helper results re-run before their ticks; the advisor at plan, review, direction, done?  yes / no
-10. Where anything deployed, the six proofs and the live check pasted?                     yes / no
+10. Where anything deployed, the six proofs and the live check pasted?  yes / no
 ```
 
 ## Helpers, and what never leaves this session
@@ -223,10 +220,10 @@ the fix of a Critical finding.
 
 | Route | Sub-command | Right when | Section |
 |---|---|---|---|
-| **Workflow** | `/engineering-rules:workflow` | The default for any substantive request: the three phases above. | this page |
-| **Brainstorm** | `/engineering-rules:brainstorm` | The idea is not a task yet: one or two forking questions per turn. | 16.1 |
+| **Workflow** | `/engineering-rules:workflow` | The default: the three phases above. | this page |
+| **Brainstorm** | `/engineering-rules:brainstorm` | The idea is not a task yet. | 16.1 |
 | **Codebase audit** | `/engineering-rules:audit` | A whole codebase against its rules, not one diff. | 16.3 |
-| **Review triage** | `/engineering-rules:triage` | A batch of review findings needs a decision each. | 16.2 |
+| **Review triage** | `/engineering-rules:triage` | A batch of review findings to decide. | 16.2 |
 | **Design spec** | `/engineering-rules:design-spec` | Authoring, extracting or refreshing the design spec. | 15.19 |
 | **Release notes** | `/engineering-rules:release-notes` | The plain summary of the task in flight. | 16.13 |
 

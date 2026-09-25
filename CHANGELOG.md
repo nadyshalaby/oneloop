@@ -2,6 +2,15 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.4.0**: the workflow page, trimmed; the last of the four trims. Words only: all 64
+  `tests/fixtures/workflow-power.txt` rows homed on the page, the coverage line, the route table's
+  shape and the work-doc's sections stay, and the page, read on each use, goes from 15,466 to
+  15,043 bytes (15,654 before 9.3.0 trimmed its blurb). What went: the intro's repeat of how the
+  law and the code rules load (the law says it), the ways-in line's "is the default ... runs the
+  same flow" (the route table's first row says it), the self-audit's alignment padding, and the
+  route table's longer "right when" notes (the brainstorm's one or two questions per turn stays in
+  16.1). Words-only trimming ends here: the page's other sentences each carry a rule, and cutting
+  further would drop one.
 - **9.3.0**: the always-on law and the listed blurbs, trimmed; the second of the four trims.
   Words only: all 72 of the law's pins, every rule clause and the 1.4 advisor line the cue leans
   on stay, and the law, loaded with every request, goes from 9,597 to 9,343 bytes. What went:
