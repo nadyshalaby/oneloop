@@ -146,11 +146,12 @@ ticked with a fresh proof line, the scout clean or every row disposed, every tas
 1. **Prove it, fresh, on the exact commit** (the committed tree with a clean `git status`; a clean
    export only when deploying): the triad (a test run that ran zero tests is a fail); every
    Done-when check; the ship gate (rows `ship.build`, `ship.boot`, `ship.smoke`, each run or
-   carrying its skip reason: a diff of only tests, docs, comments, CI config or editor settings
-   skips all three without reading 11.3; otherwise read 11.3 when the manifest has a build or
-   start script or the task deploys); on UI-bearing work the design pre-flight (15.30). One
-   Evidence line each, `command → result line`, and one line on what the checks did not reach;
-   no probe or control the plan did not name.
+   carrying its skip reason: a diff of only tests, docs, comments, CI config (pipeline files only;
+   env, build and startup config always read 11.3) or editor settings skips all three without
+   reading 11.3; otherwise read 11.3 when the manifest has a build or start script or the task
+   deploys); on UI-bearing work the design pre-flight (15.30). One Evidence line each,
+   `command → result line`, and one line on what the checks did not reach; no probe or control
+   the plan did not name.
 2. **Review,** for every diff that changes behaviour or carries a `staged` scout row: careful lane,
    one `er-reviewer` over `git diff <base>..HEAD`, handed the Evidence lines and the scout's
    `not run:` lines; fast lane or helpers unavailable, the same review here, from
