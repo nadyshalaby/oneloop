@@ -8,7 +8,8 @@ One entry per version, newest first. The README says what the setup is now; this
   "40 / 3 / 3 / 500", so it kept enforcing the two line caps 5.0.0 removed at the user's word;
   the floor is now 3 / 3 (params and nesting), and a project's own rules can still set line caps.
   The triage page (16.2) drops the same two caps from its Important examples, and its worked
-  example no longer rests on a 500-line cap. The audit's own steps, "Phase 0" to "Phase 6", are
+  example no longer rests on a 500-line cap; the design-spec route (15.19) stops citing "the hard
+  cap (1.1) is 500" for a spec's length. The audit's own steps, "Phase 0" to "Phase 6", are
   renamed "Step 0" to "Step 6" (16.3, 16.4, 16.6, 16.7, 16.8), so they no longer read as the
   workflow's phases; "the wizard tool" becomes `AskUserQuestion`, the Retrospective becomes the
   Follow-ups, and the route skills say "a command" for "a sub-command". Words only elsewhere.
