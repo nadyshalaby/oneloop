@@ -2,6 +2,10 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.1.0**: the debug check-back time goes. The user: "drop the timeout thing and focus on the
+  todos". The debug bank's Q6 (when to stop and check back) and 10.1's Check-back time rule,
+  both from 8.1.0, are removed; Q6's number stays a gap, so Q7 and Q8 keep every reference.
+  10.1's circuit breaker after three failed hypotheses stays the bound on an investigation.
 - **9.0.0**: one way in. The user: "build vs workflow. what's the different keep only one", then
   "Keep workflow, drop build". `/engineering-rules:build` was a 1 KB doorway that only loaded the
   workflow skill, so it goes, and `/engineering-rules:workflow <request>` is the default route,
