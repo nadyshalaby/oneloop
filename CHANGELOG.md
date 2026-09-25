@@ -2,6 +2,17 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **9.7.0**: cleanup release 4a, the design pages (15.1, 15.2, 15.19 to 15.30) and 12.5 in the
+  workflow's words. The design scout (15.29) now runs with the other two scouts after every
+  task, once the change has a UI file, and again inside the design pre-flight at Verify & Deploy
+  step 1; its separate run at the review's start is gone, so 12.5 takes the `pre-flight` table
+  and the staged rows in the Evidence. It keeps the same safety net as 9.6.0 (a Critical design
+  row or one in doubt is staged for the review), and a pre-existing tell goes to Follow-ups, as
+  law 1.9 says, where the page offered to fix it. The security check (12.3) gains the step 9.5
+  already relied on: it re-judges every staged `sec.hardcoded-secret` row, the only check that
+  may clear one. The design pipeline in 15.2 is redrawn on Plan, Implement and Verify & Deploy;
+  "update log" becomes "release notes" and "the wizard tool" `AskUserQuestion`. Words only
+  elsewhere.
 - **9.6.0**: cleanup release 3b, the perf and law scout pages (9.4, 9.5) in the workflow's words,
   and their rules aligned to what runs. `scripts/scout.sh` runs the scouts once after every task
   (the workflow's Implement step 5) over the whole change against the base, committed or not, so
