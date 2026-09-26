@@ -2,6 +2,16 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **11.0.2**: `TODO.md` named in a comment is no longer debt. The edit guard's debt-marker scan
+  (9.5, `clean.debt-marker`) fired on a comment line starting with `TODO.md` (seen on
+  `hooks/scope-check.sh`'s own header while 11.0.0 was built): the marker regex now stops at a
+  dot, so `TODO.md` and `TODO.archive.md`, the checklist's mandated names, pass, while `TODO`,
+  `TODO:` and `TODO(` still warn; a marker that ends a sentence with a dot is the one case it
+  no longer sees. The 9.5 HOW block also drops the `docs/work/` exclusion from its `git diff`
+  line, the work-doc folder having gone with 10.0.0 (the hook and the audit swap that line out
+  anyway). `tests/law-scout.test.sh` (95 to 97 checks) plants `TODO.md` in a `//` and a `#`
+  comment and wants both left alone; `hooks/tests/edit-guard.test.sh` (61 to 62) allows the
+  edit. Law sizes unchanged: 88 lines and 11,996 characters; the code rules 49 and 7,484.
 - **11.0.1**: the law reaches the session in two parts. The live check after 11.0.0 found a fresh
   session got a 2KB preview of the law and a file path in its place: Claude Code keeps only a
   preview of a hook context over 10,000 characters and saves the whole to a file (its

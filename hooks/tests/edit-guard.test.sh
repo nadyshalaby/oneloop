@@ -75,6 +75,7 @@ test_the_laws_own_exemptions_hold() {
   expect_edit  allow 'bare Error outside domain code'         "$P/src/a.ts" 'throw new Error("boom")'
   expect_edit  allow 'console outside domain code'            "$P/src/Button.tsx" 'console.log(user)'
   expect_edit  allow 'owned TODO'                             "$P/src/c.ts" '// TODO(nady): fix later'
+  expect_edit  allow 'TODO.md named in a comment'             "$P/src/c.ts" '// TODO.md holds the checklist'
   expect_write allow 'secret in an ignored .env'              "$P/.env" "STRIPE_KEY=$KEY"
   expect_write allow 'markdown spelling the tokens'           "$P/README.md" $'Never write eslint-disable or @ts-ignore.\ndebugger;'
   expect_write allow 'a generated file'                       "$P/src/gen/foo.generated.ts" '// eslint-disable'

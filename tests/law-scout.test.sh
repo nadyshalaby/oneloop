@@ -45,6 +45,8 @@ plant_equivalents() {
   printf 'const n = count!+1\n' > src/nn-op.ts
   printf 'debugger;\n' > src/dbg.ts
   printf '<!-- TODO fix me -->\n' > src/todo-html.html
+  printf '// TODO.md holds the checklist\n' > src/todo-file.ts
+  printf '# TODO.md at the repository root\n' > src/todo-file.sh
 }
 
 # Rules whose domain is a role or a test file, planted inside and outside that domain.
@@ -240,6 +242,8 @@ test_leaves_the_allowed_alone_and_redacts_secrets() {
   assert_missing "console outside a domain role" "Button.tsx" "$out"
   assert_missing "owned TODO" "todo-owned.ts" "$out"
   assert_missing "ticketed TODO" "todo-ticket.ts" "$out"
+  assert_missing "TODO.md named in a comment is a file, not debt" "todo-file.ts" "$out"
+  assert_missing "and in a shell comment" "todo-file.sh" "$out"
   assert_missing "skipped test naming a ticket" "skip-ticket.test.ts" "$out"
   assert_missing ".only outside a test file" "only-outside.ts" "$out"
   assert_missing "definite assignment is not a non-null assertion" "nn-definite.ts" "$out"
