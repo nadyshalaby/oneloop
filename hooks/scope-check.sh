@@ -11,6 +11,8 @@
 # reply is the yes, whether typed, picked in a pick-list, which Claude Code stores as the
 # AskUserQuestion tool's result, or sent while Claude was working, which it stores as a queued
 # command), or, when that reply says "go", of the first one added after it (the pre-approval).
+# A pick-list option whose description carries `scope: <files>` proposes that scope the moment
+# the user picks it, so the pick is its yes (`/oneloop:start` lists open task lines that way).
 # A line added later waits for a new yes, even after "go"; a line turning `[~]` or `[x]` adds
 # nothing. An edit before any approved scope, to a file the scope does not name (a path, or a
 # folder it is under), or while the checklist has no `- [ ]` or `- [~]` line, becomes a
@@ -34,8 +36,11 @@ here=${BASH_SOURCE[0]%/*}
 # call Claude made; typed while Claude worked: a queued_command attachment with a human turn)
 # and `S<tab>files` for a `- [ ] ... scope:` line an Edit, Write or MultiEdit adds to the
 # checklist (a line its old text already held is not added; of several added at once, the
-# last, since a task line is appended to its group). One pass, keeping the ids of the
-# pick-lists asked so far.
+# last, since a task line is appended to its group), and for the `scope: <files>` an
+# AskUserQuestion option's description carries (to the end of its line, or the first `. ` or
+# `; `) when the answer picked that option (Claude Code stores a pick as `"<question>"="<label>"`),
+# placed just before that answer's H. One pass, keeping the questions of the pick-lists asked
+# so far, by the call's id.
 TODO=docs/oneloop-todos/TODO.md
 ARCHIVE=docs/oneloop-todos/TODO.archive.md
 read -r -d '' EVENTS <<'JQ'
@@ -44,8 +49,12 @@ def typed: .message.content
   | if type == "string" then .
     elif type == "array" then (if any(.[]; .type == "tool_result") then null else ([.[] | select(.type == "text") | .text] | join(" ")) end)
     else null end;
-def asked: [.message.content[]? | select(.type == "tool_use" and .name == "AskUserQuestion") | .id];
-def answered($ids): [.message.content[]? | select(.type == "tool_result" and (.tool_use_id as $i | any($ids[]; . == $i))) | .content | text_of] | join(" ");
+def asked: [.message.content[]? | select(.type == "tool_use" and .name == "AskUserQuestion") | {key: .id, value: (.input.questions // [])}] | from_entries;
+def answered($asks): [.message.content[]? | select(.type == "tool_result") | (.tool_use_id // "") as $i | select($asks | has($i)) | .content | text_of] | join(" ");
+def option_files: sub("^.*scope:[[:space:]]*"; "") | split("\n")[0] | sub("(\\. |; ).*$"; "") | gsub("[`*]"; "") | sub("[.;[:space:]]+$"; "");
+def picked($asks): [.message.content[]? | select(.type == "tool_result") | (.tool_use_id // "") as $i | select($asks | has($i)) | (.content | text_of) as $a
+  | $asks[$i][]? | .question as $q | .options[]? | . as $o | select(($a | contains("\"" + $q + "\"=\"" + ($o.label // "") + "\"")) and (($o.description // "") | test("scope:"))) | $o.description]
+  | if length > 0 then ["S\t" + (.[-1] | option_files)] else [] end;
 def todo_edit: select(.type == "tool_use" and (.name == "Edit" or .name == "Write" or .name == "MultiEdit") and ((.input.file_path // "") | test("(^|/)docs/oneloop-todos/TODO\\.md$")));
 def new_text: [.input.content // empty, .input.new_string // empty, (.input.edits[]? | .new_string // empty)] | join("\n");
 def old_text: [.input.old_string // empty, (.input.edits[]? | .old_string // empty)] | join("\n");
@@ -54,14 +63,14 @@ def proposals: .message.content[]? | todo_edit | (old_text | split("\n")) as $ol
   | [new_text | split("\n")[] | select(test("^- \\[ \\] .*scope:")) | select(. as $line | any($old[]; . == $line) | not)]
   | select(length > 0) | .[-1] | "S\t" + files;
 def h: "H\t" + (gsub("[\n\t]"; " ") | .[0:2000]);
-foreach inputs as $l ({ids: [], out: []};
+foreach inputs as $l ({asks: {}, out: []};
   .out = []
   | if $l.type == "user" and ($l.isMeta // false) == false and ($l.isCompactSummary // false) == false then
-      .ids as $ids | ($l | typed) as $t | ($l | answered($ids)) as $a
-      | if $t != null then .out = [$t | h] elif $a != "" then .out = [$a | h] else . end
+      .asks as $asks | ($l | typed) as $t | ($l | answered($asks)) as $a
+      | if $t != null then .out = [$t | h] elif $a != "" then .out = ($l | picked($asks)) + [$a | h] else . end
     elif $l.type == "attachment" and $l.attachment.type == "queued_command" and $l.attachment.humanTurn == true then
       ($l.attachment.prompt // "") as $q | if $q != "" then .out = [$q | h] else . end
-    elif $l.type == "assistant" then .ids += ($l | asked) | .out = [$l | proposals]
+    elif $l.type == "assistant" then .asks += ($l | asked) | .out = [$l | proposals]
     else . end;
   .out[])
 JQ

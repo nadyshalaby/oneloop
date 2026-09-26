@@ -30,7 +30,7 @@ The map for this repository: the checks, where things live, where to start. Read
 - `hooks/session-start.sh`: carries the law into the session in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and the re-anchor after a compaction or a resume.
 - `hooks/code-rules.sh`: carries the code rules in with the first code file read or edited.
 - `hooks/risk-zone.sh`: the first edit to a risk-zone file becomes a permission prompt.
-- `hooks/scope-check.sh`: an edit outside the scope on the task line in `docs/oneloop-todos/TODO.md`, or with no open line there, becomes a permission prompt.
+- `hooks/scope-check.sh`: an edit outside the scope on the task line in `docs/oneloop-todos/TODO.md` (or in the pick-list option the user chose), or with no open line there, becomes a permission prompt.
 - `hooks/commit-check.sh`: a `git commit` that leaves `docs/oneloop-todos/TODO.md` out becomes a permission prompt.
 - `hooks/edit-guard.sh`: an edit that adds a code-rule break (a ban, a name, a file kind, a cap, a new unlisted top-level folder) becomes a permission prompt; the user's yes is the exception, kept on the line as `law-exception:`.
 - `CHANGELOG.md`: one entry per version, newest first; the version is the top entry's, and the manifests carry the same one.

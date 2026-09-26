@@ -2,6 +2,32 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **13.1.0**: `/oneloop:start` starts a new task, resumes an in-flight one or picks up a parked
+  line, at the user's word ("start skill: enables me to start new, resume existing, or complete
+  parked task."; their picks: the skill and the hook together, the pick is the yes, and a resume
+  always asks once even with "go"). A task that names an open checklist line resumes it; no
+  task lists the open lines of `docs/oneloop-todos/TODO.md`, `- [~]` first, then `- [ ]`, as one
+  `AskUserQuestion` whose options carry the task in a few words and a description that starts
+  with `scope: <files>` and says where the work stopped (`not started, from Edit` when nothing
+  changed under the scope, `edited, from Check` on uncommitted changes); anything else is a new
+  task, and "go" inside it pre-approves its scope as before. The scope-check hook learns that
+  third source of the yes: when the user's answer picks an option whose description carries
+  `scope: <files>` (Claude Code stores a pick as `"<question>"="<label>"`, matched exactly), that
+  scope is a proposal placed just before the reply, so the pick approves it; a pick without one,
+  a typed answer matching no option and an unanswered question propose nothing, and edits then
+  prompt as before. So resuming a task in a fresh session costs one question instead of a
+  question and a permission prompt. Minor: a new behaviour in a command and a new source of an
+  approval that the user still gives by hand; nothing loosened. The law's Guards bullet names
+  the picked option (three trims elsewhere paid for it: "written down" → "written", "for
+  architectural work" → "for architecture", "and only to search" → ", only to search", "the
+  scanner the edit guard runs" → "the edit guard's scanner"); the README's checklist paragraph,
+  hook row and command row, and the map's entry point follow. Tests:
+  `hooks/tests/scope-check.test.sh` gains the pick-list cases (the picked option's scope is
+  approved and the other option's is not, backticks stripped and the words after `; ` or `. `
+  dropped, an option without a scope, a typed answer, an unanswered question, the pick over an
+  earlier task line, a pick without a scope leaving the line's proposal; 81 checks; main's hook
+  fails 6 of them) and a pin for the law's new words (main's law fails it). Law: 88 lines and
+  11,979 characters before, 88 and 11,994 after; code rules unchanged at 49 and 7,593.
 - **13.0.0**: the checklist moves out of the project's root into `docs/oneloop-todos/`, at the
   user's word ("we can place the todo files in its docs/oneloop-todos folder so they can mess with
   the projects main files", read with them as: so they do not sit among the project's main files;

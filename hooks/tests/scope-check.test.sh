@@ -10,7 +10,10 @@
 # one, nor is a line the edit's old text already held or a line turning `[~]`. An edit before
 # any approved scope asks; the user's reply after a proposal is the yes, whether typed, picked
 # in a pick-list (stored as the AskUserQuestion tool's result) or sent while Claude was working
-# (stored as a queued command); another tool's result or a queued task notification is not a
+# (stored as a queued command); a pick-list option whose description carries `scope: <files>`
+# is itself a proposal of that scope when the user picks it (the pick is its yes; an option
+# without one, a typed answer matching no option and an unanswered question propose nothing);
+# another tool's result or a queued task notification is not a
 # reply; "go" in the user's message pre-approves the first proposal after it and no later one;
 # a folder on the scope covers the files under it; the checklist must hold an open line, and an
 # open line in a root TODO.md does not count (the reason then says to git mv it); the checklist
@@ -49,6 +52,16 @@ meta_line() { jq -cn --arg t "$1" '{type: "user", isMeta: true, message: {role: 
 ask_line() {
   jq -cn --arg i "$1" --arg q "$2" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: $i, name: "AskUserQuestion", input: {questions: [{question: $q}]}}]}}'
 }
+
+# ask_options <id> <question> <label> <description> [<label> <description>]: a pick-list whose
+# options carry descriptions, as the transcript stores the call.
+ask_options() {
+  jq -cn --arg i "$1" --arg q "$2" --arg l1 "$3" --arg d1 "$4" --arg l2 "${5:-}" --arg d2 "${6:-}" \
+    '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: $i, name: "AskUserQuestion", input: {questions: [{question: $q, options: ([{label: $l1, description: $d1}] + (if $l2 != "" then [{label: $l2, description: $d2}] else [] end))}]}}]}}'
+}
+
+# picked <question> <label>: the answer text Claude Code stores for one pick.
+picked() { printf '"%s"="%s"' "$1" "$2"; }
 
 # answer_line <id> <text>: the user's pick-list answer, which Claude Code stores as that call's result.
 answer_line() {
@@ -164,6 +177,30 @@ test_a_pick_list_answer_and_a_queued_message_are_replies() {
   assert_eq "a pick-list answer saying go pre-approves the next proposal" pass "$(decide Edit "$P/src/cart/summary.ts")"
 }
 
+test_a_picked_option_carrying_the_scope_is_the_proposal() {
+  open_task
+  { human_line "Resume."; ask_options q3 "Resume which task?" "Rename runningSum (Recommended)" "scope: src/util/math.ts. Not started, from Edit" "Cart summary" "scope: ${TICK}src/cart/${TICK}; edited, from Check"; answer_line q3 "$(picked "Resume which task?" "Rename runningSum (Recommended)")"; } > "$T"
+  assert_eq "the scope in the picked option is approved" pass "$(decide Edit "$P/src/util/math.ts")"
+  assert_eq "the other option's scope is not" ask "$(decide Edit "$P/src/cart/summary.ts")"
+  assert_contains "and the reason names the picked scope" "(scope: src/util/math.ts)" "$(last permissionDecisionReason)"
+  { human_line "Resume."; ask_options q3 "Resume which task?" "Rename runningSum (Recommended)" "scope: src/util/math.ts. Not started, from Edit" "Cart summary" "scope: ${TICK}src/cart/${TICK}; edited, from Check"; answer_line q3 "$(picked "Resume which task?" "Cart summary")"; } > "$T"
+  assert_eq "picking the other option approves its scope, backticks stripped, the words after ; dropped" pass "$(decide Write "$P/src/cart/new.ts")"
+  assert_eq "and not the first option's" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Resume."; ask_options q4 "Resume which task?" "Rename runningSum" "Not started, from Edit"; answer_line q4 "$(picked "Resume which task?" "Rename runningSum")"; } > "$T"
+  assert_eq "an option without scope: approves nothing" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Resume."; ask_options q5 "Resume which task?" "Rename runningSum" "scope: src/util/math.ts"; answer_line q5 "$(picked "Resume which task?" "something I typed myself")"; } > "$T"
+  assert_eq "a typed answer that matches no option approves nothing" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Resume."; ask_options q6 "Resume which task?" "Rename runningSum" "scope: src/util/math.ts"; } > "$T"
+  assert_eq "an unanswered pick-list approves nothing" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Rename it."; todo_add "src/cart/summary.ts"; ask_options q7 "Approve?" "Yes (Recommended)" "scope: src/util/math.ts"; answer_line q7 "$(picked "Approve?" "Yes (Recommended)")"; } > "$T"
+  assert_eq "the picked scope is the last proposal before the reply, over an earlier task line" pass "$(decide Edit "$P/src/util/math.ts")"
+  assert_eq "so the earlier line's file asks" ask "$(decide Edit "$P/src/cart/summary.ts")"
+  { human_line "Rename it."; todo_add "src/util/math.ts"; ask_options q8 "Approve?" "Yes (Recommended)" "The smallest diff, one file."; answer_line q8 "$(picked "Approve?" "Yes (Recommended)")"; } > "$T"
+  assert_eq "a pick without scope: leaves the task line's proposal approved" pass "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Resume."; ask_options q9 "Resume which task?" "Rename runningSum" "scope: src/util/math.ts, ${TICK}src/cart/summary.ts${TICK}."; answer_line q9 "$(picked "Resume which task?" "Rename runningSum")"; } > "$T"
+  assert_eq "a scope list ending in a full stop keeps its last file" pass "$(decide Edit "$P/src/cart/summary.ts")"
+}
+
 test_where_the_scope_is_read_from() {
   { human_line "Rename it, go."; reply_line "scope: src/util/math.ts"; } > "$T"; open_task
   assert_eq "a scope line in Claude's chat text alone is not a proposal" ask "$(decide Edit "$P/src/util/math.ts")"
@@ -269,6 +306,7 @@ test_a_proposal_waits_for_the_yes
 test_the_users_reply_is_the_yes_for_the_proposal_that_stood
 test_go_pre_approves_the_first_proposal_after_it_only
 test_a_pick_list_answer_and_a_queued_message_are_replies
+test_a_picked_option_carrying_the_scope_is_the_proposal
 test_where_the_scope_is_read_from
 test_folders_and_markdown_on_the_scope
 test_quoted_injected_and_summary_lines_are_not_replies

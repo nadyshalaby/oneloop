@@ -104,6 +104,7 @@ each written the moment the status changes
 its `TODO.archive.md`
 **The scope-check hook** asks
 the `scope:` of the last `- [ ]` line added to the checklist
+or of the pick-list option they chose
 **the commit hook** asks when a `git commit` leaves the checklist out
 # the map
 under 60 lines

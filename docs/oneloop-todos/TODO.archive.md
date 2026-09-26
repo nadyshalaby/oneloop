@@ -7,3 +7,4 @@
 - [x] 11.1.0: /oneloop:start, the loop's entry point on a task, typed or self-triggered
 - [x] 12.0.0: the edit guard prompts on every code-rule break, names, file kinds, folders and caps included; the user's yes is the exception, kept on the line as law-exception:
 - [x] 13.0.0: the checklist lives in docs/oneloop-todos/ (TODO.md, TODO.archive.md), out of the project's root; the hooks, the law and the skills read it there; an older root pair moves with git mv at the next Scope
+- [x] 13.1.0: /oneloop:start starts a new task, resumes an in-flight one or picks up a parked line; the open lines as one pick-list whose options carry the scope, and the scope-check hook takes the picked option's scope as the yes
