@@ -1,12 +1,13 @@
 #!/bin/bash
 # oneloop risk-zone guard.
-# The law's Guards: before the FIRST edit to a file whose path matches the risk regex (login,
-# payments, migrations, env files, infra, deploy settings, secrets ...), the user's yes is needed,
-# even after "go". On PreToolUse for Edit, Write, MultiEdit and NotebookEdit this hook turns that
-# first edit into a permission prompt (`permissionDecision: ask`, the reason naming the matched
-# word), so the yes cannot be skipped, and tells Claude why beside the tool result. On PostToolUse
-# for the same tools it records an edit that went through, so later edits to the same file in the
-# same session pass without a prompt; a denied edit records nothing and is asked about again.
+# The law's Guards: the FIRST edit in a session to a file whose path matches the risk regex
+# (login, payments, migrations, env files, infra, deploy settings, secrets ...) is POINTED AT,
+# never prompted (14.0.0, the user's words: "nothing should block file edits … auto-pilot mode
+# with self-control"). On PreToolUse for Edit, Write, MultiEdit and NotebookEdit this hook hands
+# Claude, beside the tool result, the matched word and what the law asks there: say what changes
+# in at most 5 lines in the final reply, and ask first, through AskUserQuestion, only for a change
+# Claude itself judges critical. On PostToolUse for the same tools it records an edit that went
+# through, so later edits to the same file in the same session are not pointed at again.
 # The regex is `risk_regex` in settings/loop.json, unless the project's CLAUDE.md (the map) sets
 # its own on a `risk_regex:` line. The path is matched as the project knows it (relative to the
 # git root, else the session's cwd). Unreadable input, another tool or event, no regex, or a
@@ -52,14 +53,13 @@ matched_word() {
   done
 }
 
-# record_file <rel>: the file that says this session already edited this path with the user's yes.
+# record_file <rel>: the file that says this session already edited this path and was pointed at.
 record_file() { printf '%s/%s/%s' "$STATE_DIR" "${session:-no-session}" "$(printf '%s' "$1" | cksum | cut -d ' ' -f 1)"; }
 
-# emit_ask <rel> <word>: the PreToolUse decision, as the JSON Claude Code reads.
-emit_ask() {
-  jq -cn --arg r "engineering law (Guards): $1 is a risk zone (its path matches \`$2\`). This is the first edit to it in this session: approve it to say yes, or reject it." \
-    --arg c "engineering law (Guards): $1 is a risk zone (its path matches \`$2\`); the user is being asked to approve this first edit, which is the yes the law requires. The change is shown to them in at most 5 lines before the edit." \
-    '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r,additionalContext:$c}}'
+# emit_pointer <rel> <word>: the context Claude reads beside the tool result; no decision, so nothing blocks.
+emit_pointer() {
+  jq -cn --arg c "engineering law (Guards): $1 is a risk zone (its path matches \`$2\`), and this is the first edit to it in this session; nothing blocks it. Say what changes there in at most 5 lines in the final reply. A change you judge critical (money, auth or permissions, data loss or a migration, a public contract, a behaviour the user did not ask to change) is asked through AskUserQuestion before it is built, not after." \
+    '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:$c}}'
 }
 
 read_hook_input || exit 0
@@ -84,6 +84,6 @@ if [ "$event" = PostToolUse ]; then
 fi
 [ -f "$record" ] && exit 0
 word=$(matched_word "$rel" "$regex")
-append_log "$project" "guard | risk | ask | $rel | matches ${word:-$regex}"
-emit_ask "$rel" "${word:-$regex}"
+append_log "$project" "guard | risk | first | $rel | matches ${word:-$regex}"
+emit_pointer "$rel" "${word:-$regex}"
 exit 0

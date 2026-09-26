@@ -25,7 +25,7 @@ you write. Long forms: `references/01-always-on-law/` under the harness root.
 - No focused or skipped tests: `.only`, `fit`, `fdescribe`; `.skip`, `xit`, `xdescribe`, `test.todo` without a ticket or owner on the same line.
 - No debug artifacts: no `debugger`, no `console.*` in domain code (log through the project's logger).
 
-The edit guard turns an edit that adds one of these, a name, file or cap break below, or a new unlisted top-level folder into a permission prompt (patterns: 9.5); the user's yes is the exception, kept on the line as `law-exception: <what the technology needs>`; a no means fix the line, never route around it.
+The edit guard points at an edit that adds one of these, a name, file or cap break below, or a new unlisted top-level folder (patterns: 9.5); fix the line in your next edit, never route around it; a technical exception stays on the line as `law-exception: <what the technology needs>`, listed in the final reply.
 
 **One thing per file.** One component, one class (its private helpers with it) per file. Types in `*.types`, constants in `*.constants`, config in `*.config`, schemas in `*.schema`, style tokens and class maps in `*.styles`; single-use values stay inline. One folder skeleton per repository: read 2.3 before creating any file or folder. A technical exception cites the compiler or linter error it prevents.
 

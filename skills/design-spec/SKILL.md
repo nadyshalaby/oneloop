@@ -17,6 +17,6 @@ outright: author, extract or refresh the project's design spec.
    15.19 detects the mode from the repository; nothing is asked before it has looked.
 2. **Read 15.19 from disk and run it**, with 15.1 to 15.6 as it names them, as a task of the
    loop (the always-on law): writing or changing the spec is an edit, so it gets the scope
-   line, the note and the yes before anything is written.
+   line and the note before anything is written.
 
 A command picks the route; it waives no check, and the law binds throughout.

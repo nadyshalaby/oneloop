@@ -1,8 +1,9 @@
 #!/bin/bash
 # Guard: the explain skill keeps the shape the user chose for every explanation: the problem,
-# what I'd build, the effect and the risks, then it stops (the build runs the loop, whose yes is
-# still needed before any edit; the skill is no gate of its own since 10.0.0), never about
-# tests, reviews or specs, and read-only (nothing run to try an idea). Run: bash tests/explain.test.sh
+# what I'd build, the effect and the risks; inside the loop it is the Scope step's explanation
+# and Edit follows at once, no yes waited for (14.0.0); asked on its own it stops (the build runs
+# the loop; the skill is no gate of its own since 10.0.0); never about tests, reviews or specs,
+# and read-only (nothing run to try an idea). Run: bash tests/explain.test.sh
 # EXPLAIN_MD points the test at another copy of the skill, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -13,8 +14,9 @@ PINS="**The problem.**
 **What I'd build.** Pseudocode of the core logic
 **Effect.**
 **Risks.**
-Then stop. The build, when the user wants it, runs the loop
-the loop's yes is still needed before any edit
+Inside the loop, Edit follows at once
+Asked on its own, stop here: the build, when the user wants it, runs the loop
+no yes is waited for
 Never about tests, reviews, specs or process
 Nothing is run to try an idea"
 

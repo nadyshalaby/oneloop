@@ -81,7 +81,7 @@ test_the_loop_hooks_sit_where_the_law_says() {
   assert_eq "part 1 then part 2" "1 2" "$(law_parts "$HOOKS_JSON")"
   assert_eq "and nothing else starts a session" "session-start.sh" "$(jq -r '.hooks.SessionStart[].hooks[].command' "$HOOKS_JSON" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | sort -u | tr '\n' ' ' | sed 's/ $//')"
   assert_eq "the prompt hook is the one-line reminder and nothing else" "loop-reminder.sh " "$(scripts_on "$HOOKS_JSON" UserPromptSubmit '')"
-  assert_eq "every edit runs the risk-zone prompt, the scope check, the code rules, then the edit guard" "risk-zone.sh scope-check.sh code-rules.sh edit-guard.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse 'Edit|Write|MultiEdit|NotebookEdit')"
+  assert_eq "every edit runs the risk-zone pointer, the scope check, the code rules, then the edit guard" "risk-zone.sh scope-check.sh code-rules.sh edit-guard.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse 'Edit|Write|MultiEdit|NotebookEdit')"
   assert_eq "every read runs the code rules" "code-rules.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse Read)"
   assert_eq "every edit that went through is recorded by the risk-zone hook" "risk-zone.sh " "$(scripts_on "$HOOKS_JSON" PostToolUse 'Edit|Write|MultiEdit|NotebookEdit')"
   gone=$(wired_scripts "$HOOKS_JSON" | grep -E 'advisor|lane|plan-note|re-anchor' || true)

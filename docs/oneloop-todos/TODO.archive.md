@@ -8,3 +8,4 @@
 - [x] 12.0.0: the edit guard prompts on every code-rule break, names, file kinds, folders and caps included; the user's yes is the exception, kept on the line as law-exception:
 - [x] 13.0.0: the checklist lives in docs/oneloop-todos/ (TODO.md, TODO.archive.md), out of the project's root; the hooks, the law and the skills read it there; an older root pair moves with git mv at the next Scope
 - [x] 13.1.0: /oneloop:start starts a new task, resumes an in-flight one or picks up a parked line; the open lines as one pick-list whose options carry the scope, and the scope-check hook takes the picked option's scope as the yes
+- [x] 14.0.0: auto-pilot with self-control: no hook asks or blocks in any mode, a guard points and Claude fixes at once, Scope explains the change and proceeds with no yes, a progress line before each step, the scope read from the checklist's [~] lines, /oneloop:start resumes without a question

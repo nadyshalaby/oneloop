@@ -2,8 +2,8 @@
 # oneloop edit guard (the code-rules hook).
 # Runs on PreToolUse for Edit, Write, MultiEdit and NotebookEdit. The code rules (the law's 1.1,
 # its Names and One thing per file, 2.2 and 3.4) bind every line of production code. This hook
-# runs the law scout's own shell block (9.5) over the text an edit would write and turns the
-# edit into a PERMISSION PROMPT when it ADDS a finding: the bans (a suppression, an empty catch,
+# runs the law scout's own shell block (9.5) over the text an edit would write and POINTS Claude
+# at the fix when it ADDS a finding: the bans (a suppression, an empty catch,
 # a bare built-in error in a domain-role file, a non-null assertion, an inline type, a focused or
 # unowned skipped test, a debug artifact, an ownerless debt marker, a removed-code comment, a
 # hardcoded secret), the names (a refused whole name, an `I` prefix, the wrong case for the
@@ -15,12 +15,15 @@
 # only the hook sees the map.
 # 12.0.0, at the user's word ("these laws are my own coding style, i want to enforce every single
 # law … claude models can't ignore them unless the target technology will break if it used
-# them"; their pick: a prompt on everything). The prompt names every rule the edit adds, its
-# line and its fix. The user's approval is the exception, recorded on that line as a comment
+# them"), the guard judges every rule; 14.0.0, at their word again ("nothing should block file
+# edits, the model shall strictly apply the engineering rules/laws without asking for edit
+# permissions or to correct it. it should be in auto-pilot mode with self-control"; "hooks shall
+# point and claude fixes raised problems"), it never prompts: the pointer names every rule the
+# edit adds, its line and its fix, nothing blocks the edit, and Claude fixes the line in its next
+# edit, never routes around it. A technical exception is stated on that line as a comment
 # `law-exception: <what the technology needs>`, which the scout lists (`note.law-exception`); a
-# line that already states one still prompts, with the exception quoted, so nothing passes on
-# its own say-so. A rejection means: fix the line and retry, never route around it.
-# What is already in the file never prompts: the block runs over the text being replaced too,
+# line that states one is still pointed at, with the exception quoted, so the final reply can
+# list it. What is already in the file is never pointed at: the block runs over the text being replaced too,
 # and only a count that grows counts (a new file has nothing to compare against, so all of it
 # counts). 9.5 stays the one source of the patterns; this file holds none of them.
 # Exempt, by the law's own definitions: prose, generated files and migrations; test files, except
@@ -42,7 +45,7 @@ here=${BASH_SOURCE[0]%/*}
 LAW_SCOUT="${ONELOOP_HOME:-$(cd -P "$here/.." && pwd)}/references/09-implement/9.5-the-law-scout.md"
 TEST_RULES='ban.suppression|test.focused|test.skipped|sec.hardcoded-secret'
 EVIDENCE_CHARS=120
-PROMPT_RULES=4
+LISTED_RULES=4
 
 # domain_role <path>: yes when the file name marks domain code, where the bare-error ban applies.
 domain_role() {
@@ -104,7 +107,7 @@ scan() {
   grep -E '^[a-z]+\.[a-z-]+ ' "$W/$1.out" | keep_applicable
 }
 
-# why <rule>: the law's own words for the rule, quoted in the prompt.
+# why <rule>: the law's own words for the rule, quoted to Claude.
 why() {
   case "$1" in
     ban.suppression) printf 'zero lint, type or coverage suppressions; the ban holds in test files too, whose sole exception is @ts-expect-error over deliberately invalid input with a comment saying why' ;;
@@ -140,10 +143,10 @@ why() {
   esac
 }
 
-# emit <reason> <context>: the prompt as the JSON Claude Code reads: the permission decision
-# `ask` with its reason for the user, and the same case for the model beside the tool result.
+# emit <context>: the pointer as the JSON Claude Code reads: context for the model beside the
+# tool result, no decision, so nothing blocks.
 emit() {
-  jq -cn --arg r "$1" --arg c "$2" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r,additionalContext:$c}}'
+  jq -cn --arg c "$1" '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:$c}}'
 }
 
 # growths: reads `new <finding>` and `old <finding>` lines; prints, in order of first appearance,
@@ -155,28 +158,27 @@ growths() {
     END { for (i = 1; i <= k; i++) if (n[order[i]] > o[order[i]]) print first[order[i]] }'
 }
 
-# describe <finding line>: one clause of the prompt: the rule, the line, the evidence, the law's
+# describe <finding line>: one clause of the pointer: the rule, the line, the evidence, the law's
 # words, and the exception the line states if it states one. The finding is
 # `rule path:line:evidence`, the block's own shape; the log gets one line per rule.
 describe() {
   rule=${1%% *}; detail=${1#"$rule $rel:"}; line_no=${detail%%:*}; text=${detail#*:}
   stated=""
   case "$text" in *law-exception:*) stated=" It states its exception: law-exception:${text##*law-exception:}." ;; esac
-  append_log "$project" "guard | edit | ask | $rule | $path | line $line_no of the new text"
+  append_log "$project" "guard | edit | fix | $rule | $path | line $line_no of the new text"
   printf '%s at line %s of the new text: %s. The rule: %s.%s' "$rule" "$line_no" "$(printf '%s' "$text" | cut -c1-"$EVIDENCE_CHARS")" "$(why "$rule")" "$stated"
 }
 
-# ask <finding lines>: the prompt, one clause per rule; the first PROMPT_RULES in full, the rest
-# counted, so a big edit still gets one prompt the user can read.
-ask() {
+# point <finding lines>: the pointer, one clause per rule; the first LISTED_RULES in full, the
+# rest counted, so a big edit still gets one pointer that can be read.
+point() {
   total=$(printf '%s\n' "$1" | grep -c .)
-  clauses=$(printf '%s\n' "$1" | head -n "$PROMPT_RULES" | while IFS= read -r finding; do printf ' %s' "$(describe "$finding")"; done)
+  clauses=$(printf '%s\n' "$1" | head -n "$LISTED_RULES" | while IFS= read -r finding; do printf ' %s' "$(describe "$finding")"; done)
   more=""
-  [ "$total" -gt "$PROMPT_RULES" ] && more=" And $((total - PROMPT_RULES)) more rule(s) after these."
+  [ "$total" -gt "$LISTED_RULES" ] && more=" And $((total - LISTED_RULES)) more rule(s) after these."
   breaks="a code-rule break"
   [ "$total" -gt 1 ] && breaks="$total code-rule breaks"
-  emit "oneloop, the code rules (1.1, 2.2, 3.4): this edit adds $breaks.$clauses$more Approve to make this the exception (the line then carries \`law-exception: <what the technology needs>\`); reject to have the line fixed." \
-       "engineering law (1.1, 2.2, 3.4): this edit adds $breaks.$clauses$more The user is being asked; their approval is the exception, recorded on that line as a comment \`law-exception: <what the technology needs>\`. A rejection means: fix the line and retry, never route around it. The patterns are the law scout's (9.5), run over the edit."
+  emit "engineering law (1.1, 2.2, 3.4): this edit adds $breaks.$clauses$more Fix it now: nothing blocks this edit; fix each named line in your next edit, never route around it. A technical exception stays only as a comment on the line, \`law-exception: <what the technology needs>\`, and is listed in the final reply. The patterns are the law scout's (9.5), run over the edit."
 }
 
 # map_folders <root>: the top-level folders the project map's Key directories list, one per line
@@ -211,8 +213,8 @@ unlisted_folder() {
   printf 'folder.unlisted %s:1:%s/ is not among the Key directories of %s/CLAUDE.md (%s)\n' "$rel" "$folder" "${root##*/}" "$(printf '%s' "$listed" | tr '\n' ' ' | sed 's/ $//')"
 }
 
-# judge: prompt on every rule whose count grows from the old text to the new (a new file has no
-# old text, so every finding in it counts), and on a new file under a folder the map does not list.
+# judge: point at every rule whose count grows from the old text to the new (a new file has no old
+# text, so every finding in it counts), and a new file under a folder the map does not list.
 judge() {
   new_findings=$(scan new)
   grown=""
@@ -222,7 +224,7 @@ judge() {
   fi
   unlisted=$(unlisted_folder)
   findings=$(printf '%s\n%s\n' "$grown" "$unlisted" | grep .)
-  [ -z "$findings" ] || ask "$findings"
+  [ -z "$findings" ] || point "$findings"
 }
 
 read_hook_input || exit 0

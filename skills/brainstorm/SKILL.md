@@ -18,6 +18,6 @@ idea is not a task yet.
 2. **Read 16.1 from disk and run it**: one or two forking questions per turn, every one
    through `AskUserQuestion`, nothing edited, until the user signals intent to build. The
    task then runs the loop (the always-on law): its Scope step opens on the distillation,
-   prints the scope line and the note, and waits for the yes.
+   prints the scope line and the note, and proceeds: no yes is waited for.
 
 A command picks the route; it waives no check, and the law binds throughout.

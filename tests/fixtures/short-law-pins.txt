@@ -54,9 +54,14 @@ ask for the file list as a pick-list
 Never read the project
 `scope: <files>`
 a note of at most 3 lines: what changes, which files, what could go wrong
-wait for the yes through `AskUserQuestion`
-the word "go" in the user's message is pre-approval
-print it and the note, then proceed without waiting
+**Auto-pilot:** no step waits for a yes
+never ask permission to edit or to fix
+a clarification the code cannot answer
+a change in logic you judge critical
+asked before it is built
+`oneloop:explain` the change (the problem, the pseudocode, the effect, the risks)
+**Progress line**, before each step
+✅ on the done ones, 🔵 on the current, ⚪ on the rest
 # the loop: edit
 One grep for an existing component or util to reuse
 The smallest diff that satisfies the request
@@ -65,7 +70,8 @@ extend it in the same edit; otherwise no test ritual
 **Scope ratchet:**
 more than double the files stated
 never widen silently, never narrow to fit
-a file the change needs is in the scope or the work stops
+a file the change needs goes on the scope
+on the task line too, then goes on
 **Stuck twice**
 stop editing, state the root cause, ask
 # the loop: check and commit
@@ -77,18 +83,19 @@ read `git diff` once and fix anything obvious
 No separate reviewer
 Stage the changed files by name
 one commit with a one-line message, on the current branch
-the files changed, the check results, the side-finds list if any. Nothing else.
+the files changed, the check results, each guard's point and its fix, the side-finds list if any. Nothing else.
 # plan mode
 never enter it for them or add a planning layer
 Scope is the plan and the rest is unchanged
 # guards
 **Risk zones**
 `auth|login|session|permission|rbac|payment|billing|invoice|migration|schema\.prisma|migrations/|\.env|infra/|terraform|Dockerfile|\.github/workflows|deploy|secret|purge`
-show what will change in at most 5 lines
-even after "go"
-turns that first edit into a permission prompt
-**The edit guard** turns
-permission prompt naming rule, line and fix
+a hook points, you fix, nothing blocks
+say what changes there in at most 5 lines in the final reply
+ask first only a change you judge critical
+**The edit guard** points
+naming rule, line and fix
+fix the line in your next edit
 `law-exception: <what the technology needs>`
 never route around it
 # the checklist
@@ -97,15 +104,16 @@ never route around it
 move there with `git mv` at the next Scope
 studied as input, never used to track
 One line per task, appended to its group
-`- [ ] <task> (scope: <files>)` is added at Scope
+`- [~] <task> (scope: <files>)` is added at Scope
 each written the moment the status changes
-`- [~]` at the yes or "go"
+while parked or waiting on a question
 `- [x]` at Commit, staged in the same commit
 its `TODO.archive.md`
-**The scope-check hook** asks
-the `scope:` of the last `- [ ]` line added to the checklist
-or of the pick-list option they chose
-**the commit hook** asks when a `git commit` leaves the checklist out
+**The scope-check hook** points
+no `- [~]` line of the checklist covers
+**the commit hook** points
+No hook asks or blocks, in any permission mode
+every point is fixed at once
 # the map
 under 60 lines
 hooks enforce rules, the map only orients
@@ -124,13 +132,12 @@ Finish the whole task
 Every detail the user gave
 **Token discipline:**
 do not narrate the loop
-the scope line, the note and the final reply are the only status output
+the scope line, the note, the explanation, the progress lines and the final reply are the only status output
 # precedence
 This law is the floor
 the stricter rule wins
 Never waivable
 in their own words
-the risk-zone yes
 # never chase what you find on the way
 Never chase what you find on the way
 told to the user at once

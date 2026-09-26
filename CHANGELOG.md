@@ -2,6 +2,57 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **14.0.0**: auto-pilot with self-control, at the user's word ("whether i am in bypass-permissions
+  mode or any other modes there is nothing should block file edits, the model shall strictly apply
+  the engineering rules/laws without asking for edit permissions or to correct it. it should be in
+  auto-pilot mode with self-control. the only allowed questions or asking, is clarification
+  questions or critical change in logic that needs my confirmation"; their picks: the model
+  estimates the criticality itself, the scope is read from the checklist file's `- [~]` lines, and
+  `/oneloop:start` asks only when nothing names a line and several are open; then "instead of
+  noteing violations … fix it since we are auto-pilot self-controlled self-judging by the model it
+  self" and "hooks shall point and claude fixes raised problems"; then "I need the oneloop to
+  `oneloop:explain` the implementation before starting the task (part of the loop, no approval
+  needed, it's for helping me to keep up with the model while he is working …)" and "print very
+  simple colorized vistual progress note which step we are in (previous, current, next) before
+  progressing to a new step in the loop"). No hook asks or blocks any more, in any permission
+  mode (Claude Code honours a hook's `ask` even in bypass-permissions mode, which is where every
+  prompt of the day came from): the risk-zone, scope-check, commit-check and edit-guard hooks hand
+  Claude a pointer beside the tool result (`additionalContext` alone, no `permissionDecision`)
+  that names the problem and its fix, log it (`guard | <hook> | fix | …`; the risk zone's first
+  edit as `first`), and Claude fixes it at once: the file goes on the task line, the checklist is
+  ticked, staged and committed right after, the code-rule break is fixed in the next edit; a
+  technical exception stays on the line as `law-exception: <what the technology needs>` and is
+  listed in the final reply. The Scope step waits for no yes and the word "go" means nothing
+  special any more: the scope line, the note, then `oneloop:explain` on the change (the problem,
+  the pseudocode, the effect, the risks) so the user can follow the work, then Edit; the scope
+  ratchet restates the scope on the task line and goes on; `- [~]` is written at Scope (`- [ ]`
+  only while parked or waiting on a question); a progress line precedes each step (the four steps
+  in order, ✅ on the done ones, 🔵 on the current, ⚪ on the rest); the final reply lists each
+  guard's point and its fix; the only questions left, through `AskUserQuestion`, are a
+  clarification the code cannot answer and a change in logic Claude judges critical, asked before
+  it is built. The scope-check hook reads the scope from the checklist file alone (the `scope:`
+  of every `- [~]` line of `docs/oneloop-todos/TODO.md`, joined), so the transcript reader with
+  its yes, its "go" and its picked option is gone, and with it a failure seen the same day: the
+  13.1.0 reader's jq aborted on a transcript line whose content was an array of blocks and then
+  judged every later edit against a stale scope. `/oneloop:start` resumes a named line, or the one
+  open line, without a question. Major, and a loosening the user chose, said plainly: every
+  machine stop is gone; an out-of-scope edit, a risk-zone first edit, a code-rule break and a
+  commit without the checklist all go through and rely on Claude fixing what the hook pointed at,
+  and the yes at Scope is gone. The reminder line is `one loop · auto-pilot: a guard points, you
+  fix · proof required · ask only a clarification or a critical logic change` (121 bytes). The
+  law's cap rises from 12,000 to 12,500 characters to hold the explain and the progress-line
+  rules, both asked for; four trims paid for part of it ("The list goes to the user at the end"
+  gone, the catalog names in the last section gone, the risk-zone yes gone from Never waivable,
+  the checklist's parked clause shortened). The long forms 1.1, 1.4, 1.6, 1.10, 2.2, 5.3, 9.5,
+  15.28, 16.1 and 16.4, the start, explain, brainstorm and design-spec skills, the README, the map
+  and the manifests follow. Tests: `hooks/tests/scope-check.test.sh` rewritten for the file-based
+  guard (50 checks, from 81 transcript cases; main's hook fails 23), `risk-zone.test.sh` (33
+  checks; main's hook fails 19), `edit-guard.test.sh` (117; main's fails 67),
+  `commit-check.test.sh` (25; main's fails 12) and `loop-reminder.test.sh` (9; main's fails 1)
+  read a pointer instead of a decision, `tests/explain.test.sh` pins the new handoff (main's
+  skill fails it), the pins and the retired wording move with the law (main's law and main's code
+  rules each fail both checks). Law: 88 lines and 11,994 characters before, 88 and 12,408 after;
+  code rules 49 and 7,593 before, 49 and 7,596 after.
 - **13.1.0**: `/oneloop:start` starts a new task, resumes an in-flight one or picks up a parked
   line, at the user's word ("start skill: enables me to start new, resume existing, or complete
   parked task."; their picks: the skill and the hook together, the pick is the yes, and a resume

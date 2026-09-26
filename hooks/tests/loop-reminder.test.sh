@@ -9,7 +9,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/../../tests/harness.sh"
 here=$(dirname "${BASH_SOURCE[0]}")
 SCRIPT="${LOOP_REMINDER_SH:-$here/../loop-reminder.sh}"
-LINE='one loop · wait for yes unless "go" · proof required · risk zones need my yes'
+LINE='one loop · auto-pilot: a guard points, you fix · proof required · ask only a clarification or a critical logic change'
 
 # run_event <event>: what the hook prints for that event.
 run_event() {

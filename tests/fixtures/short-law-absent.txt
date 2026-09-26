@@ -39,11 +39,14 @@ Trivial ask
 → verify:
 The edit guard hook refuses
 its refusal is this rule speaking
-# 12.0.0, the edit guard prompts on every code-rule break ("i want to enforce every single law"): the warn-only wording is retired.
-The code-rules hook warns
-**The code-rules hook** warns
-never blocks
-warning, not a block
+# 14.0.0, auto-pilot with self-control ("nothing should block file edits … without asking for edit permissions"): the yes, the pre-approval and the prompts are retired.
+wait for the yes
+waits for the yes
+pre-approval
+permission prompt
+even after "go"
+the risk-zone yes
+their approval is the yes
 # 13.0.0, the checklist lives in docs/oneloop-todos/ ("so they can mess with the projects main files", read as: so they do not): the root location is retired.
 at the repository root
 # 11.0.0, the plugin: the law is handed to the session by a hook, so no fixed install path may come back.

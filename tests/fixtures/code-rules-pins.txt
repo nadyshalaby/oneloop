@@ -79,9 +79,9 @@ Surgical changes
 Goal-driven execution
 never loosened to pass
 never hunks of this diff
-# the edit guard prompts; the user's yes is the exception, kept on the line
-The edit guard turns
-permission prompt
+# the edit guard notes; a technical exception is stated on the line
+The edit guard points
+fix the line in your next edit
 `law-exception: <what the technology needs>`
 never route around it
 # names (the short form of the placement guide's symbol table and refused names)

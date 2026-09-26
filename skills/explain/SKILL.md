@@ -3,7 +3,7 @@ name: explain
 description: >-
   Explains logic short and plain: the problem, pseudocode, the effect, the risks. Use it whenever
   the user asks how code, a flow or a feature works, or asks you to explain a change before it is
-  built.
+  built, and at the loop's Scope step on every change, after the scope line and the note (the law).
 ---
 
 # explain
@@ -14,8 +14,9 @@ pseudocode, never a report.
 ## Read first, run nothing, change nothing
 
 Read just enough to get the logic right: files, searches and `git` history. Nothing is run to try
-an idea (no scratch code, no experiments, no test runs), and nothing is edited or created: an
-explanation is not the loop's Scope step, and the loop's yes is still needed before any edit.
+an idea (no scratch code, no experiments, no test runs), and nothing is edited or created here.
+Inside the loop this comes right after the scope line and the note (the law's Scope step), and
+the loop then goes on to Edit; no yes is waited for. Asked on its own, it ends the turn.
 
 ## Explaining a change before it is built
 
@@ -28,8 +29,9 @@ Write, in this order and short:
 - **Effect.** What changes for the user and in the code, in a line or two.
 - **Risks.** What could go wrong for the user or in the code, or is given up, one line each.
 
-Then stop. The build, when the user wants it, runs the loop (the always-on law): the scope
-line, the note and the yes come from its Scope step, not from here.
+Inside the loop, Edit follows at once. Asked on its own, stop here: the build, when the user
+wants it, runs the loop (the always-on law), whose Scope step prints the scope line and the
+note; an explanation already given for the same change stands and is not repeated.
 
 ## Explaining existing code
 
