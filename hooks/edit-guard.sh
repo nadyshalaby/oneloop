@@ -1,5 +1,5 @@
 #!/bin/bash
-# engineering-rules code-rules hook (the edit guard).
+# oneloop code-rules hook (the edit guard).
 # Runs on PreToolUse for Edit, Write, MultiEdit and NotebookEdit. The bans in the law's 1.1
 # are zero tolerance in production code. This hook runs the law scout's own shell block (9.5)
 # over the text an edit would write, and WARNS beside the tool result when the edit ADDS a
@@ -29,7 +29,7 @@ here=${BASH_SOURCE[0]%/*}
 # shellcheck source=./path-kind.sh
 . "$here/path-kind.sh"
 
-LAW_SCOUT="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}/references/09-implement/9.5-the-law-scout.md"
+LAW_SCOUT="${ONELOOP_HOME:-$(cd -P "$here/.." && pwd)}/references/09-implement/9.5-the-law-scout.md"
 HOOK_RULES='ban.suppression|ban.empty-catch|ban.bare-error|test.focused|test.skipped|clean.debug-artifact|clean.debt-marker|clean.removed-comment|sec.hardcoded-secret'
 TEST_RULES='ban.suppression|test.focused|test.skipped|sec.hardcoded-secret'
 EVIDENCE_CHARS=120

@@ -1,20 +1,21 @@
 #!/bin/bash
-# Guard: every hook settings/hooks.json runs is a script that exists in hooks/, every command
-# reaches it through the fixed home, $HOME/.claude/engineering-rules/hooks/, which install.sh
-# merges into ~/.claude/settings.json, every hook script that reads Claude Code's event input
-# is wired to an event, the status line runs hooks/statusline.sh (it reads no event), the one
-# hook that reaches the Bash tool is the commit check (it asks, never blocks; git safety itself
-# binds through the law), the prompt hook carries no matcher, because UserPromptSubmit takes
-# none, and the loop's hooks sit where the law puts them (the one-line reminder alone on every
-# prompt; the risk-zone prompt, the scope check and the code-rules warning on every edit, in
-# that order; the risk-zone record after it). Run: bash tests/hooks-wiring.test.sh
+# Guard: every hook hooks/hooks.json runs is a script that exists in hooks/, every command
+# reaches it through the plugin root Claude Code expands (`${CLAUDE_PLUGIN_ROOT}/hooks/`), every
+# hook script that reads Claude Code's event input is wired to an event, the fragment sets no
+# status line (a plugin cannot; bin/setup-statusline.sh does), the one hook that reaches the
+# Bash tool is the commit check (it asks, never blocks; git safety itself binds through the
+# law), the prompt hook carries no matcher, because UserPromptSubmit takes none, and the loop's
+# hooks sit where the law puts them (the law on every session start; the one-line reminder
+# alone on every prompt; the risk-zone prompt, the scope check, the code rules and the
+# code-rules warning on every edit; the code rules on every read; the risk-zone record after
+# every edit that went through). Run: bash tests/hooks-wiring.test.sh
 # HOOKS_JSON points the test at another fragment, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT=$(repo_root) || exit 1
-HOOKS_JSON="${HOOKS_JSON:-$ROOT/settings/hooks.json}"
-PREFIX="bash \"\$HOME/.claude/engineering-rules/hooks/"
+HOOKS_JSON="${HOOKS_JSON:-$ROOT/hooks/hooks.json}"
+PREFIX="bash \"\${CLAUDE_PLUGIN_ROOT}/hooks/"
 
 # wired_commands <manifest>: every command string in it, one per line.
 wired_commands() { jq -r '.hooks[][] | .hooks[].command' "$1"; }
@@ -24,6 +25,9 @@ wired_scripts() { wired_commands "$1" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | sor
 
 # event_scripts: the hook scripts that read an event on stdin, sorted.
 event_scripts() { grep -l 'read_hook_input ||' "$ROOT"/hooks/*.sh | sed 's#.*/##' | sort -u; }
+
+# scripts_on <manifest> <event> <matcher>: the scripts the event runs under that exact matcher, in order.
+scripts_on() { jq -r --arg e "$2" --arg m "$3" '.hooks[$e][] | select((.matcher // "") == $m) | .hooks[].command' "$1" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | tr '\n' ' '; }
 
 # bash_matchers <manifest>: every PreToolUse or PostToolUse matcher that reaches the Bash tool,
 # one per line, judged as Claude Code judges it: the tool name against the matcher as a regex
@@ -43,24 +47,20 @@ test_every_event_script_is_wired() {
   assert_contains "every event-reading script is wired" "<none>" "${missing:-<none>}"
 }
 
-test_every_command_goes_through_the_home() {
+test_every_command_goes_through_the_plugin_root() {
   stray=$(wired_commands "$HOOKS_JSON" | grep -v -F "$PREFIX")
-  assert_contains "every command runs bash on a script in the fixed home" "<none>" "${stray:-<none>}"
+  assert_contains "every command runs bash on a script under the plugin root" "<none>" "${stray:-<none>}"
 }
 
-# The status line is one settings key, not an event; it runs the script here and falls back.
-test_the_status_line_runs_the_script() {
-  line=$(jq -r '.statusLine.command // empty' "$HOOKS_JSON")
-  assert_contains "the status line runs hooks/statusline.sh" "f=\"\$HOME/.claude/engineering-rules/hooks/statusline.sh\"" "$line"
-  assert_contains "and falls back to the personal script" "exec sh \"\$HOME/.claude/statusline-command.sh\"" "$line"
+# A plugin's hooks fragment cannot set the status line, so a statusLine key here would be dead.
+test_no_status_line_in_the_fragment() {
+  assert_eq "the fragment sets no status line" false "$(jq 'has("statusLine")' "$HOOKS_JSON")"
+  assert_eq "the fragment holds hooks and nothing else" "hooks" "$(jq -r 'keys | join(" ")' "$HOOKS_JSON")"
 }
-
-# on_bash <manifest>: the scripts the PreToolUse matcher written exactly as Bash runs, in order.
-on_bash() { jq -r '.hooks.PreToolUse[] | select(.matcher == "Bash") | .hooks[].command' "$1" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | tr '\n' ' '; }
 
 test_only_the_commit_check_reaches_bash() {
   assert_eq "the one matcher that reaches Bash is the literal Bash" "Bash" "$(bash_matchers "$HOOKS_JSON" | tr '\n' ' ' | sed 's/ $//')"
-  assert_eq "and it runs the commit check alone" "commit-check.sh " "$(on_bash "$HOOKS_JSON")"
+  assert_eq "and it runs the commit check alone" "commit-check.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse Bash)"
 }
 
 test_the_nine_events_are_wired() {
@@ -68,19 +68,19 @@ test_the_nine_events_are_wired() {
   assert_eq "the nine events" "Notification PostToolUse PreToolUse SessionStart Stop StopFailure SubagentStart SubagentStop UserPromptSubmit " "$events"
 }
 
-# edit_hooks <manifest> <event>: the scripts the event runs on the four edit tools, in order.
-edit_hooks() { jq -r --arg e "$2" '.hooks[$e][] | select(.matcher == "Edit|Write|MultiEdit|NotebookEdit") | .hooks[].command' "$1" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | tr '\n' ' '; }
-
-# The loop's guards sit where the law says: the one-line reminder alone on every prompt, the
-# risk-zone prompt, then the scope check, then the code-rules warning on every edit, and the
-# risk-zone record after every edit that went through.
+# The loop's guards sit where the law says: the law on every session start, the one-line
+# reminder alone on every prompt, the risk-zone prompt, the scope check, the code rules and
+# the code-rules warning on every edit, the code rules on every read, and the risk-zone record
+# after every edit that went through.
 test_the_loop_hooks_sit_where_the_law_says() {
-  prompt=$(jq -r '.hooks.UserPromptSubmit[].hooks[].command' "$HOOKS_JSON" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | tr '\n' ' ')
-  assert_eq "the prompt hook is the one-line reminder and nothing else" "loop-reminder.sh " "$prompt"
-  assert_eq "every edit runs the risk-zone prompt, the scope check, then the code-rules warning" "risk-zone.sh scope-check.sh edit-guard.sh " "$(edit_hooks "$HOOKS_JSON" PreToolUse)"
-  assert_eq "every edit that went through is recorded by the risk-zone hook" "risk-zone.sh " "$(edit_hooks "$HOOKS_JSON" PostToolUse)"
-  gone=$(wired_scripts "$HOOKS_JSON" | grep -E 'advisor|lane|plan-note' || true)
-  assert_eq "no advisor, lane or plan-note hook is wired" "" "$gone"
+  assert_eq "every session start carries the law" "session-start.sh " "$(scripts_on "$HOOKS_JSON" SessionStart 'startup|resume|clear|compact|fork')"
+  assert_eq "and nothing else starts a session" "session-start.sh" "$(jq -r '.hooks.SessionStart[].hooks[].command' "$HOOKS_JSON" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | sort -u | tr '\n' ' ' | sed 's/ $//')"
+  assert_eq "the prompt hook is the one-line reminder and nothing else" "loop-reminder.sh " "$(scripts_on "$HOOKS_JSON" UserPromptSubmit '')"
+  assert_eq "every edit runs the risk-zone prompt, the scope check, the code rules, then the code-rules warning" "risk-zone.sh scope-check.sh code-rules.sh edit-guard.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse 'Edit|Write|MultiEdit|NotebookEdit')"
+  assert_eq "every read runs the code rules" "code-rules.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse Read)"
+  assert_eq "every edit that went through is recorded by the risk-zone hook" "risk-zone.sh " "$(scripts_on "$HOOKS_JSON" PostToolUse 'Edit|Write|MultiEdit|NotebookEdit')"
+  gone=$(wired_scripts "$HOOKS_JSON" | grep -E 'advisor|lane|plan-note|re-anchor' || true)
+  assert_eq "no advisor, lane, plan-note or re-anchor hook is wired" "" "$gone"
 }
 
 # UserPromptSubmit takes no matcher and fires on every prompt, so a matcher written there is
@@ -90,26 +90,31 @@ test_the_prompt_hook_carries_no_matcher() {
   assert_contains "the prompt hook carries no matcher" "<none>" "${stray:-<none>}"
 }
 
-# The checks have to be able to fail: a missing script, an unwired script, a second hook on
-# Bash and a Bash regex on PostToolUse are all named.
+# The checks have to be able to fail: a missing script, an unwired script, a command outside
+# the plugin root, a status line, a second hook on Bash and a Bash regex on PostToolUse are all
+# named.
 test_planted_breaches_are_named() {
-  jq '.hooks.Stop[0].hooks[0].command = "bash \"$HOME/.claude/engineering-rules/hooks/no-such-hook.sh\""' "$HOOKS_JSON" > "$WORK/planted.json"
+  jq '.hooks.Stop[0].hooks[0].command = "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/no-such-hook.sh\""' "$HOOKS_JSON" > "$WORK/planted.json"
   named=$(for script in $(wired_scripts "$WORK/planted.json"); do [ -f "$ROOT/hooks/$script" ] || printf '%s' "$script"; done)
   assert_contains "a planted missing script is named" "no-such-hook.sh" "$named"
   ghost=$(comm -23 <(printf 'ghost-hook.sh\n') <(wired_scripts "$HOOKS_JSON"))
   assert_contains "a planted unwired script is named" "ghost-hook.sh" "$ghost"
-  jq '(.hooks.PreToolUse[] | select(.matcher == "Bash") | .hooks) += [{type: "command", command: "bash \"$HOME/.claude/engineering-rules/hooks/edit-guard.sh\""}]' "$HOOKS_JSON" > "$WORK/bash.json"
-  assert_eq "a planted second hook on Bash is named" "commit-check.sh edit-guard.sh " "$(on_bash "$WORK/bash.json")"
-  jq '.hooks.PostToolUse += [{matcher: "^Bash$", hooks: [{type: "command", command: "bash \"$HOME/.claude/engineering-rules/hooks/edit-guard.sh\""}]}]' "$HOOKS_JSON" > "$WORK/post-bash.json"
+  jq '.hooks.Stop[0].hooks[0].command = "bash \"$HOME/.claude/somewhere/hooks/progress-notify.sh\""' "$HOOKS_JSON" > "$WORK/home.json"
+  assert_contains "a command outside the plugin root is named" "somewhere" "$(wired_commands "$WORK/home.json" | grep -v -F "$PREFIX")"
+  jq '.statusLine = {type: "command", command: "echo"}' "$HOOKS_JSON" > "$WORK/status.json"
+  assert_eq "a planted status line is named" true "$(jq 'has("statusLine")' "$WORK/status.json")"
+  jq '(.hooks.PreToolUse[] | select(.matcher == "Bash") | .hooks) += [{type: "command", command: "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/edit-guard.sh\""}]' "$HOOKS_JSON" > "$WORK/bash.json"
+  assert_eq "a planted second hook on Bash is named" "commit-check.sh edit-guard.sh " "$(scripts_on "$WORK/bash.json" PreToolUse Bash)"
+  jq '.hooks.PostToolUse += [{matcher: "^Bash$", hooks: [{type: "command", command: "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/edit-guard.sh\""}]}]' "$HOOKS_JSON" > "$WORK/post-bash.json"
   assert_eq "a planted PostToolUse regex on Bash is named beside the one matcher" "Bash ^Bash$" "$(bash_matchers "$WORK/post-bash.json" | tr '\n' ' ' | sed 's/ $//')"
-  jq '.hooks.UserPromptSubmit[0].hooks += [{type: "command", command: "bash \"$HOME/.claude/engineering-rules/hooks/advisor-cue.sh\""}]' "$HOOKS_JSON" > "$WORK/two-prompt.json"
-  assert_eq "a second prompt hook is caught" "loop-reminder.sh advisor-cue.sh " "$(jq -r '.hooks.UserPromptSubmit[].hooks[].command' "$WORK/two-prompt.json" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | tr '\n' ' ')"
+  jq '.hooks.UserPromptSubmit[0].hooks += [{type: "command", command: "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/advisor-cue.sh\""}]' "$HOOKS_JSON" > "$WORK/two-prompt.json"
+  assert_eq "a second prompt hook is caught" "loop-reminder.sh advisor-cue.sh " "$(scripts_on "$WORK/two-prompt.json" UserPromptSubmit '')"
 }
 
 test_every_wired_script_exists
 test_every_event_script_is_wired
-test_every_command_goes_through_the_home
-test_the_status_line_runs_the_script
+test_every_command_goes_through_the_plugin_root
+test_no_status_line_in_the_fragment
 test_only_the_commit_check_reaches_bash
 test_the_nine_events_are_wired
 test_the_loop_hooks_sit_where_the_law_says

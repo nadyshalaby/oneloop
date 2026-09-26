@@ -94,13 +94,14 @@ never route around it
 **The checklist**, mandatory
 `TODO.md` at the repository root is the only task tracker
 studied as input, never used to track
-One line per task, under a `## <milestone>` heading
-`- [ ] <task>` is added at Scope with the scope line
+One line per task, appended to its group
+`- [ ] <task> (scope: <files>)` is added at Scope
 each written the moment the status changes
 `- [~]` at the yes or "go"
 `- [x]` at Commit with `TODO.md` staged in the same commit
 `TODO.archive.md`
 **The scope-check hook** asks
+the `scope:` of the last `- [ ]` line added to `TODO.md`
 **the commit hook** asks when a `git commit` leaves `TODO.md` out
 # the map
 under 60 lines
@@ -108,7 +109,7 @@ hooks enforce rules, the map only orients
 A map over 60 lines, or a project with none, is a side find
 # helpers
 This chat does everything
-`er-reader`
+`oneloop:er-reader`
 only after grep has failed twice
 never a `fork`, never a builder or a reviewer
 # one goal, pace, principles
@@ -146,5 +147,6 @@ bare built-in error throws in domain code
 focused or skipped tests
 debug artifacts
 `engineering-code.md`
-# config
-`~/.claude/engineering-rules/settings/loop.json`
+# config and paths
+`settings/loop.json`
+under the harness root named above

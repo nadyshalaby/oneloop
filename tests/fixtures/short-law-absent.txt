@@ -39,3 +39,8 @@ Trivial ask
 → verify:
 The edit guard hook refuses
 its refusal is this rule speaking
+# 11.0.0, the plugin: the law is handed to the session by a hook, so no fixed install path may come back.
+~/.claude/engineering-rules
+~/.claude/rules/engineering-code.md
+/engineering-rules:
+install.sh

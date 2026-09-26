@@ -1,33 +1,33 @@
 ---
-name: update-engineering-rules
+name: update-rules
 description: >-
-  Changes and ships the user's engineering rules (law, command skills, references, hooks, the
-  loop config, settings fragment, installer) in the repo at ~/.claude/engineering-rules. Use it
-  whenever the user asks to add, change, remove, loosen or tighten an engineering rule, law,
-  step of the loop, guard, command, hook or check, or to update the engineering rules. Ends
-  tested, installed, committed and pushed.
+  Changes and ships the oneloop harness (the engineering law, the code rules, the command
+  skills, the reference pages, the hooks, the loop config, the plugin manifests) from its dev
+  checkout at ~/Code/oneloop. Use it whenever the user asks to add, change, remove, loosen or
+  tighten an engineering rule, law, step of the loop, guard, command, hook or check, or to update
+  the rules. Ends tested, released, installed and pushed.
 ---
 
-# Updating the engineering rules
+# Updating the rules
 
 The rules are a harness every session runs inside, so a change to them is a change to a live
-system: the checkout at `~/.claude/engineering-rules` is what every new session loads, and its
-hooks run in every open session the moment a file changes. Work on a copy, prove it, then
+system: the installed plugin is what every new session loads, and the dev checkout at
+`~/Code/oneloop` is where a change is made and proven first. Work on a copy, prove it, then
 release it in one step, the same way the law's 1.11 ships anything else.
 
 ## Where a rule lives, and what it costs
 
 | The rule | Its file | Who pays for it |
 |---|---|---|
-| Binds every task in every session | `law/engineering-law.md`, the core the `CLAUDE.md` block imports | every session and every helper, on every turn; capped at 90 lines and 11,200 characters |
-| Binds every line of code written | `law/engineering-code.md`, which `install.sh` copies (never links: a linked rules file does not load) into `~/.claude/rules/`, where its `paths:` globs load it the first time a code file is read | every session and helper that reads code, from that read on; capped at 60 lines and 7,600 characters |
+| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, and again after a compaction | every session, from its first turn; capped at 90 lines and 12,000 characters |
+| Binds every line of code written | `law/engineering-code.md`, handed to a session by `hooks/code-rules.sh` with the first code file it reads or edits (its `paths:` globs say which files count) | every session that touches code, once; capped at 60 lines and 7,600 characters |
 | The reasons and procedures behind an always-on rule | `references/01-always-on-law/1.x-*.md`, the long forms | only when read |
 | The loop's defaults: the four checks, the discovery budget, the two regexes | `settings/loop.json`, read by the hooks and named by the law | nothing per turn |
-| A command the user types | `skills/<command>/SKILL.md` | its description in every session's skill list; the body when called |
-| The one helper, the read-only reader | `agents/er-reader.md`, linked into `~/.claude/agents/` | its description in every session's agent list; the body when sent |
+| A command the user types | `skills/<command>/SKILL.md`, served as `/oneloop:<command>` | its description in every session's skill list; the body when called |
+| The one helper, the read-only reader | `agents/er-reader.md`, served as `oneloop:er-reader` | its description in every session's agent list; the body when sent |
 | Detail one step or command reads | `references/<nn>-*/<n.n>-*.md` | only when read |
-| Enforced by a machine at the tool boundary | `hooks/<name>.sh`, wired in `settings/hooks.json` | a process on every matching event |
-| How the rules reach Claude Code | `settings/claude-md-block.md`, `settings/hooks.json`, `install.sh` | nothing per turn |
+| Enforced by a machine at the tool boundary | `hooks/<name>.sh`, wired in `hooks/hooks.json` under `${CLAUDE_PLUGIN_ROOT}` | a process on every matching event |
+| How the rules reach Claude Code | `.claude-plugin/plugin.json` (the plugin, its version), `.claude-plugin/marketplace.json` (this repository as its own marketplace), `hooks/hooks.json`; `bin/setup-statusline.sh` for the status line, the one thing a plugin cannot set | nothing per turn |
 
 Put a rule on the cheapest layer that still binds when it must: the core only for what every
 task needs, the code rules for what only writing code needs (the core keeps a one-line summary
@@ -56,7 +56,7 @@ hook warns or asks, never blocks (the law, Guards).
   follow-up and reported, not fixed inside this change unless it blocks it.
 - **A hook must never be the outage.** A hook that cannot judge exits 0 with one log line; it
   warns only about what the law bans, and only about what the edit adds, never what was
-  already there; the risk-zone hook asks, it never denies.
+  already there; the risk-zone and scope hooks ask, they never deny.
 - **Evidence, safety and questions as the law says.** Every claim in the report has output run
   this session behind it (1.5); git safety holds throughout (1.7); a fork only the user can
   decide (which layer, whether a loosening is wanted, a name) goes through `AskUserQuestion`
@@ -64,33 +64,40 @@ hook warns or asks, never blocks (the law, Guards).
 
 ## The steps
 
-1. **Find the repository and check it is calm.**
-   `ER=$(cd -P ~/.claude/engineering-rules && pwd)`, then `git -C "$ER" status --porcelain`
-   and `git -C "$ER" worktree list`. A dirty tree or another change branch in flight is work
-   somebody left: stop and tell the user rather than build on it. The live checkout is on `main`.
+1. **Find the checkout and check it is calm.**
+   `ER=$(cd -P ~/Code/oneloop && pwd)`, then `git -C "$ER" status --porcelain` and
+   `git -C "$ER" worktree list`. A dirty tree or another change branch in flight is work
+   somebody left: stop and tell the user rather than build on it. The checkout is on `main`, and
+   `claude plugin list` shows `oneloop@oneloop` enabled at the version of the top `CHANGELOG.md`
+   entry; anything else is a release half done, to be told, not built on.
 2. **Restate the change in one line and pick its layer** from the table. Ask only what the user
    must decide; everything the repository can answer, look up.
-3. **Work in a worktree, never in the live checkout.**
+3. **Work in a worktree, never in the checkout.**
    `git -C "$ER" worktree add -b rules/<slug> "$ER.worktrees/<slug>" main`, and every edit,
-   test and commit below happens there, so open sessions keep running the old rules until the
-   new ones are proven.
+   test and commit below happens there; sessions keep running the installed plugin until the
+   new version is released.
 4. **Make the smallest change that does it**, in every file the old wording lives in, the long
    form beside the short law included, and keep both law files under their caps.
 5. **Change the tests with it.** New always-on wording gets pins; wording that must never come
    back goes into `tests/fixtures/short-law-absent.txt`; a hook change gets a test beside it
    (`hooks/tests/`); a new command is listed in `tests/commands.test.sh` (a typed command in
    `COMMANDS`, a standalone skill in `STANDALONE`); a new loop default is checked in
-   `tests/loop-config.test.sh`. Watch each new check fail on the old text: point the test's
-   override (`LAW_MD`, `CODE_MD`, `LOOP_JSON`, `RISK_ZONE_SH`, `LOOP_REMINDER_SH` and the like)
-   at `git -C "$ER" show main:<path>` saved to a scratch file.
+   `tests/loop-config.test.sh`; a new hook is wired in `hooks/hooks.json` and pinned in
+   `tests/hooks-wiring.test.sh`. Watch each new check fail on the old text: point the test's
+   override (`LAW_MD`, `CODE_MD`, `LOOP_JSON`, `SCOPE_CHECK_SH`, `SESSION_START_SH`,
+   `CODE_RULES_SH` and the like) at `git -C "$ER" show main:<path>` saved to a scratch file.
 6. **Run everything, on the exact commit you will ship.** Every `*.test.sh` in the worktree
-   (`find . -name '*.test.sh' -not -path './.git/*'`, each run, each result line pasted), and
-   `shellcheck -x -P SCRIPTDIR -S style install.sh hooks/*.sh hooks/tests/*.sh tests/*.sh`.
-   Every file green, no finding; a red one sends you back to step 4.
+   (`find . -name '*.test.sh' -not -path './.git/*'`, each run, each result line pasted),
+   `shellcheck -x -P SCRIPTDIR -S style bin/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh`, and
+   `claude plugin validate --strict .` in the worktree. Every file green, no finding; a red one
+   sends you back to step 4.
 7. **Write it into the history.** A new top entry in `CHANGELOG.md` with the next version:
    major when a rule or a command is removed, renamed or loosened; minor for a new rule, check,
    hook or command; patch for wording and fixes. It says what changed, why in the user's words,
-   what protection a loosening removes, and both law files' sizes before and after.
+   what protection a loosening removes, and both law files' sizes before and after. The same
+   version goes into `.claude-plugin/plugin.json` and the marketplace entry in
+   `.claude-plugin/marketplace.json` (`tests/plugin.test.sh` keeps the three equal); it is what
+   `claude plugin update` compares.
 8. **Commit in the worktree**, explicit paths only, a message that says what and why, no
    attribution trailer (1.7).
 9. **Prove the release before making it.** The law's deploy command (1.11), read for a harness:
@@ -98,19 +105,21 @@ hook warns or asks, never blocks (the law, Guards).
    watched on one real event before it is called done; rule text has no switch, so its rollback
    is the revert below; there are no migrations; nothing else is in flight (step 1); and the
    rollback is named: the `main` commit before this one, undone with
-   `git -C "$ER" revert --no-edit <this commit>` and a re-run of the installer.
-10. **Release it.** `git -C "$ER" merge --ff-only rules/<slug>` in the live checkout, then
-    `bash "$ER/install.sh"`, which re-links renamed skills, re-merges changed hooks and
-    re-copies the code rules (a copy, so a change to `law/engineering-code.md` binds nobody
-    until this runs) and changes nothing else, and `bash "$ER/install.sh" --check`, which must
-    print `engineering-rules: installed and wired`.
+   `git -C "$ER" revert --no-edit <this commit>`, pushed, and `claude plugin update oneloop@oneloop`.
+10. **Release it.** `git -C "$ER" merge --ff-only rules/<slug>` in the checkout, then
+    `git -C "$ER" push origin main`: the marketplace is the GitHub repository, so the push is
+    the publish. Then `claude plugin update oneloop@oneloop`, which fetches the marketplace and
+    installs the new version, and `claude plugin list`, which must show `oneloop@oneloop` enabled
+    at that version. Running sessions keep the old version until they restart (or run
+    `/reload-plugins`); new sessions get the new one.
 11. **Verify it live.** A fresh session that could only answer from the new rules:
     `env -i HOME="$HOME" PATH="$PATH" USER="$USER" TERM=xterm-256color LANG=en_US.UTF-8 SHELL=/bin/zsh TMPDIR="$TMPDIR" claude -p "<a question only the changed rule answers>" --no-session-persistence --model sonnet`,
-    its answer pasted; a hook change also gets one real event through the installed hook. If
-    it did not take, revert (step 9) and say so.
-12. **Push it.** `git -C "$ER" push origin main`. No remote, or a refused push, is said plainly
-    with its error; never force.
-13. **Clean up.** `git -C "$ER" worktree remove "$ER.worktrees/<slug>"` on a clean worktree only,
+    its answer pasted; a hook change also gets one real event through the installed copy
+    (`p=$(jq -r '.plugins["oneloop@oneloop"][0].installPath' ~/.claude/plugins/installed_plugins.json)`,
+    then the event piped into `bash "$p/hooks/<hook>.sh"`). If it did not take, roll back
+    (step 9) and say so.
+12. **Clean up.** `git -C "$ER" worktree remove "$ER.worktrees/<slug>"` on a clean worktree only,
     never `--force`, then `git -C "$ER" branch -d rules/<slug>`.
-14. **Report in plain words:** what changed and why, what it costs or saves every session, what
-    was run and what it printed, the commit, the push, the rollback, and any follow-ups found.
+13. **Report in plain words:** what changed and why, what it costs or saves every session, what
+    was run and what it printed, the commit, the push, the installed version, the rollback, and
+    any follow-ups found.

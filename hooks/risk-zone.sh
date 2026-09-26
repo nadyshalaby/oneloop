@@ -1,5 +1,5 @@
 #!/bin/bash
-# engineering-rules risk-zone guard.
+# oneloop risk-zone guard.
 # The law's Guards: before the FIRST edit to a file whose path matches the risk regex (login,
 # payments, migrations, env files, infra, deploy settings, secrets ...), the user's yes is needed,
 # even after "go". On PreToolUse for Edit, Write, MultiEdit and NotebookEdit this hook turns that
@@ -23,8 +23,8 @@ here=${BASH_SOURCE[0]%/*}
 # shellcheck source=./path-kind.sh
 . "$here/path-kind.sh"
 
-CONFIG="${ENGINEERING_RULES_HOME:-$(cd -P "$here/.." && pwd)}/settings/loop.json"
-STATE_DIR="${TMPDIR:-/tmp}/engineering-rules-risk"
+CONFIG="${ONELOOP_HOME:-$(cd -P "$here/.." && pwd)}/settings/loop.json"
+STATE_DIR="${TMPDIR:-/tmp}/oneloop-risk"
 
 # project_map <path>: the CLAUDE.md of the repository the file is in, else the cwd's, else nothing.
 project_map() {

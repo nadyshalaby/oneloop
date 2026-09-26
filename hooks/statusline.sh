@@ -1,9 +1,9 @@
 #!/bin/bash
-# engineering-rules status line, two rows. The first says where you are: directory, git
+# oneloop status line, two rows. The first says where you are: directory, git
 # branch and dirty state, and the model. The second holds the meters: the context in use,
 # session uptime, the claude.ai plan usage and how often the conversation was compacted; it is
 # left out while all are empty.
-# Receives Claude Code's status-line JSON on stdin; install.sh points settings.json's
+# Receives Claude Code's status-line JSON on stdin; bin/setup-statusline.sh points settings.json's
 # statusLine here.
 # It is re-rendered continuously, so the compaction scan keeps a cursor per transcript and
 # reads only the bytes added since the last render. Runs on the bash macOS ships (3.2).
@@ -101,7 +101,7 @@ render_session_segment() {
 
 # transcript_cache <scan>: the cursor file one scan keeps for this transcript.
 transcript_cache() {
-  printf '%s/engineering-rules-%s-%s' "$CACHE_DIR" "$1" "$(printf '%s' "$transcript_path" | cksum | cut -d ' ' -f 1)"
+  printf '%s/oneloop-%s-%s' "$CACHE_DIR" "$1" "$(printf '%s' "$transcript_path" | cksum | cut -d ' ' -f 1)"
 }
 
 # read_bytes <offset> <count>: that slice of the transcript. dd moves the shared descriptor to

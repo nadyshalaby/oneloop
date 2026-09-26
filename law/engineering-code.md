@@ -4,12 +4,11 @@ paths:
   - "**/*.{py,pyi,go,rs,java,kt,kts,scala,groovy,swift,m,mm,c,h,cc,cpp,cxx,hpp,cs,fs,rb,php}"
   - "**/*.{ex,exs,erl,hs,clj,dart,lua,r,R,jl,pl,pm,sh,bash,zsh,ps1,sql,sol,zig,tf,proto,graphql,gql}"
   - "**/*.{css,scss,sass,less,html}"
-managed-by: engineering-rules install.sh, copied from law/engineering-code.md; change the repository and re-run it
 ---
 # Engineering law: the code rules
 
-Part of the engineering law, loaded the first time you read a code file; binds every line of code you
-write. Long forms: `~/.claude/engineering-rules/references/01-always-on-law/`.
+Part of the engineering law, loaded with the first code file you read or edit; binds every line of code
+you write. Long forms: `references/01-always-on-law/` under the harness root.
 
 - **Production code**: every file that ships. Test files (`*.test.*`, `*.spec.*`, `*_test.*`, `*_spec.*`, `test_*`, anything under `tests/`, `__tests__/`, `test/`, `spec/`), generated files and migrations are exempt from the bans below, except that the suppression ban holds in tests too and the focused/skipped-test ban exists only for tests.
 - **Domain code**: services, use-cases, repositories, business rules, validators, jobs, workers; not scripts, tests, CLI glue or presentation. **Hot path**: runs per request, render, row, job or frame, or in a loop over data-sized input. **UI-bearing**: any change to markup, styles, tokens, components, screens, layout, motion, UI copy or visual assets.

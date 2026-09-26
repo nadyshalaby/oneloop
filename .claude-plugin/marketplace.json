@@ -1,0 +1,17 @@
+{
+  "name": "oneloop",
+  "owner": {
+    "name": "nadyshalaby"
+  },
+  "metadata": {
+    "description": "The oneloop harness for Claude Code: one loop for every task, with the engineering law always on."
+  },
+  "plugins": [
+    {
+      "name": "oneloop",
+      "source": ".",
+      "description": "One loop for every task in Claude Code: scope, edit, check, commit. An always-on engineering law, guards as hooks, a TODO.md checklist and typed commands.",
+      "version": "11.0.0"
+    }
+  ]
+}

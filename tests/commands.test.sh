@@ -1,12 +1,12 @@
 #!/bin/bash
 # Guard: the skills directory holds exactly the commands the law names and the three standalone
 # skills, and nothing else, so a removed skill (the workflow, quick, full, an agents switch)
-# cannot linger; each command keeps its shape (a name matching its directory under the
-# `engineering-rules:` prefix, user-only invocation, no argument list, under the cap); a
+# cannot linger; each command keeps its shape (a name equal to its directory, which the plugin
+# serves as `/oneloop:<name>`; user-only invocation; no argument list; under the cap); a
 # standalone skill names itself, carries the description it triggers on, keeps model invocation
-# on and stays under the cap; and the law names every one of them, since the law is where a
-# session learns what it can type. A plain request is the loop, which no skill carries.
-# Run: bash tests/commands.test.sh
+# on and stays under the cap; and the law names every one of them as `:<name>`, since the law
+# is where a session learns what it can type. A plain request is the loop, which no skill
+# carries. Run: bash tests/commands.test.sh
 # SKILLS_DIR and LAW_MD point the test at other copies, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -14,13 +14,10 @@
 ROOT=$(repo_root) || exit 1
 SKILLS="${SKILLS_DIR:-$ROOT/skills}"
 LAW="${LAW_MD:-$ROOT/law/engineering-law.md}"
-PREFIX=engineering-rules
-# The commands the user types, each `/engineering-rules:<name>`, space-separated.
+# The commands the user types, each `/oneloop:<name>`, space-separated.
 COMMANDS="audit brainstorm design-spec release-notes triage"
-# Skills that ship beside the law and trigger on their own description, and those among them
-# that keep the name the user gave them instead of the prefix.
-STANDALONE="explain update-engineering-rules status-report"
-OWN_NAME="update-engineering-rules status-report"
+# Skills that ship beside the law and trigger on their own description.
+STANDALONE="explain update-rules status-report"
 LINE_CAP=500
 TICK=$(printf '\140')
 
@@ -29,12 +26,6 @@ skill_dirs() { find "$1" -mindepth 1 -maxdepth 1 -type d | sed 's#.*/##' | sort;
 
 # listed: every command and standalone name, one per line, sorted.
 listed() { tr ' ' '\n' <<< "$COMMANDS $STANDALONE" | sort; }
-
-# command_name <dir>: the name a skill must carry, which install.sh also gives its link in
-# ~/.claude/skills: `engineering-rules:<dir>`, except the skills in OWN_NAME.
-command_name() {
-  case " $OWN_NAME " in *" $1 "*) printf '%s' "$1" ;; *) printf '%s:%s' "$PREFIX" "$1" ;; esac
-}
 
 # front_value <SKILL.md> <key>: the frontmatter value of the key, empty when absent.
 front_value() { sed -n '2,/^---$/p' "$1" | sed -n -E "s/^$2: *//p" | head -n 1; }
@@ -50,7 +41,7 @@ command_defects() {
   for name in $(tr ' ' '\n' <<< "$COMMANDS"); do
     file="$1/$name/SKILL.md"
     [ -f "$file" ] || { printf '%s: no skill directory\n' "$name"; continue; }
-    [ "$(front_value "$file" name)" = "$(command_name "$name")" ] || printf '%s: name is not %s\n' "$name" "$(command_name "$name")"
+    [ "$(front_value "$file" name)" = "$name" ] || printf '%s: name is not %s\n' "$name" "$name"
     [ "$(front_value "$file" disable-model-invocation)" = true ] || printf '%s: model invocation is not disabled\n' "$name"
     [ -z "$(front_value "$file" arguments)" ] || printf '%s: takes an argument list\n' "$name"
     over_cap "$name" "$file"
@@ -62,7 +53,7 @@ standalone_defects() {
   for name in $(tr ' ' '\n' <<< "$STANDALONE"); do
     file="$1/$name/SKILL.md"
     [ -f "$file" ] || { printf '%s: no skill directory\n' "$name"; continue; }
-    [ "$(front_value "$file" name)" = "$(command_name "$name")" ] || printf '%s: name is not %s\n' "$name" "$(command_name "$name")"
+    [ "$(front_value "$file" name)" = "$name" ] || printf '%s: name is not %s\n' "$name" "$name"
     [ -n "$(front_value "$file" description)" ] || printf '%s: no description\n' "$name"
     [ "$(front_value "$file" disable-model-invocation)" != true ] || printf '%s: model invocation is disabled\n' "$name"
     over_cap "$name" "$file"
@@ -72,11 +63,9 @@ standalone_defects() {
 # stray_dirs <skills dir>: every skill directory that is neither a command nor a standalone.
 stray_dirs() { comm -23 <(skill_dirs "$1") <(listed); }
 
-# unnamed_in_law <law>: every command or standalone skill the law does not name (a command as
-# `:<name>` in backticks, a standalone by its full name).
+# unnamed_in_law <law>: every command or standalone skill the law does not name as `:<name>`.
 unnamed_in_law() {
-  for name in $(tr ' ' '\n' <<< "$COMMANDS"); do grep -qF -- ":$name\`" "$1" || printf '%s\n' "$name"; done
-  for name in $(tr ' ' '\n' <<< "$STANDALONE"); do grep -qF -- "$(command_name "$name")" "$1" || printf '%s\n' "$name"; done
+  for name in $(listed); do grep -qF -- ":$name\`" "$1" || printf '%s\n' "$name"; done
 }
 
 test_every_skill_directory_is_listed() {
@@ -96,13 +85,13 @@ test_the_law_names_every_one() {
 }
 
 # The checks have to be able to fail: a leftover workflow, quick or agents directory, a command
-# that takes an argument list or is open to the model, a missing command, a standalone skill
-# without its name or with model invocation off, one over the cap, and a law that names only
-# some of them are all named.
+# that takes an argument list, is open to the model or still carries the old prefixed name, a
+# missing command, a standalone skill without its name or with model invocation off, one over
+# the cap, and a law that names only some of them are all named.
 test_planted_breaches_are_named() {
   mkdir -p "$WORK/skills/workflow" "$WORK/skills/quick" "$WORK/skills/agents" "$WORK/skills/brainstorm" "$WORK/skills/audit" "$WORK/skills/explain" "$WORK/skills/status-report"
-  printf -- '---\nname: %s:brainstorm\narguments: [mode]\ndisable-model-invocation: true\n---\nbody\n' "$PREFIX" > "$WORK/skills/brainstorm/SKILL.md"
-  printf -- '---\nname: %s:audit\n---\nbody\n' "$PREFIX" > "$WORK/skills/audit/SKILL.md"
+  printf -- '---\nname: brainstorm\narguments: [mode]\ndisable-model-invocation: true\n---\nbody\n' > "$WORK/skills/brainstorm/SKILL.md"
+  printf -- '---\nname: engineering-rules:audit\n---\nbody\n' > "$WORK/skills/audit/SKILL.md"
   printf -- '---\nname: explain\ndescription: "a planted standalone"\ndisable-model-invocation: true\n---\n' > "$WORK/skills/explain/SKILL.md"
   { printf -- '---\nname: status-report\ndescription: d\n---\n'; awk 'BEGIN { for (i = 0; i < 501; i++) print "filler" }'; } > "$WORK/skills/status-report/SKILL.md"
   stray=$(stray_dirs "$WORK/skills")
@@ -112,14 +101,14 @@ test_planted_breaches_are_named() {
   assert_missing "a listed command is not" "brainstorm" "$stray"
   defects=$(command_defects "$WORK/skills")
   assert_contains "a command that takes an argument list is named" "brainstorm: takes an argument list" "$defects"
+  assert_contains "a command with the old prefixed name is named" "audit: name is not audit" "$defects"
   assert_contains "a command open to the model is named" "audit: model invocation is not disabled" "$defects"
   assert_contains "a missing command is named" "triage: no skill directory" "$defects"
   defects=$(standalone_defects "$WORK/skills")
-  assert_contains "a standalone skill without its name is named" "explain: name is not $PREFIX:explain" "$defects"
   assert_contains "a standalone skill with model invocation off is named" "explain: model invocation is disabled" "$defects"
   assert_contains "a skill over the cap is named" "status-report: 505 lines" "$defects"
-  printf '%s\n' "Typed commands: ${TICK}/$PREFIX:brainstorm${TICK}, ${TICK}:audit${TICK}; ${TICK}/status-report${TICK}." > "$WORK/law.md"
-  assert_eq "the commands a law does not name are named" "design-spec release-notes triage explain update-engineering-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
+  printf '%s\n' "Typed commands: ${TICK}/oneloop:brainstorm${TICK}, ${TICK}:audit${TICK}, ${TICK}:status-report${TICK}." > "$WORK/law.md"
+  assert_eq "the commands a law does not name are named" "design-spec explain release-notes triage update-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
 }
 
 test_every_skill_directory_is_listed

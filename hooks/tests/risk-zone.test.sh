@@ -102,9 +102,9 @@ test_the_map_overrides_the_default_regex() {
 test_the_config_is_the_default_and_no_regex_is_silence() {
   mkdir -p "$WORK/er/settings"
   printf '{"risk_regex":"ui/"}\n' > "$WORK/er/settings/loop.json"
-  out=$(event_json PreToolUse Edit "$P/src/ui/Button.tsx" s7 | ENGINEERING_RULES_HOME="$WORK/er" bash "$SCRIPT")
+  out=$(event_json PreToolUse Edit "$P/src/ui/Button.tsx" s7 | ONELOOP_HOME="$WORK/er" bash "$SCRIPT")
   assert_contains "the regex comes from the home's loop.json" '"permissionDecision":"ask"' "$out"
-  out=$(event_json PreToolUse Edit "$P/src/auth/login.ts" s7 | ENGINEERING_RULES_HOME=/nonexistent bash "$SCRIPT")
+  out=$(event_json PreToolUse Edit "$P/src/auth/login.ts" s7 | ONELOOP_HOME=/nonexistent bash "$SCRIPT")
   assert_eq "no config and no map line: nothing to judge" "" "$out"
 }
 

@@ -10,7 +10,7 @@
 ROOT=$(repo_root) || exit 1
 MAP="${MAP_MD:-$ROOT/CLAUDE.md}"
 LINE_CAP=60
-LINT='shellcheck -x -P SCRIPTDIR -S style install.sh hooks/*.sh hooks/tests/*.sh tests/*.sh'
+LINT='shellcheck -x -P SCRIPTDIR -S style bin/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh'
 TICK=$(printf '\140')
 
 # line_count <file>
@@ -64,7 +64,7 @@ test_the_map_orients() {
 test_the_risk_regex_covers_the_live_pieces() {
   re=$(risk_regex "$MAP")
   assert_eq "the map sets a risk regex" yes "$([ -n "$re" ] && echo yes || echo no)"
-  assert_eq "the installer and a hook are risk zones" "yes yes yes" "$(matches "$re" install.sh) $(matches "$re" hooks/edit-guard.sh) $(matches "$re" settings/loop.json)"
+  assert_eq "the manifests, the wiring, a hook, the loop config and the status line setup are risk zones" "yes yes yes yes yes" "$(matches "$re" .claude-plugin/plugin.json) $(matches "$re" hooks/hooks.json) $(matches "$re" hooks/edit-guard.sh) $(matches "$re" settings/loop.json) $(matches "$re" bin/setup-statusline.sh)"
   assert_eq "the law, a page and a hook test are not" "no no no" "$(matches "$re" law/engineering-law.md) $(matches "$re" references/02-doctrine/2.1-code-quality-the-full-doctrine.md) $(matches "$re" hooks/tests/edit-guard.test.sh)"
 }
 

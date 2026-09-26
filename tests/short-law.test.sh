@@ -1,8 +1,8 @@
 #!/bin/bash
-# Guard: the law keeps every rule the long form pins, stays small, and carries no text the
-# CLAUDE.md import parser would read as an import. It is two files. The core, which CLAUDE.md
-# loads into every session and every helper, and the code rules, which install.sh copies into
-# the user's rules folder so Claude Code loads them the first time a code file is read. Both
+# Guard: the law keeps every rule the long form pins, stays small, and carries no text a
+# CLAUDE.md import parser would read as an import. It is two files. The core, which the
+# session-start hook hands to every session, and the code rules, which the code-rules hook hands
+# to a session with the first code file it reads or edits (its paths: globs say which). Both
 # are compacted; a compaction that drops a banned token, a cap, a guardrail, a git rule, a
 # banned phrase or a step of the loop fails here instead of silently loosening the law. The pins
 # are data, one per line, in fixtures/short-law-pins.txt (the core) and
@@ -110,22 +110,22 @@ test_no_stray_imports() {
   assert_eq "nor in the code rules" "" "$(stray_imports "$CODE")"
 }
 
-# The code rules load only through their front matter: a paths: list of globs that covers the
-# common code files, and the managed-by line install.sh reads to tell its own copy from a file
-# the user wrote. The core has none, because CLAUDE.md imports it whole.
+# The code rules' front matter is a paths: list of globs that covers the common code files; the
+# code-rules hook reads it to know which files bring the rules in, and strips it from what it
+# hands the session. The core has none, because it is handed to the session whole.
 test_code_rules_front_matter() {
   assert_eq "the code rules list globs under paths:" yes "$(more_than "$(path_globs "$CODE" | grep -c .)" 0)"
   extensions=$(path_extensions "$CODE")
   for ext in ts tsx js py go rs java rb php sh sql css html; do
     assert_eq "and the globs cover .$ext" "$ext" "$(printf '%s\n' "$extensions" | grep -x -- "$ext")"
   done
-  assert_contains "the code rules name their installer" "managed-by: engineering-rules" "$(front_matter "$CODE")"
+  assert_eq "the code rules carry nothing else in their front matter" "" "$(front_matter "$CODE" | grep -vE '^paths:|^  - "')"
   assert_eq "the core law has no front matter" "" "$(front_matter "$LAW")"
 }
 
 # The checks above can fail: a copy with one pin removed, one import-shaped line, one retired
 # line and too many lines is refused on all four counts, for the core and the code rules both;
-# a code copy whose front matter lost its paths and its marker is refused on both.
+# a code copy whose front matter lost its paths is refused.
 test_the_checks_can_fail() {
   planted="$WORK/planted.md"
   {
@@ -143,7 +143,7 @@ test_the_checks_can_fail() {
   bare="$WORK/bare.md"
   { printf -- '---\nsummary: no paths here\n---\n'; sed '1,/^---$/d' "$CODE"; } > "$bare"
   assert_eq "a copy with no paths: lists no globs" "" "$(path_globs "$bare")"
-  assert_missing "and carries no managed-by marker" "managed-by: engineering-rules" "$(front_matter "$bare")"
+  assert_eq "and its stray front matter line is named" "summary: no paths here" "$(front_matter "$bare" | grep -vE '^paths:|^  - "')"
 }
 
 test_every_rule_is_pinned

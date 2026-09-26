@@ -1,5 +1,5 @@
 #!/bin/bash
-# engineering-rules commit check.
+# oneloop commit check.
 # The law's checklist at the Commit step, judged by a machine: a `git commit` must carry the
 # ticked task line, so TODO.md must be staged, or named in the same command (an add that runs
 # before the commit). Otherwise the commit becomes a permission prompt (`permissionDecision:

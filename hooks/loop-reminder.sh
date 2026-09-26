@@ -1,5 +1,5 @@
 #!/bin/bash
-# engineering-rules loop reminder.
+# oneloop loop reminder.
 # Runs on UserPromptSubmit, which fires on every prompt and takes no matcher, and prints exactly
 # one line into the turn: the loop's four standing rules (the law: one mode, the scope gate and
 # its "go" pre-approval, proof before "done", the risk-zone yes). It judges nothing and refuses

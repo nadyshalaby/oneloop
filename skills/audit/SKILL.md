@@ -1,13 +1,13 @@
 ---
-name: engineering-rules:audit
-description: "Codebase audit under the engineering-rules law, picked by your word: the whole codebase against its own rules and the catalogs, not a per-diff review. Usage: /engineering-rules:audit [a project root or directory]"
+name: audit
+description: "Codebase audit under the engineering law, picked by your word: the whole codebase against its own rules and the catalogs, not a per-diff review. Usage: /oneloop:audit [a project root or directory]"
 argument-hint: "[a project root or directory]"
 disable-model-invocation: true
 ---
 
 # Codebase audit, by the user's word
 
-The user typed `/engineering-rules:audit`. That picks the audit (16.3) outright: the whole
+The user typed `/oneloop:audit`. That picks the audit (16.3) outright: the whole
 codebase against its rules, never a per-diff review.
 
 - **Whole invocation:** `$ARGUMENTS`

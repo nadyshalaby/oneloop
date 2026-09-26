@@ -1,5 +1,5 @@
 ---
-name: engineering-rules:explain
+name: explain
 description: >-
   Explains logic short and plain: the problem, pseudocode, the effect, the risks. Use it whenever
   the user asks how code, a flow or a feature works, or asks you to explain a change before it is

@@ -1,18 +1,20 @@
 #!/bin/bash
-# engineering-rules scope check.
+# oneloop scope check.
 # The law's Scope step, its scope ratchet and its checklist, judged by a machine before an
-# edit inside a git repository: the file must be on the approved scope line, and the
-# repository's TODO.md must hold an open task line. The approved scope line comes from the
-# session transcript: the `scope: <files>` line that stood when the user last replied (their
+# edit inside a git repository: the file must be on the approved scope, and the repository's
+# TODO.md must hold an open task line. The scope comes from TODO.md itself: at Scope, Claude
+# adds `- [ ] <task> (scope: <files>)` to it, and that edit is a tool call the session
+# transcript always keeps (Claude's chat text is not always kept, so it never counts here). The
+# approved scope is the scope of the last such line added before the user last replied (their
 # reply is the yes, whether typed, picked in a pick-list, which Claude Code stores as the
 # AskUserQuestion tool's result, or sent while Claude was working, which it stores as a queued
-# command), or, when that reply says "go", the first scope line printed after it (the
-# pre-approval). A scope line restated later waits for a new yes, even after "go". An edit
-# before any approved scope line, to a file the line does not name (a path, or a folder it is
-# under), or while TODO.md has no `- [ ]` or `- [~]` line, becomes a permission prompt
-# (`permissionDecision: ask`) whose approval is the yes. Nothing to judge (another tool or
-# event, no repository, a file outside it, TODO.md and TODO.archive.md themselves, no readable
-# transcript, unreadable input): exit 0 with no output.
+# command), or, when that reply says "go", of the first one added after it (the pre-approval).
+# A line added later waits for a new yes, even after "go"; a line turning `[~]` or `[x]` adds
+# nothing. An edit before any approved scope, to a file the scope does not name (a path, or a
+# folder it is under), or while TODO.md has no `- [ ]` or `- [~]` line, becomes a permission
+# prompt (`permissionDecision: ask`) whose approval is the yes. Nothing to judge (another tool
+# or event, no repository, a file outside it, TODO.md and TODO.archive.md themselves, no
+# readable transcript, unreadable input): exit 0 with no output.
 set -u
 umask 077
 
@@ -27,8 +29,9 @@ here=${BASH_SOURCE[0]%/*}
 # for a message from the user (typed while Claude was idle: a user line that is not a tool
 # result, an injected text or a compaction summary; picked: the result of an AskUserQuestion
 # call Claude made; typed while Claude worked: a queued_command attachment with a human turn)
-# and `S<tab>files` for a scope line in a reply Claude wrote. One pass, keeping the ids of the
-# pick-lists asked so far.
+# and `S<tab>files` for a `- [ ] ... scope:` line an Edit, Write or MultiEdit adds to a TODO.md
+# (a line its old text already held is not added; of several added at once, the last, since a
+# task line is appended to its group). One pass, keeping the ids of the pick-lists asked so far.
 read -r -d '' EVENTS <<'JQ'
 def text_of: if type == "string" then . elif type == "array" then ([.[]? | .text? // ""] | join(" ")) else "" end;
 def typed: .message.content
@@ -37,8 +40,13 @@ def typed: .message.content
     else null end;
 def asked: [.message.content[]? | select(.type == "tool_use" and .name == "AskUserQuestion") | .id];
 def answered($ids): [.message.content[]? | select(.type == "tool_result" and (.tool_use_id as $i | any($ids[]; . == $i))) | .content | text_of] | join(" ");
-def scopes: [.message.content[]? | select(.type == "text") | .text] | join("\n") | split("\n")[]
-  | select(test("^[^A-Za-z]*scope:")) | "S\t" + (sub("^[^A-Za-z]*scope:[[:space:]]*"; "") | gsub("[`*]"; ""));
+def todo_edit: select(.type == "tool_use" and (.name == "Edit" or .name == "Write" or .name == "MultiEdit") and ((.input.file_path // "") | test("(^|/)TODO\\.md$")));
+def new_text: [.input.content // empty, .input.new_string // empty, (.input.edits[]? | .new_string // empty)] | join("\n");
+def old_text: [.input.old_string // empty, (.input.edits[]? | .old_string // empty)] | join("\n");
+def files: sub("^.*scope:[[:space:]]*"; "") | gsub("[`*]"; "") | sub("\\)[[:space:]]*$"; "") | sub("[[:space:]]+$"; "");
+def proposals: .message.content[]? | todo_edit | (old_text | split("\n")) as $old
+  | [new_text | split("\n")[] | select(test("^- \\[ \\] .*scope:")) | select(. as $line | any($old[]; . == $line) | not)]
+  | select(length > 0) | .[-1] | "S\t" + files;
 def h: "H\t" + (gsub("[\n\t]"; " ") | .[0:2000]);
 foreach inputs as $l ({ids: [], out: []};
   .out = []
@@ -47,7 +55,7 @@ foreach inputs as $l ({ids: [], out: []};
       | if $t != null then .out = [$t | h] elif $a != "" then .out = [$a | h] else . end
     elif $l.type == "attachment" and $l.attachment.type == "queued_command" and $l.attachment.humanTurn == true then
       ($l.attachment.prompt // "") as $q | if $q != "" then .out = [$q | h] else . end
-    elif $l.type == "assistant" then .ids += ($l | asked) | .out = [$l | scopes]
+    elif $l.type == "assistant" then .ids += ($l | asked) | .out = [$l | proposals]
     else . end;
   .out[])
 JQ
@@ -58,7 +66,7 @@ events() { jq -n -r "$EVENTS" "$1" 2>/dev/null; }
 # says_go <text>: the word "go" in the user's message, as the law reads it.
 says_go() { printf '%s' "$1" | grep -qiE '(^|[^[:alnum:]_])go([^[:alnum:]_]|$)'; }
 
-# approved_scope <transcript>: the files of the approved scope line, empty when none is.
+# approved_scope <transcript>: the files of the approved scope, empty when none is.
 approved_scope() {
   last_h=""; s_last=""; s_at_h=""; n_after=0; s_after1=""
   while IFS=$'\t' read -r kind text; do
@@ -72,9 +80,9 @@ EOF
   if says_go "$last_h" && [ "$n_after" -ge 1 ]; then printf '%s' "$s_after1"; else printf '%s' "$s_at_h"; fi
 }
 
-# in_scope <rel> <files> <prefixes>: the path is named by the scope line, exactly or by a
-# folder it is under; an absolute entry under one of the prefixes (the repository's physical
-# root, the session's cwd as it knows it) counts by its relative form.
+# in_scope <rel> <files> <prefixes>: the path is named by the scope, exactly or by a folder it
+# is under; an absolute entry under one of the prefixes (the repository's physical root, the
+# session's cwd as it knows it) counts by its relative form.
 in_scope() {
   for entry in $(printf '%s' "$2" | tr ',' ' '); do
     for prefix in $(printf '%s' "$3" | tr ' ' '\n'); do entry=${entry#"$prefix"/}; done
@@ -96,7 +104,7 @@ existing_parent() {
 # emit_ask <reason>: the PreToolUse decision, as the JSON Claude Code reads.
 emit_ask() {
   jq -cn --arg r "engineering law (the loop): $1." \
-    --arg c "engineering law (the loop): $1. The user is being asked to approve this edit; their approval is the yes. A rejection means: restate the scope or add the task line, then try again." \
+    --arg c "engineering law (the loop): $1. The user is being asked to approve this edit; their approval is the yes. A rejection means: restate the scope on the task line in TODO.md or add the task line, then try again." \
     '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r,additionalContext:$c}}'
 }
 
@@ -117,12 +125,12 @@ project="${cwd##*/}"
 reason=""; why=""
 scope=$(approved_scope "$transcript")
 if [ -z "$scope" ]; then
-  reason="no approved scope line yet: print \`scope: <files>\` and the note, then wait for the yes"; why="no scope"
+  reason="no approved scope yet: add \`- [ ] <task> (scope: <files>)\` to TODO.md, print the scope line and the note, then wait for the yes"; why="no scope"
 elif ! in_scope "$rel" "$scope" "$root $cwd"; then
-  reason="$rel is outside the approved scope line (scope: $scope): restate the scope and wait for the yes"; why="outside scope"
+  reason="$rel is outside the approved scope (scope: $scope): restate the scope on the task line in TODO.md and wait for the yes"; why="outside scope"
 fi
 if ! grep -qE '^- \[( |~)\] ' "$root/TODO.md" 2>/dev/null; then
-  reason="${reason:+$reason; }TODO.md has no open task line: add \`- [ ] <task>\` first"; why="${why:+$why + }no task line"
+  reason="${reason:+$reason; }TODO.md has no open task line: add \`- [ ] <task> (scope: <files>)\` first"; why="${why:+$why + }no task line"
 fi
 [ -n "$reason" ] || exit 0
 append_log "$project" "guard | scope | ask | $rel | $why"

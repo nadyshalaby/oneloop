@@ -1,12 +1,12 @@
 ---
-name: engineering-rules:release-notes
-description: "Prints the engineering-rules release notes for the task in flight: the plain-language summary, only when you type it (16.13). Usage: /engineering-rules:release-notes"
+name: release-notes
+description: "Prints the release notes for the task in flight: the plain-language summary, only when you type it (16.13). Usage: /oneloop:release-notes"
 disable-model-invocation: true
 ---
 
 # Release notes, on demand
 
-The user typed `/engineering-rules:release-notes`. That picks the release notes (16.13) outright.
+The user typed `/oneloop:release-notes`. That picks the release notes (16.13) outright.
 It takes no request: printing a summary is not a task, and it sends no helper. Nothing prints
 them unasked: the loop's final reply is the files changed, the check results and the side finds.
 

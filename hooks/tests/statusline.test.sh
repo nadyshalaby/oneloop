@@ -128,7 +128,7 @@ test_compaction_cursor_resets() {
   compact_boundary auto > "$C"
   line=$(render "$(build_compact_json)")
   assert_contains "a transcript that shrank is counted afresh" "compacted 1x (1 auto)" "$line"
-  printf 'not a cursor\n' > "$WORK/engineering-rules-compactions-$(printf '%s' "$C" | cksum | cut -d ' ' -f 1)"
+  printf 'not a cursor\n' > "$WORK/oneloop-compactions-$(printf '%s' "$C" | cksum | cut -d ' ' -f 1)"
   line=$(render "$(build_compact_json)")
   assert_contains "a broken cursor file is counted afresh" "compacted 1x (1 auto)" "$line"
 }

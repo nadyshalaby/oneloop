@@ -1,13 +1,13 @@
 ---
-name: engineering-rules:design-spec
-description: "The design-spec route of the engineering-rules law, picked by your word: author, extract or refresh the project's design spec. Usage: /engineering-rules:design-spec [author|extract|refresh] [a direction]"
+name: design-spec
+description: "The design-spec route of the engineering law, picked by your word: author, extract or refresh the project's design spec. Usage: /oneloop:design-spec [author|extract|refresh] [a direction]"
 argument-hint: "[author|extract|refresh] [a direction]"
 disable-model-invocation: true
 ---
 
 # Design spec, by the user's word
 
-The user typed `/engineering-rules:design-spec`. That picks the design-spec route (15.19)
+The user typed `/oneloop:design-spec`. That picks the design-spec route (15.19)
 outright: author, extract or refresh the project's design spec.
 
 - **Whole invocation:** `$ARGUMENTS`

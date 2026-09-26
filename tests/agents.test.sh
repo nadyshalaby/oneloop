@@ -3,8 +3,9 @@
 # (10.0.0, the user's words: "No Builder, no Reviewer"). The one agent file names itself after
 # its file, says what it is for, runs on sonnet (the law says a Sonnet search) with a turn cap,
 # holds no editing tool, and its description carries the law's condition: sent only after grep
-# has failed twice, and only to search. The law names it and sends no fork and no built-in agent
-# type. AGENTS_DIR and LAW_MD point the test at other copies, for a watched failure.
+# has failed twice, and only to search. The law names it by the name the plugin gives it
+# (`oneloop:er-reader`) and sends no fork and no built-in agent type. AGENTS_DIR and LAW_MD
+# point the test at other copies, for a watched failure.
 # Run: bash tests/agents.test.sh
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -41,7 +42,7 @@ agent_defects() {
 
 # law_defects <law> <agents dir>: the law not naming the reader, or a send it must never make.
 law_defects() {
-  grep -qF "${TICK}er-reader${TICK}" "$1" || printf 'the law never names er-reader\n'
+  grep -qF "${TICK}oneloop:er-reader${TICK}" "$1" || printf 'the law never names oneloop:er-reader\n'
   grep -qF "never a ${TICK}fork${TICK}" "$1" || printf 'the law does not refuse a fork\n'
   grep -nE 'subagent_type|"(fork|Explore|Plan|general-purpose)"' "$1" "$2"/*.md | sed 's/^/sends a built-in type: /'
   return 0
@@ -75,7 +76,7 @@ test_planted_breaches_are_named() {
   assert_contains "a missing turn cap is named" "er-builder: no numeric maxTurns" "$out"
   printf 'Helpers: send %ser-builder%s with subagent_type "fork".\n' "$TICK" "$TICK" > "$WORK/law.md"
   out=$(law_defects "$WORK/law.md" "$WORK/agents")
-  assert_contains "a law that names no reader is named" "the law never names er-reader" "$out"
+  assert_contains "a law that names no reader is named" "the law never names oneloop:er-reader" "$out"
   assert_contains "a built-in send is named" "sends a built-in type" "$out"
 }
 

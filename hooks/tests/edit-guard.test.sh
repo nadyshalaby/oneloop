@@ -5,7 +5,7 @@
 # nothing. It never returns a permission decision (10.0.0, the user's words: "WARN in the tool
 # result, never block. Hard blocks caused silent edit-retry loops"). EDIT_GUARD_SH points the
 # test at another copy of the script, for a watched failure; the copy needs hook-input.sh,
-# progress-log.sh and path-kind.sh beside it, and finds 9.5 through ENGINEERING_RULES_HOME or
+# progress-log.sh and path-kind.sh beside it, and finds 9.5 through ONELOOP_HOME or
 # its own ../references tree.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=../../tests/harness.sh
@@ -142,7 +142,7 @@ test_a_broken_block_is_logged_not_trusted() {
   law=references/09-implement/9.5-the-law-scout.md
   root="$WORK/broken" && mkdir -p "$root/${law%/*}"
   awk '/^### HOW/ { h = 1 } { print } h && /^```bash$/ && !done { print "if true; then"; done = 1 }' "$here/../../$law" > "$root/$law"
-  out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME="$root" bash "$SCRIPT")
+  out=$(edit_json "$P/src/q.ts" 'debugger;' | ONELOOP_HOME="$root" bash "$SCRIPT")
   assert_eq "a broken block judges nothing" "" "$out"
   assert_contains "and says so in the log" " proj | guard | edit | skipped | 9.5 block failed on the new text (exit 2)" "$(tail -n 1 "$LOG")"
   before=$(wc -l < "$LOG" | tr -d ' ')
@@ -171,11 +171,11 @@ test_unreadable_input_and_missing_law() {
   assert_missing "malformed stdin prints nothing" "hookSpecificOutput" "$out"
   out=$(jq -cn '{hook_event_name:"PreToolUse",tool_name:"Bash",cwd:"/tmp/proj",tool_input:{command:"x"}}' | bash "$SCRIPT")
   assert_missing "a Bash event is not judged here" "hookSpecificOutput" "$out"
-  out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME=/nonexistent bash "$SCRIPT")
+  out=$(edit_json "$P/src/q.ts" 'debugger;' | ONELOOP_HOME=/nonexistent bash "$SCRIPT")
   assert_missing "a missing 9.5 warns about nothing" "hookSpecificOutput" "$out"
   assert_contains "and says so in the log" " proj | guard | edit | skipped | 9.5 not found at /nonexistent/references" "$(tail -n 1 "$LOG")"
-  out=$(edit_json "$P/src/q.ts" 'debugger;' | ENGINEERING_RULES_HOME="$here/../.." bash "$SCRIPT")
-  assert_contains "9.5 is read from ENGINEERING_RULES_HOME when it is set" 'warning, not a block' "$out"
+  out=$(edit_json "$P/src/q.ts" 'debugger;' | ONELOOP_HOME="$here/../.." bash "$SCRIPT")
+  assert_contains "9.5 is read from ONELOOP_HOME when it is set" 'warning, not a block' "$out"
 }
 
 build_fixture || { printf 'FAIL could not build the fixture repo\n'; exit 1; }

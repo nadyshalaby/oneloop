@@ -1,7 +1,51 @@
-# engineering-rules, the history
+# oneloop, the history
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **11.0.0**: oneloop, the harness as a Claude Code plugin, at the user's word ("convert this
+  harness to claude plugin that i can install and maintain once needed", "reallocate the folder
+  inside our ~/Code project then install it and refresh claude plugins", "rename the repo as
+  well"; the name from their pick, "oneloop"). The repository is the plugin and its own
+  marketplace (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` with
+  `source: "."`), installed with `claude plugin marketplace add nadyshalaby/oneloop` and
+  `claude plugin install oneloop@oneloop`, updated with `claude plugin update oneloop@oneloop`;
+  the dev checkout moved from `~/.claude/engineering-rules` to `~/Code/oneloop`, and the GitHub
+  repository was renamed from `claude-engineering-rules` to `oneloop`. A plugin cannot add to
+  CLAUDE.md or place a rules file, so the law reaches the session another way:
+  `hooks/session-start.sh` hands the whole core law to every session as it starts (startup,
+  resume, clear, compact, fork), headed by the plugin version and the harness root, and after a
+  compaction or a resume adds the re-anchor lines (the re-anchor hook is gone);
+  `hooks/code-rules.sh` hands the code rules (front matter off) to a session with the first code
+  file it reads or edits, once per session, on PreToolUse for Read and the four edit tools. The
+  law's paths are relative to that root (`references/`, `law/engineering-code.md`,
+  `settings/loop.json`); the typed commands are `/oneloop:brainstorm`, `:audit`, `:triage`,
+  `:design-spec`, `:release-notes`, `:status-report`, `:update-rules` and `oneloop:explain` (a
+  skill's name is its folder, the plugin adds the prefix; `update-engineering-rules` became
+  `update-rules`); the reader is `oneloop:er-reader`. The scope check now reads the scope from
+  `TODO.md`: the session that shipped 10.1.1 showed that Claude Code keeps every tool call and
+  every user message in the transcript but only some of Claude's own chat text (19 of a day's
+  messages), so the `scope:` line in chat could not be relied on; at the user's pick ("Yes,
+  TODO.md is the source") the task line is `- [ ] <task> (scope: <files>)`, appended to its
+  group, and the hook reads the scope from the Edit, Write or MultiEdit that adds it (of several
+  added at once, the last; a line the edit's old text held, or one turning `[~]`, adds nothing),
+  while a scope line in chat, in another file's edit or in a tool result no longer counts
+  (`hooks/tests/scope-check.test.sh`, 54 to 62 checks). Gone: `install.sh` and its 62 checks,
+  `settings/hooks.json` (now `hooks/hooks.json`, every command under `${CLAUDE_PLUGIN_ROOT}`),
+  `settings/claude-md-block.md`, the rules copy and the CLAUDE.md block, `hooks/re-anchor.sh`.
+  New: `bin/setup-statusline.sh` (a plugin cannot set the status line; this writes one that finds
+  the installed version through installed_plugins.json on each render and falls back to the
+  personal script; `--check`, `--remove`, `--force`), `tests/plugin.test.sh` (the manifests,
+  their versions equal to this entry's), `tests/setup-statusline.test.sh`,
+  `hooks/tests/session-start.test.sh`, `hooks/tests/code-rules.test.sh`; `tests/old-words.test.sh`
+  also refuses the installer era's names now, and `tests/hooks-wiring.test.sh` pins the plugin
+  root and the absence of a status line in the fragment. The docs say the plugin: the README, the
+  map (its `risk_regex` covers the manifests, the wiring and `bin/`), the update-rules skill (the
+  push is the publish, then `claude plugin update`; a hook check runs against the installed
+  copy). One limit, said plainly: a subagent gets no law, because no hook injects context into
+  one, where the CLAUDE.md import may have reached it; the law allows only the read-only reader
+  anyway. Sizes: the core law 11,939 to 11,996 bytes (88 lines; the paths shrank, the checklist
+  and the scope-hook rule grew); the code rules 7,598 to 7,484 (50 to 49 lines; the managed-by
+  line went).
 - **10.1.1**: `TODO.md` is the only task tracker, at the user's word ("if the user asked to work
   from old docs or tracking files. the harness shall only study his file(s). but strictly use our
   main todo to reflect this work. TODO.md is the only main trusted task tracking in the harness.

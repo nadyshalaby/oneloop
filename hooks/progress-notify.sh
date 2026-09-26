@@ -1,5 +1,5 @@
 #!/bin/bash
-# engineering-rules progress notifier.
+# oneloop progress notifier.
 # Runs on Stop (Claude finished a turn), on Notification (Claude is waiting on you), on
 # StopFailure (the turn died on an API error) and on SubagentStart and SubagentStop (a helper
 # was sent, or came back). Appends one line per event to the progress log, and raises a

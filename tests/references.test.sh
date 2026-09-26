@@ -8,7 +8,7 @@
 # decimals are values; every 0.x, which reads as a value (CLS under 0.1, an alpha of 0.9) and
 # has had no page since the orientation map went; and the tests, which quote old numbers on
 # purpose. A page is reachable when a root (the law, the skills, the agents, the hooks, the
-# settings, install.sh) or a reachable page cites it; 01-always-on-law/ is the
+# settings, the bin scripts) or a reachable page cites it; 01-always-on-law/ is the
 # law's long form and always live. Needs perl. ROOT_DIR points the test at another copy, for a
 # watched failure. Run: bash tests/references.test.sh
 # shellcheck source-path=SCRIPTDIR
@@ -54,7 +54,7 @@ dangling() {
 # roots: the files that load on their own; a page is read only because a root or a read page cites it.
 roots() {
   ls "$ROOT"/law/*.md "$ROOT"/skills/*/SKILL.md "$ROOT"/agents/*.md "$ROOT"/hooks/*.sh \
-    "$ROOT"/settings/* "$ROOT/install.sh"
+    "$ROOT"/settings/* "$ROOT"/bin/*.sh
 }
 
 # rule_files: every file the dangling check reads, the roots, the README and the pages.
@@ -115,7 +115,7 @@ EOF
 test_a_planted_orphan_is_named() {
   mkdir -p "$WORK/tree"
   cp -R "$ROOT"/law "$ROOT"/skills "$ROOT"/agents "$ROOT"/hooks "$ROOT"/settings \
-    "$ROOT/install.sh" "$ROOT/references" "$WORK/tree/"
+    "$ROOT/bin" "$ROOT/references" "$WORK/tree/"
   printf '# 14.9 [ref] Nobody points here\n' > "$WORK/tree/references/14-anti-patterns/14.9-nobody-points-here.md"
   orphan=$(ROOT="$WORK/tree"; unreached)
   assert_eq "a page nothing cites is named" "references/14-anti-patterns/14.9-nobody-points-here.md" "$orphan"

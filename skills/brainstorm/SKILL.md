@@ -1,13 +1,13 @@
 ---
-name: engineering-rules:brainstorm
-description: "Brainstorming under the engineering-rules law, picked by your word: one Socratic conversation, one or two forking questions a turn, until the idea is a task and the loop starts. Usage: /engineering-rules:brainstorm <the idea>"
+name: brainstorm
+description: "Brainstorming under the engineering law, picked by your word: one Socratic conversation, one or two forking questions a turn, until the idea is a task and the loop starts. Usage: /oneloop:brainstorm <the idea>"
 argument-hint: "[the idea]"
 disable-model-invocation: true
 ---
 
 # Brainstorm, by the user's word
 
-The user typed `/engineering-rules:brainstorm`. That picks the brainstorm (16.1) outright: the
+The user typed `/oneloop:brainstorm`. That picks the brainstorm (16.1) outright: the
 idea is not a task yet.
 
 - **Whole invocation:** `$ARGUMENTS`
