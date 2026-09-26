@@ -3,12 +3,13 @@
 The engineering law and working method for Claude Code, as a plugin. One short law is handed to
 every session as it starts; the code rules join it with the first code file the session reads or
 edits; nine hooks enforce the parts of the law a machine can see; every task is one line in a
-`TODO.md` checklist; and a handful of typed commands cover what is not a plain task. Install it
-once from GitHub, update it with one command, and every project gets the same rules.
+`docs/oneloop-todos/TODO.md` checklist; and a handful of typed commands cover what is not a
+plain task. Install it once from GitHub, update it with one command, and every project gets the
+same rules.
 
 It grew out of the same author's earlier plugin (2.21.0 and before) and the installer-era
 harness (3.0.0 to 10.1.1, wired into `~/.claude` by a script; both in the history). Here the core law is
-88 lines and 11,996 characters, the code rules 49 lines and 7,484, and everything else stays on
+88 lines and 11,979 characters, the code rules 49 lines and 7,593, and everything else stays on
 disk until a rule sends Claude to it.
 
 ## One loop, for everything
@@ -32,17 +33,20 @@ typo runs the same four steps as a new module.
 4. **Commit.** The changed files staged by name, one commit, a one-line message, on the current
    branch. The final reply is the files changed, the check results and the side finds.
 
-Every task is one line in the repository's `TODO.md`, a plain checklist and the only task
-tracker (a doc or tracking file you point at is read as input, never used to track), appended
-to its group: under a `## <milestone>` heading when you name one, else the unheaded group on
-top. `- [ ] <task> (scope: <files>)` is written at Scope as the scope line is printed, `- [~]` at
-the yes or "go", `- [x]` at Commit and staged in the same commit, each the moment the status
-changes; when every line of a group is ticked, that group moves whole to `TODO.archive.md` under
-a dated heading and the other groups stay. Two hooks make it hard to skip: the scope-check hook
-reads the scope from that task line (the one added before you replied, or the first one added
-after a message of yours saying "go") and turns an edit outside it, an edit before any, or an
-edit while `TODO.md` has no open line into a permission prompt; the commit hook does the same
-for a `git commit` that leaves `TODO.md` out. In both, your approval is the yes.
+Every task is one line in the repository's `docs/oneloop-todos/TODO.md`, a plain checklist and
+the only task tracker (a doc or tracking file you point at is read as input, never used to
+track; a root `TODO.md` and `TODO.archive.md` from an older version move there with `git mv` at
+the next Scope, in that task's commit), appended to its group: under a `## <milestone>` heading
+when you name one, else the unheaded group on top. `- [ ] <task> (scope: <files>)` is written at
+Scope as the scope line is printed, `- [~]` at the yes or "go", `- [x]` at Commit and staged in
+the same commit, each the moment the status changes; when every line of a group is ticked, that
+group moves whole to `TODO.archive.md` beside it under a dated heading and the other groups
+stay. Two hooks make it hard to skip: the scope-check hook reads the scope from that task line
+(the one added before you replied, or the first one added after a message of yours saying "go")
+and turns an edit outside it, an edit before any, or an edit while the checklist has no open
+line into a permission prompt, and a `TODO.md` anywhere else, the root included, is not the
+checklist and counts for nothing; the commit hook does the same for a `git commit` that leaves
+the checklist out. In both, your approval is the yes.
 
 Deploy is a command, not a step: on the word "deploy", the checks, the deploy, the live check.
 Plan mode is yours to enter for architectural work; the law never enters it for you or adds a
@@ -62,8 +66,8 @@ search, sent only after grep has failed twice on an unfamiliar codebase.
 
 | What | File | When, and what it costs |
 |---|---|---|
-| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 11,996 characters, capped at 90 and 12,000 by `tests/short-law.test.sh` |
-| The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, handed to the session by `hooks/code-rules.sh` | the first time a session reads or edits a file its `paths:` globs match (the common code extensions), once per session; 49 lines and 7,484 characters, capped at 60 and 7,600 |
+| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 11,979 characters, capped at 90 and 12,000 by `tests/short-law.test.sh` |
+| The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, handed to the session by `hooks/code-rules.sh` | the first time a session reads or edits a file its `paths:` globs match (the common code extensions), once per session; 49 lines and 7,593 characters, capped at 60 and 7,600 |
 | The loop's defaults: the four checks, the discovery budget, the risk regex, the UI path regex | `settings/loop.json` | read by the risk-zone hook; the law states the same defaults, and `tests/loop-config.test.sh` keeps the two equal |
 | The one helper, `oneloop:er-reader` | `agents/er-reader.md` | its one-line description in every session's agent list; its body only when it is sent |
 | The commands | `skills/<command>/SKILL.md` | only when you type one; the model cannot invoke them |
@@ -152,8 +156,8 @@ Wired in `hooks/hooks.json`, every command under `${CLAUDE_PLUGIN_ROOT}/hooks/`.
 | `UserPromptSubmit` | `loop-reminder.sh` | one line into every prompt: `one loop · wait for yes unless "go" · proof required · risk zones need my yes` |
 | `PreToolUse` on reads and edits | `code-rules.sh` | the first time a session reads or edits a file the code rules' `paths:` globs name, hands it the code rules beside the tool result, once per session |
 | `PreToolUse` and `PostToolUse` on edits | `risk-zone.sh` | before the first edit in a session to a file whose path matches the risk regex (the map's `risk_regex:` line, else `settings/loop.json`), turns the edit into a permission prompt whose approval is the yes the law requires; after an edit that went through, records it, so the next edit to that file passes and a rejected one asks again |
-| `PreToolUse` on edits | `scope-check.sh` | reads the session transcript for the `- [ ] <task> (scope: <files>)` line Claude last added to `TODO.md` before you replied (whether you typed the reply, picked it in a pick-list or sent it while Claude was working), or the first one added after a message of yours saying "go", and turns an edit to a file not on that scope, an edit before any, or an edit while `TODO.md` has no open task line into a permission prompt; edits to `TODO.md` itself, files outside the repository and sessions with no readable transcript are not judged |
-| `PreToolUse` on the shell | `commit-check.sh` | turns a `git commit` that neither stages nor names `TODO.md` into a permission prompt; the repository is the one `git -C` names, else the session's folder |
+| `PreToolUse` on edits | `scope-check.sh` | reads the session transcript for the `- [ ] <task> (scope: <files>)` line Claude last added to `docs/oneloop-todos/TODO.md`, the checklist, before you replied (whether you typed the reply, picked it in a pick-list or sent it while Claude was working), or the first one added after a message of yours saying "go", and turns an edit to a file not on that scope, an edit before any, or an edit while the checklist has no open task line into a permission prompt (while a root `TODO.md` still exists, the reason says to move it and its archive there with `git mv`); a `TODO.md` anywhere else neither proposes nor counts; edits to the checklist and its archive themselves, files outside the repository and sessions with no readable transcript are not judged |
+| `PreToolUse` on the shell | `commit-check.sh` | turns a `git commit` that neither stages nor names `docs/oneloop-todos/TODO.md` into a permission prompt (a root `TODO.md` does not count); the repository is the one `git -C` names, else the session's folder |
 | `PreToolUse` on edits | `edit-guard.sh` | turns an edit that adds a code-rule break the scanner (9.5) can judge into a permission prompt: the bans (suppressions, empty catches, bare `Error` throws in domain files, non-null `!`, inline types, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets), the names (case, refused words, the `I` prefix, boolean prefixes, a default export that disagrees with its file), the file kinds (a second class or component, a type, constant, schema or class map outside its home, a file or folder in the wrong case or named for nothing), the caps (a fourth parameter, a flag parameter) and a new file under a top-level folder the map does not list; every rule the edit adds is named with its line and fix, your approval is the exception, recorded on the line as `law-exception: <what the technology needs>`, and what was already in the file is never named |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | one progress-log line per event, and a desktop notification when a turn ends, waits on you, or dies on an error |
 | status line (set by `bin/setup-statusline.sh`) | `statusline.sh` | two rows: folder, branch and model; then context, uptime, plan usage and compactions |
@@ -204,7 +208,7 @@ agents/er-reader.md             the one helper, read-only, with its model and tu
 hooks/hooks.json                the wiring: which script runs on which event
 hooks/                          the nine hook scripts, their shared helpers and their tests
 bin/setup-statusline.sh         the one-time status line setup, the one thing a plugin cannot wire
-TODO.md                         this repository's own checklist, one line per task; TODO.archive.md keeps the ticked ones
+docs/oneloop-todos/             this repository's own checklist: TODO.md, one line per task, and TODO.archive.md, the ticked ones
 references/                     72 pages, one file each, numbered as the law cites them
 CLAUDE.md                       this repository's own map, in the shape the law asks of every project
 tests/                          the repository's own tests and their fixtures

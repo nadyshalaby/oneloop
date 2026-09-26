@@ -44,6 +44,8 @@ The code-rules hook warns
 **The code-rules hook** warns
 never blocks
 warning, not a block
+# 13.0.0, the checklist lives in docs/oneloop-todos/ ("so they can mess with the projects main files", read as: so they do not): the root location is retired.
+at the repository root
 # 11.0.0, the plugin: the law is handed to the session by a hook, so no fixed install path may come back.
 ~/.claude/engineering-rules
 ~/.claude/rules/engineering-code.md

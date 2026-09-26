@@ -93,17 +93,18 @@ permission prompt naming rule, line and fix
 never route around it
 # the checklist
 **The checklist**, mandatory
-`TODO.md` at the repository root is the only task tracker
+`docs/oneloop-todos/TODO.md` is the only task tracker
+move there with `git mv` at the next Scope
 studied as input, never used to track
 One line per task, appended to its group
 `- [ ] <task> (scope: <files>)` is added at Scope
 each written the moment the status changes
 `- [~]` at the yes or "go"
-`- [x]` at Commit with `TODO.md` staged in the same commit
-`TODO.archive.md`
+`- [x]` at Commit, staged in the same commit
+its `TODO.archive.md`
 **The scope-check hook** asks
-the `scope:` of the last `- [ ]` line added to `TODO.md`
-**the commit hook** asks when a `git commit` leaves `TODO.md` out
+the `scope:` of the last `- [ ]` line added to the checklist
+**the commit hook** asks when a `git commit` leaves the checklist out
 # the map
 under 60 lines
 hooks enforce rules, the map only orients

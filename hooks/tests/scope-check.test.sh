@@ -4,16 +4,19 @@
 # a reply Claude wrote, a tool call and its result, a skill's injected text, a compaction
 # summary, a pick-list answer, a queued message) and feeds the guard one edit event against a
 # scratch git repo, then reads the decision. The scope is the `- [ ] <task> (scope: <files>)`
-# line Claude adds to TODO.md, read from that Edit, Write or MultiEdit in the transcript; a
-# scope line in Claude's chat text, in another file's edit, in a tool result, a summary or an
-# injected text is not one, nor is a line the edit's old text already held or a line turning
-# `[~]`. An edit before any approved scope asks; the user's reply after a proposal is the yes,
-# whether typed, picked in a pick-list (stored as the AskUserQuestion tool's result) or sent
-# while Claude was working (stored as a queued command); another tool's result or a queued task
-# notification is not a reply; "go" in the user's message pre-approves the first proposal after
-# it and no later one; a folder on the scope covers the files under it; TODO.md must hold an
-# open line; TODO.md and TODO.archive.md themselves, files outside the repository, other tools
-# and events, a missing transcript and unreadable input are nothing to judge. SCOPE_CHECK_SH
+# line Claude adds to the checklist, docs/oneloop-todos/TODO.md, read from that Edit, Write or
+# MultiEdit in the transcript; a scope line in Claude's chat text, in another file's edit (a
+# root TODO.md, the old home, included), in a tool result, a summary or an injected text is not
+# one, nor is a line the edit's old text already held or a line turning `[~]`. An edit before
+# any approved scope asks; the user's reply after a proposal is the yes, whether typed, picked
+# in a pick-list (stored as the AskUserQuestion tool's result) or sent while Claude was working
+# (stored as a queued command); another tool's result or a queued task notification is not a
+# reply; "go" in the user's message pre-approves the first proposal after it and no later one;
+# a folder on the scope covers the files under it; the checklist must hold an open line, and an
+# open line in a root TODO.md does not count (the reason then says to git mv it); the checklist
+# and its archive themselves, files outside the repository, other tools and events, a missing
+# transcript and unreadable input are nothing to judge; a TODO.md anywhere else is judged like
+# any other file. SCOPE_CHECK_SH
 # points the test at another copy of the script, for a watched failure; the copy needs
 # hook-input.sh and progress-log.sh beside it.
 # shellcheck source-path=SCRIPTDIR
@@ -26,9 +29,10 @@ LOG="$WORK/config/progress.log"
 P="$WORK/p"
 T="$WORK/transcript.jsonl"
 TICK=$(printf '\140')
+TODO="docs/oneloop-todos/TODO.md"
 
 build_fixture() {
-  mkdir -p "$P/src/util" "$P/src/cart" "$WORK/elsewhere" || return 1
+  mkdir -p "$P/src/util" "$P/src/cart" "$P/docs/oneloop-todos" "$WORK/elsewhere" || return 1
   git init -q "$P" && : > "$P/src/util/math.ts" && : > "$P/src/cart/summary.ts" && : > "$P/README.md" && : > "$WORK/elsewhere/x.ts"
 }
 
@@ -61,29 +65,29 @@ notification_line() {
   jq -cn --arg t "$1" '{type: "attachment", attachment: {type: "queued_command", commandMode: "task-notification", prompt: $t}}'
 }
 
-# todo_add <files> [file]: Claude adding a task line with its scope to TODO.md (default) or to
-# another file, as the transcript stores the Edit.
+# todo_add <files> [file]: Claude adding a task line with its scope to the checklist (default)
+# or to another file, as the transcript stores the Edit.
 todo_add() {
-  jq -cn --arg p "${2:-$P/TODO.md}" --arg f "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "e1", name: "Edit", input: {file_path: $p, old_string: "", new_string: ("- [ ] a task (scope: " + $f + ")")}}]}}'
+  jq -cn --arg p "${2:-$P/$TODO}" --arg f "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "e1", name: "Edit", input: {file_path: $p, old_string: "", new_string: ("- [ ] a task (scope: " + $f + ")")}}]}}'
 }
 
 # todo_write <content>: Claude rewriting TODO.md whole.
 todo_write() {
-  jq -cn --arg p "$P/TODO.md" --arg c "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "w1", name: "Write", input: {file_path: $p, content: $c}}]}}'
+  jq -cn --arg p "$P/$TODO" --arg c "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "w1", name: "Write", input: {file_path: $p, content: $c}}]}}'
 }
 
 # todo_flip <files>: the task line turning [~], an Edit whose old text holds the [ ] line.
 todo_flip() {
-  jq -cn --arg p "$P/TODO.md" --arg f "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "e2", name: "Edit", input: {file_path: $p, old_string: ("- [ ] a task (scope: " + $f + ")"), new_string: ("- [~] a task (scope: " + $f + ")")}}]}}'
+  jq -cn --arg p "$P/$TODO" --arg f "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "e2", name: "Edit", input: {file_path: $p, old_string: ("- [ ] a task (scope: " + $f + ")"), new_string: ("- [~] a task (scope: " + $f + ")")}}]}}'
 }
 
 # todo_multi <files>: the task line added through a MultiEdit.
 todo_multi() {
-  jq -cn --arg p "$P/TODO.md" --arg f "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "m1", name: "MultiEdit", input: {file_path: $p, edits: [{old_string: "## Later", new_string: ("## Later\n- [ ] a task (scope: " + $f + ")")}]}}]}}'
+  jq -cn --arg p "$P/$TODO" --arg f "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "m1", name: "MultiEdit", input: {file_path: $p, edits: [{old_string: "## Later", new_string: ("## Later\n- [ ] a task (scope: " + $f + ")")}]}}]}}'
 }
 
-# open_task: TODO.md with one task in flight.
-open_task() { printf -- '- [~] rename runningSum to sum (scope: src/util/math.ts)\n' > "$P/TODO.md"; }
+# open_task: the checklist with one task in flight.
+open_task() { printf -- '- [~] rename runningSum to sum (scope: src/util/math.ts)\n' > "$P/$TODO"; }
 
 # event_json <tool> <path>: the edit event as Claude Code sends it, pointing at the transcript.
 event_json() {
@@ -115,7 +119,7 @@ test_a_proposal_waits_for_the_yes() {
   open_task
   assert_eq "an edit before the yes asks" ask "$(decide Edit "$P/src/util/math.ts")"
   assert_eq "the decision is for PreToolUse" PreToolUse "$(last hookEventName)"
-  assert_contains "the reason says no scope is approved yet" "no approved scope yet: add ${TICK}- [ ] <task> (scope: <files>)${TICK} to TODO.md, print the scope line and the note, then wait for the yes" "$(last permissionDecisionReason)"
+  assert_contains "the reason says no scope is approved yet" "no approved scope yet: add ${TICK}- [ ] <task> (scope: <files>)${TICK} to docs/oneloop-todos/TODO.md, print the scope line and the note, then wait for the yes" "$(last permissionDecisionReason)"
   assert_contains "the context tells Claude the approval is the yes" "their approval is the yes" "$(last additionalContext)"
   assert_contains "it is logged" " p | guard | scope | ask | src/util/math.ts | no scope" "$(tail -n 1 "$LOG")"
 }
@@ -125,7 +129,7 @@ test_the_users_reply_is_the_yes_for_the_proposal_that_stood() {
   assert_eq "the scoped file passes after the reply" pass "$(decide Edit "$P/src/util/math.ts")"
   assert_eq "a Write to it passes too" pass "$(decide Write "$P/src/util/math.ts")"
   assert_eq "a file outside the scope asks" ask "$(decide Edit "$P/src/cart/summary.ts")"
-  assert_contains "the reason names the file and the approved scope" "src/cart/summary.ts is outside the approved scope (scope: src/util/math.ts): restate the scope on the task line in TODO.md and wait for the yes" "$(last permissionDecisionReason)"
+  assert_contains "the reason names the file and the approved scope" "src/cart/summary.ts is outside the approved scope (scope: src/util/math.ts): restate the scope on the task line in docs/oneloop-todos/TODO.md and wait for the yes" "$(last permissionDecisionReason)"
   assert_contains "and is logged as outside scope" " p | guard | scope | ask | src/cart/summary.ts | outside scope" "$(tail -n 1 "$LOG")"
 }
 
@@ -166,6 +170,8 @@ test_where_the_scope_is_read_from() {
   assert_contains "so no scope is approved" "no approved scope yet" "$(last permissionDecisionReason)"
   { human_line "Rename it, go."; todo_add "src/util/math.ts" "$P/README.md"; } > "$T"
   assert_eq "a task line written into another file is not one either" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Rename it, go."; todo_add "src/util/math.ts" "$P/TODO.md"; } > "$T"
+  assert_eq "nor is one written into a root TODO.md, the old home" ask "$(decide Edit "$P/src/util/math.ts")"
   { human_line "Rename it, go."; todo_write "## Now
 - [x] an old task (scope: src/cart/summary.ts)
 - [ ] a task (scope: src/util/math.ts)"; } > "$T"
@@ -207,21 +213,29 @@ test_quoted_injected_and_summary_lines_are_not_replies() {
 
 test_the_checklist_must_hold_an_open_line() {
   { human_line "go"; todo_add "src/util/math.ts"; } > "$T"
-  rm -f "$P/TODO.md"
-  assert_eq "no TODO.md asks" ask "$(decide Edit "$P/src/util/math.ts")"
-  assert_contains "the reason says to add the line" "TODO.md has no open task line: add ${TICK}- [ ] <task> (scope: <files>)${TICK} first" "$(last permissionDecisionReason)"
+  rm -f "$P/$TODO"
+  assert_eq "no checklist asks" ask "$(decide Edit "$P/src/util/math.ts")"
+  assert_contains "the reason says to add the line" "docs/oneloop-todos/TODO.md has no open task line: add ${TICK}- [ ] <task> (scope: <files>)${TICK} first" "$(last permissionDecisionReason)"
+  assert_missing "and, with no root TODO.md, says nothing of a move" "old home" "$(last permissionDecisionReason)"
   assert_contains "and is logged" " p | guard | scope | ask | src/util/math.ts | no task line" "$(tail -n 1 "$LOG")"
-  printf -- '- [x] an earlier task\n' > "$P/TODO.md"
+  printf -- '- [~] an old task (scope: src/util/math.ts)\n' > "$P/TODO.md"
+  assert_eq "an open line in a root TODO.md, the old home, does not count" ask "$(decide Edit "$P/src/util/math.ts")"
+  assert_contains "and the reason says to move it" "first (the root TODO.md is the old home: git mv it and TODO.archive.md into docs/oneloop-todos/ first)" "$(last permissionDecisionReason)"
+  printf -- '- [x] an earlier task\n' > "$P/$TODO"
   assert_eq "only ticked lines ask too" ask "$(decide Edit "$P/src/util/math.ts")"
-  printf -- '- [x] an earlier task\n- [ ] rename computeTotal (scope: src/util/math.ts)\n' > "$P/TODO.md"
-  assert_eq "an open line passes" pass "$(decide Edit "$P/src/util/math.ts")"
+  assert_missing "and once the checklist exists the move is not mentioned" "old home" "$(last permissionDecisionReason)"
   rm -f "$P/TODO.md"
+  printf -- '- [x] an earlier task\n- [ ] rename computeTotal (scope: src/util/math.ts)\n' > "$P/$TODO"
+  assert_eq "an open line passes" pass "$(decide Edit "$P/src/util/math.ts")"
+  rm -f "$P/$TODO"
   assert_eq "both reasons come together, outside scope and no line" ask "$(decide Edit "$P/src/cart/summary.ts")"
-  assert_contains "the reason carries both" "outside the approved scope (scope: src/util/math.ts): restate the scope on the task line in TODO.md and wait for the yes; TODO.md has no open task line" "$(last permissionDecisionReason)"
+  assert_contains "the reason carries both" "outside the approved scope (scope: src/util/math.ts): restate the scope on the task line in docs/oneloop-todos/TODO.md and wait for the yes; docs/oneloop-todos/TODO.md has no open task line" "$(last permissionDecisionReason)"
   assert_contains "the log names both" "| outside scope + no task line" "$(tail -n 1 "$LOG")"
   human_line "Start something new." > "$T"
-  assert_eq "TODO.md itself is never judged" pass "$(decide Write "$P/TODO.md")"
-  assert_eq "nor is the archive" pass "$(decide Write "$P/TODO.archive.md")"
+  assert_eq "the checklist itself is never judged" pass "$(decide Write "$P/$TODO")"
+  assert_eq "nor is its archive" pass "$(decide Write "$P/docs/oneloop-todos/TODO.archive.md")"
+  assert_eq "a root TODO.md is judged like any other file" ask "$(decide Write "$P/TODO.md")"
+  assert_eq "and so is a TODO.md in another folder" ask "$(decide Write "$P/src/TODO.md")"
 }
 
 test_outside_the_repository_is_not_judged() {

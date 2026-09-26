@@ -2,6 +2,32 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **13.0.0**: the checklist moves out of the project's root into `docs/oneloop-todos/`, at the
+  user's word ("we can place the todo files in its docs/oneloop-todos folder so they can mess with
+  the projects main files", read with them as: so they do not sit among the project's main files;
+  their pick: fixed there, the old root files moved with `git mv` at the next Scope).
+  `docs/oneloop-todos/TODO.md` is now the only task tracker and `docs/oneloop-todos/TODO.archive.md`
+  its archive; the law's checklist paragraph and Guards bullet, the `start` and `status-report`
+  skills, the README, the map and the manifests say so. The scope-check hook reads the task line
+  from that file alone (a `- [ ] ... scope:` line added to a `TODO.md` anywhere else, the root
+  included, proposes nothing), exempts the checklist and its archive from judgment instead of the
+  root pair, and, while the checklist is missing and a root `TODO.md` exists, says in its reason
+  to `git mv` that file and its archive into `docs/oneloop-todos/` first; the commit hook passes a
+  commit that stages or names `docs/oneloop-todos/TODO.md` and asks on one that only carries a
+  root `TODO.md`. Major because a rule's home moves and the hooks no longer accept the old one: in
+  a project on 12.x or earlier, the next task's Scope step moves the root `TODO.md` and
+  `TODO.archive.md` with `git mv` into `docs/oneloop-todos/` and that task's commit carries the
+  move; until then the scope-check hook asks on every edit and its reason says what to do. This
+  repository's own pair moved the same way in this commit. "at the repository root" joins the
+  retired wording. Tests: `hooks/tests/scope-check.test.sh` gains the root-file cases (a task
+  line written into a root `TODO.md` proposes nothing, an open line there does not count and the
+  reason says to move it, a root or other `TODO.md` is judged like any file; 69 checks) and
+  `hooks/tests/commit-check.test.sh` a second fixture in the old layout (a root `TODO.md` staged
+  or named still asks, the `git mv` commit passes; 25 checks); the pins follow the new wording,
+  and the old law, scope hook and commit hook fail 2, 30 and 6 of the new checks. Law: 88 lines
+  and 11,980 characters before, 88 and 11,979 after (three trims elsewhere paid for the path);
+  code rules unchanged at 49 and 7,593. Nothing loosened: the checklist stays mandatory, only its
+  place changes.
 - **12.0.0**: the edit guard prompts on everything the code rules ban, at the user's word ("these
   laws are my own coding style, i want to enforce every single law. when anyone see the codebase.
   he should see these all laws are applied cleanly. claude models can't ignore them unless the

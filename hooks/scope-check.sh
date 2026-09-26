@@ -2,19 +2,22 @@
 # oneloop scope check.
 # The law's Scope step, its scope ratchet and its checklist, judged by a machine before an
 # edit inside a git repository: the file must be on the approved scope, and the repository's
-# TODO.md must hold an open task line. The scope comes from TODO.md itself: at Scope, Claude
-# adds `- [ ] <task> (scope: <files>)` to it, and that edit is a tool call the session
-# transcript always keeps (Claude's chat text is not always kept, so it never counts here). The
+# checklist, `docs/oneloop-todos/TODO.md`, must hold an open task line. The scope comes from
+# the checklist itself: at Scope, Claude adds `- [ ] <task> (scope: <files>)` to it, and that
+# edit is a tool call the session transcript always keeps (Claude's chat text is not always
+# kept, so it never counts here; a line added to a `TODO.md` anywhere else, the root included,
+# is not the checklist and counts for nothing). The
 # approved scope is the scope of the last such line added before the user last replied (their
 # reply is the yes, whether typed, picked in a pick-list, which Claude Code stores as the
 # AskUserQuestion tool's result, or sent while Claude was working, which it stores as a queued
 # command), or, when that reply says "go", of the first one added after it (the pre-approval).
 # A line added later waits for a new yes, even after "go"; a line turning `[~]` or `[x]` adds
 # nothing. An edit before any approved scope, to a file the scope does not name (a path, or a
-# folder it is under), or while TODO.md has no `- [ ]` or `- [~]` line, becomes a permission
-# prompt (`permissionDecision: ask`) whose approval is the yes. Nothing to judge (another tool
-# or event, no repository, a file outside it, TODO.md and TODO.archive.md themselves, no
-# readable transcript, unreadable input): exit 0 with no output.
+# folder it is under), or while the checklist has no `- [ ]` or `- [~]` line, becomes a
+# permission prompt (`permissionDecision: ask`) whose approval is the yes; with no checklist
+# but a root TODO.md, the reason also says to move that one and its archive there with git mv.
+# Nothing to judge (another tool or event, no repository, a file outside it, the checklist and
+# its archive themselves, no readable transcript, unreadable input): exit 0 with no output.
 set -u
 umask 077
 
@@ -29,9 +32,12 @@ here=${BASH_SOURCE[0]%/*}
 # for a message from the user (typed while Claude was idle: a user line that is not a tool
 # result, an injected text or a compaction summary; picked: the result of an AskUserQuestion
 # call Claude made; typed while Claude worked: a queued_command attachment with a human turn)
-# and `S<tab>files` for a `- [ ] ... scope:` line an Edit, Write or MultiEdit adds to a TODO.md
-# (a line its old text already held is not added; of several added at once, the last, since a
-# task line is appended to its group). One pass, keeping the ids of the pick-lists asked so far.
+# and `S<tab>files` for a `- [ ] ... scope:` line an Edit, Write or MultiEdit adds to the
+# checklist (a line its old text already held is not added; of several added at once, the
+# last, since a task line is appended to its group). One pass, keeping the ids of the
+# pick-lists asked so far.
+TODO=docs/oneloop-todos/TODO.md
+ARCHIVE=docs/oneloop-todos/TODO.archive.md
 read -r -d '' EVENTS <<'JQ'
 def text_of: if type == "string" then . elif type == "array" then ([.[]? | .text? // ""] | join(" ")) else "" end;
 def typed: .message.content
@@ -40,7 +46,7 @@ def typed: .message.content
     else null end;
 def asked: [.message.content[]? | select(.type == "tool_use" and .name == "AskUserQuestion") | .id];
 def answered($ids): [.message.content[]? | select(.type == "tool_result" and (.tool_use_id as $i | any($ids[]; . == $i))) | .content | text_of] | join(" ");
-def todo_edit: select(.type == "tool_use" and (.name == "Edit" or .name == "Write" or .name == "MultiEdit") and ((.input.file_path // "") | test("(^|/)TODO\\.md$")));
+def todo_edit: select(.type == "tool_use" and (.name == "Edit" or .name == "Write" or .name == "MultiEdit") and ((.input.file_path // "") | test("(^|/)docs/oneloop-todos/TODO\\.md$")));
 def new_text: [.input.content // empty, .input.new_string // empty, (.input.edits[]? | .new_string // empty)] | join("\n");
 def old_text: [.input.old_string // empty, (.input.edits[]? | .old_string // empty)] | join("\n");
 def files: sub("^.*scope:[[:space:]]*"; "") | gsub("[`*]"; "") | sub("\\)[[:space:]]*$"; "") | sub("[[:space:]]+$"; "");
@@ -104,7 +110,7 @@ existing_parent() {
 # emit_ask <reason>: the PreToolUse decision, as the JSON Claude Code reads.
 emit_ask() {
   jq -cn --arg r "engineering law (the loop): $1." \
-    --arg c "engineering law (the loop): $1. The user is being asked to approve this edit; their approval is the yes. A rejection means: restate the scope on the task line in TODO.md or add the task line, then try again." \
+    --arg c "engineering law (the loop): $1. The user is being asked to approve this edit; their approval is the yes. A rejection means: restate the scope on the task line in $TODO or add the task line, then try again." \
     '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r,additionalContext:$c}}'
 }
 
@@ -119,18 +125,20 @@ parent=$(existing_parent "$path")
 root=$(git -C "$parent" rev-parse --show-toplevel 2>/dev/null) || exit 0
 physical="$(cd "$parent" 2>/dev/null && pwd -P)/${path#"$parent"/}"
 case "$physical" in "$root"/*) rel=${physical#"$root"/} ;; *) exit 0 ;; esac
-case "$rel" in TODO.md|TODO.archive.md) exit 0 ;; esac
+case "$rel" in "$TODO"|"$ARCHIVE") exit 0 ;; esac
 [ -n "$transcript" ] && [ -r "$transcript" ] || exit 0
 project="${cwd##*/}"
 reason=""; why=""
 scope=$(approved_scope "$transcript")
 if [ -z "$scope" ]; then
-  reason="no approved scope yet: add \`- [ ] <task> (scope: <files>)\` to TODO.md, print the scope line and the note, then wait for the yes"; why="no scope"
+  reason="no approved scope yet: add \`- [ ] <task> (scope: <files>)\` to $TODO, print the scope line and the note, then wait for the yes"; why="no scope"
 elif ! in_scope "$rel" "$scope" "$root $cwd"; then
-  reason="$rel is outside the approved scope (scope: $scope): restate the scope on the task line in TODO.md and wait for the yes"; why="outside scope"
+  reason="$rel is outside the approved scope (scope: $scope): restate the scope on the task line in $TODO and wait for the yes"; why="outside scope"
 fi
-if ! grep -qE '^- \[( |~)\] ' "$root/TODO.md" 2>/dev/null; then
-  reason="${reason:+$reason; }TODO.md has no open task line: add \`- [ ] <task> (scope: <files>)\` first"; why="${why:+$why + }no task line"
+if ! grep -qE '^- \[( |~)\] ' "$root/$TODO" 2>/dev/null; then
+  moved=""
+  [ -e "$root/TODO.md" ] && [ ! -e "$root/$TODO" ] && moved=" (the root TODO.md is the old home: git mv it and TODO.archive.md into docs/oneloop-todos/ first)"
+  reason="${reason:+$reason; }$TODO has no open task line: add \`- [ ] <task> (scope: <files>)\` first$moved"; why="${why:+$why + }no task line"
 fi
 [ -n "$reason" ] || exit 0
 append_log "$project" "guard | scope | ask | $rel | $why"
