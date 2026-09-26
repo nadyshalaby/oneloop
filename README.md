@@ -166,6 +166,7 @@ hook can inject context into one; the law allows only the read-only reader anywa
 | Command | What it does |
 |---|---|
 | a plain request | the loop: scope, edit, check, commit |
+| `/oneloop:start <task>` | the same loop on that task, restated as a checklist of what each step owes, start to commit; "go" inside the task pre-approves the scope. It also fires on its own when you ask to build, fix, change or add something and no loop step has begun, the case where a plain request slipped past the loop |
 | `/oneloop:brainstorm <idea>` | one Socratic conversation until the idea is a task, then hands it to the loop's Scope step |
 | `/oneloop:audit [directory]` | a whole-codebase audit against the law and the catalogs |
 | `/oneloop:triage <findings>` | a batch of review findings, each accepted, pushed back, deferred or sent back for restatement |

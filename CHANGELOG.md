@@ -2,6 +2,27 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **11.1.0**: `/oneloop:start <task>`, the loop's entry point, at the user's word ("sometimes
+  claude might ingnore the oneloop. i need some entrypoint skill to trigger on a task .e.g.
+  (start, do, go, or ...etc.)"; their picks: typed and self-triggered, named `start`). The skill
+  (`skills/start/SKILL.md`) takes the task from its arguments (the user's last message when
+  empty), makes sure the law is in context (it reads `law/engineering-law.md` under the plugin
+  root when it cannot quote the law's first line), and restates the four steps as a checklist of
+  the outputs each one owes: the scope line, the note and the `TODO.md` task line, then the wait
+  for the yes ("go" in the task is the yes, a risk zone still asks); `- [~]` and the smallest
+  diff inside the scope; lint, typecheck, test, `ui_check`, one `git diff` read; the commit with
+  `TODO.md` ticked, and the reply of files, checks and side finds. Its description also lets
+  Claude invoke it on its own when the user asks to start, do, build, implement, fix, change,
+  add, rename or remove something and no loop step has happened yet, which is the case the user
+  saw: a session that let a plain request slip past the loop. The law's last line names it
+  (`Commands: /oneloop:start (the loop on a typed task), …`) and, to stay under the
+  12,000-character cap, that line got shorter elsewhere: "(look up an id)" to "(by id)", "the
+  code-rules hook runs" to "the edit guard runs", "Typed commands" to "Commands", "worked
+  anti-patterns" to "anti-patterns", and "(UI work)" dropped after the frontend design law;
+  11,996 to 11,997 characters, 88 lines. `tests/commands.test.sh` lists `start` among the
+  standalone skills (a description, model invocation on, under the cap) and the pins add
+  the `/oneloop:start` phrase and "A plain request is the loop". Code rules unchanged: 49 lines
+  and 7,484 characters.
 - **11.0.2**: `TODO.md` named in a comment is no longer debt. The edit guard's debt-marker scan
   (9.5, `clean.debt-marker`) fired on a comment line starting with `TODO.md` (seen on
   `hooks/scope-check.sh`'s own header while 11.0.0 was built): the marker regex now stops at a

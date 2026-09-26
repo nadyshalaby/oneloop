@@ -85,4 +85,4 @@ Independent tool calls go in one message; never re-derive what this session prov
 
 ## Where the details are
 
-2.1 code quality, 2.2 file placement, 3.1 to 3.4 the performance, security, test-scenario and clean-code catalogs (look up an id), 9.5 the banned-token scanner the code-rules hook runs, 14.1 worked anti-patterns, 15.x the frontend design law (UI work), 16.3 the codebase audit. Typed commands: `/oneloop:brainstorm`, `:audit`, `:triage`, `:design-spec`, `:release-notes`, `:status-report`, `:update-rules`; `oneloop:explain` when asked how code works. A plain request is the loop.
+2.1 code quality, 2.2 file placement, 3.1 to 3.4 the performance, security, test-scenario and clean-code catalogs (by id), 9.5 the banned-token scanner the edit guard runs, 14.1 anti-patterns, 15.x the frontend design law, 16.3 the codebase audit. Commands: `/oneloop:start` (the loop on a typed task), `:brainstorm`, `:audit`, `:triage`, `:design-spec`, `:release-notes`, `:status-report`, `:update-rules`; `oneloop:explain` when asked how code works. A plain request is the loop.

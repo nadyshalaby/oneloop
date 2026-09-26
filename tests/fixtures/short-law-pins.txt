@@ -150,3 +150,6 @@ debug artifacts
 # config and paths
 `settings/loop.json`
 under the harness root named above
+# commands
+`/oneloop:start` (the loop on a typed task)
+A plain request is the loop

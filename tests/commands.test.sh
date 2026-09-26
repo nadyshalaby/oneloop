@@ -5,8 +5,8 @@
 # serves as `/oneloop:<name>`; user-only invocation; no argument list; under the cap); a
 # standalone skill names itself, carries the description it triggers on, keeps model invocation
 # on and stays under the cap; and the law names every one of them as `:<name>`, since the law
-# is where a session learns what it can type. A plain request is the loop, which no skill
-# carries. Run: bash tests/commands.test.sh
+# is where a session learns what it can type. A plain request is the loop; `start` is that same
+# loop as a checklist on one task, typed or self-triggered. Run: bash tests/commands.test.sh
 # SKILLS_DIR and LAW_MD point the test at other copies, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -17,7 +17,7 @@ LAW="${LAW_MD:-$ROOT/law/engineering-law.md}"
 # The commands the user types, each `/oneloop:<name>`, space-separated.
 COMMANDS="audit brainstorm design-spec release-notes triage"
 # Skills that ship beside the law and trigger on their own description.
-STANDALONE="explain update-rules status-report"
+STANDALONE="explain update-rules status-report start"
 LINE_CAP=500
 TICK=$(printf '\140')
 
@@ -108,7 +108,7 @@ test_planted_breaches_are_named() {
   assert_contains "a standalone skill with model invocation off is named" "explain: model invocation is disabled" "$defects"
   assert_contains "a skill over the cap is named" "status-report: 505 lines" "$defects"
   printf '%s\n' "Typed commands: ${TICK}/oneloop:brainstorm${TICK}, ${TICK}:audit${TICK}, ${TICK}:status-report${TICK}." > "$WORK/law.md"
-  assert_eq "the commands a law does not name are named" "design-spec explain release-notes triage update-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
+  assert_eq "the commands a law does not name are named" "design-spec explain release-notes start triage update-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
 }
 
 test_every_skill_directory_is_listed
