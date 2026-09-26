@@ -5,7 +5,7 @@
 # status line (a plugin cannot; bin/setup-statusline.sh does), the one hook that reaches the
 # Bash tool is the commit check (it asks, never blocks; git safety itself binds through the
 # law), the prompt hook carries no matcher, because UserPromptSubmit takes none, and the loop's
-# hooks sit where the law puts them (the law on every session start; the one-line reminder
+# hooks sit where the law puts them (the law, in two parts, on every session start; the one-line reminder
 # alone on every prompt; the risk-zone prompt, the scope check, the code rules and the
 # code-rules warning on every edit; the code rules on every read; the risk-zone record after
 # every edit that went through). Run: bash tests/hooks-wiring.test.sh
@@ -28,6 +28,9 @@ event_scripts() { grep -l 'read_hook_input ||' "$ROOT"/hooks/*.sh | sed 's#.*/##
 
 # scripts_on <manifest> <event> <matcher>: the scripts the event runs under that exact matcher, in order.
 scripts_on() { jq -r --arg e "$2" --arg m "$3" '.hooks[$e][] | select((.matcher // "") == $m) | .hooks[].command' "$1" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | tr '\n' ' '; }
+
+# law_parts <manifest>: the arguments the session-start commands pass, in order, space-separated.
+law_parts() { jq -r '.hooks.SessionStart[].hooks[].command' "$1" | sed -E 's#.*session-start\.sh" ?##' | tr '\n' ' ' | sed 's/ $//'; }
 
 # bash_matchers <manifest>: every PreToolUse or PostToolUse matcher that reaches the Bash tool,
 # one per line, judged as Claude Code judges it: the tool name against the matcher as a regex
@@ -68,12 +71,14 @@ test_the_nine_events_are_wired() {
   assert_eq "the nine events" "Notification PostToolUse PreToolUse SessionStart Stop StopFailure SubagentStart SubagentStop UserPromptSubmit " "$events"
 }
 
-# The loop's guards sit where the law says: the law on every session start, the one-line
-# reminder alone on every prompt, the risk-zone prompt, the scope check, the code rules and
-# the code-rules warning on every edit, the code rules on every read, and the risk-zone record
-# after every edit that went through.
+# The loop's guards sit where the law says: the law, in two parts, on every session start (Claude
+# Code keeps only a preview of a hook context over 10,000 characters), the one-line reminder
+# alone on every prompt, the risk-zone prompt, the scope check, the code rules and the
+# code-rules warning on every edit, the code rules on every read, and the risk-zone record after
+# every edit that went through.
 test_the_loop_hooks_sit_where_the_law_says() {
-  assert_eq "every session start carries the law" "session-start.sh " "$(scripts_on "$HOOKS_JSON" SessionStart 'startup|resume|clear|compact|fork')"
+  assert_eq "every session start carries the law in two parts" "session-start.sh session-start.sh " "$(scripts_on "$HOOKS_JSON" SessionStart 'startup|resume|clear|compact|fork')"
+  assert_eq "part 1 then part 2" "1 2" "$(law_parts "$HOOKS_JSON")"
   assert_eq "and nothing else starts a session" "session-start.sh" "$(jq -r '.hooks.SessionStart[].hooks[].command' "$HOOKS_JSON" | sed -E 's#.*/hooks/([^"]+)".*#\1#' | sort -u | tr '\n' ' ' | sed 's/ $//')"
   assert_eq "the prompt hook is the one-line reminder and nothing else" "loop-reminder.sh " "$(scripts_on "$HOOKS_JSON" UserPromptSubmit '')"
   assert_eq "every edit runs the risk-zone prompt, the scope check, the code rules, then the code-rules warning" "risk-zone.sh scope-check.sh code-rules.sh edit-guard.sh " "$(scripts_on "$HOOKS_JSON" PreToolUse 'Edit|Write|MultiEdit|NotebookEdit')"
@@ -91,9 +96,11 @@ test_the_prompt_hook_carries_no_matcher() {
 }
 
 # The checks have to be able to fail: a missing script, an unwired script, a command outside
-# the plugin root, a status line, a second hook on Bash and a Bash regex on PostToolUse are all
-# named.
+# the plugin root, a status line, a second hook on Bash, a Bash regex on PostToolUse and a law
+# handed over in one part are all named.
 test_planted_breaches_are_named() {
+  jq '.hooks.SessionStart[0].hooks |= .[0:1]' "$HOOKS_JSON" > "$WORK/one-part.json"
+  assert_eq "a planted lone law part is named" "1" "$(law_parts "$WORK/one-part.json")"
   jq '.hooks.Stop[0].hooks[0].command = "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/no-such-hook.sh\""' "$HOOKS_JSON" > "$WORK/planted.json"
   named=$(for script in $(wired_scripts "$WORK/planted.json"); do [ -f "$ROOT/hooks/$script" ] || printf '%s' "$script"; done)
   assert_contains "a planted missing script is named" "no-such-hook.sh" "$named"

@@ -26,7 +26,7 @@ The map for this repository: the checks, where things live, where to start. Read
 - `law/engineering-law.md`: the loop, the guards, the map rule, the helpers rule; handed to every session as it starts.
 - `law/engineering-code.md`: the caps, the bans, the principles; handed to a session with its first code file.
 - `hooks/hooks.json`: which script runs on which event, every path under the plugin root.
-- `hooks/session-start.sh`: carries the law into the session, and the re-anchor after a compaction or a resume.
+- `hooks/session-start.sh`: carries the law into the session in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and the re-anchor after a compaction or a resume.
 - `hooks/code-rules.sh`: carries the code rules in with the first code file read or edited.
 - `hooks/risk-zone.sh`: the first edit to a risk-zone file becomes a permission prompt.
 - `hooks/scope-check.sh`: an edit outside the scope on the `TODO.md` task line, or with no open line there, becomes a permission prompt.

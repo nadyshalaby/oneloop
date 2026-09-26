@@ -2,6 +2,26 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **11.0.1**: the law reaches the session in two parts. The live check after 11.0.0 found a fresh
+  session got a 2KB preview of the law and a file path in its place: Claude Code keeps only a
+  preview of a hook context over 10,000 characters and saves the whole to a file (its
+  context-window page says so for hook output; measured here on SessionStart with `claude -p
+  --settings`: 9,000 characters arrive whole, 10,500 are cut, 11,000 on plain stdout are cut the
+  same way, and two hooks of 6,500 each both arrive whole, so the limit is per hook, not per
+  event). The law with its header ran to 12,185 characters (12,411 after a compaction), and the
+  dry run's session spent a tool call reading the saved file. Now `hooks/hooks.json` runs
+  `hooks/session-start.sh` twice on every session start, `1` and `2`, and each run carries one
+  part: the split is the `## ` heading nearest the middle by characters (the line nearest the
+  middle when that heading would leave a part over 9,000), so today part 1 is lines 1 to 38
+  (6,361 characters with its header) and part 2 lines 39 to 88 (6,519 with the header and the
+  compaction anchor); each part's header names the part and its lines, the plugin version and
+  the harness root, and part 2 carries the re-anchor, now "the law in its two parts is the law".
+  `hooks/tests/session-start.test.sh` (22 to 37 checks) joins the two parts back into the law
+  byte for byte, holds both under 10,000 on a fresh start and after a compaction, and splits a
+  long law whose only heading sits at the top near the middle; `tests/hooks-wiring.test.sh` (30
+  to 32) pins the two runs in order; `hooks/tests/code-rules.test.sh` (21 to 22) holds the
+  code-rules context (7,328 characters) under the same limit. Law sizes unchanged: 88 lines and
+  11,996 characters; the code rules 49 and 7,484.
 - **11.0.0**: oneloop, the harness as a Claude Code plugin, at the user's word ("convert this
   harness to claude plugin that i can install and maintain once needed", "reallocate the folder
   inside our ~/Code project then install it and refresh claude plugins", "rename the repo as

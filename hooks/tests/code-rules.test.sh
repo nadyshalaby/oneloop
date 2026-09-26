@@ -82,6 +82,8 @@ test_the_repositorys_own_rules_load_whole() {
   expected=$(body "$REAL/law/engineering-code.md")
   assert_eq "the repository's code rules are carried whole, front matter off" yes "$(printf '%s' "$ctx" | jq -Rs --arg e "$expected" 'contains($e)' | sed 's/true/yes/')"
   assert_missing "and the globs stay out" '"**/*.{ts' "$ctx"
+  if [ "$(printf '%s' "$ctx" | wc -c | tr -d ' ')" -lt 10000 ]; then fits=yes; else fits=no; fi
+  assert_eq "and the whole context stays under the 10,000 characters Claude Code shows whole" yes "$fits"
 }
 
 build_fake_root || { printf 'FAIL could not build the fake root\n'; exit 1; }

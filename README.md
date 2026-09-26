@@ -60,7 +60,7 @@ search, sent only after grep has failed twice on an unfamiliar codebase.
 
 | What | File | When, and what it costs |
 |---|---|---|
-| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 11,996 characters, capped at 90 and 12,000 by `tests/short-law.test.sh` |
+| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 11,996 characters, capped at 90 and 12,000 by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, handed to the session by `hooks/code-rules.sh` | the first time a session reads or edits a file its `paths:` globs match (the common code extensions), once per session; 49 lines and 7,484 characters, capped at 60 and 7,600 |
 | The loop's defaults: the four checks, the discovery budget, the risk regex, the UI path regex | `settings/loop.json` | read by the risk-zone hook; the law states the same defaults, and `tests/loop-config.test.sh` keeps the two equal |
 | The one helper, `oneloop:er-reader` | `agents/er-reader.md` | its one-line description in every session's agent list; its body only when it is sent |
@@ -73,7 +73,7 @@ The two law files win over everything under `references/`: each long form in
 `references/01-always-on-law/` keeps the reasons and procedures behind a section of theirs, and
 if the two ever differ, the long form is the defect. The law's paths (`references/`,
 `law/engineering-code.md`, `settings/loop.json`) are relative to the harness root, which the
-session-start hook names in the line above the law.
+session-start hook names in the line above each part of the law.
 
 ## Install, update, uninstall
 
@@ -146,7 +146,7 @@ Wired in `hooks/hooks.json`, every command under `${CLAUDE_PLUGIN_ROOT}/hooks/`.
 
 | Event | Script | What it does |
 |---|---|---|
-| `SessionStart` (startup, resume, clear, compact, fork) | `session-start.sh` | hands the core law to the session, headed by the plugin version and the harness root; after a compaction or a resume adds the re-anchor: the law above is the law, a task in flight resumes at its loop step, nothing from before the loss counts as proof |
+| `SessionStart` (startup, resume, clear, compact, fork) | `session-start.sh`, run twice, `1` and `2` | hands the core law to the session in two parts, each under the 10,000 characters Claude Code shows whole (a larger hook context arrives as a 2KB preview and a file path), split at the heading nearest the middle, each headed by the part and its lines, the plugin version and the harness root; after a compaction or a resume part 2 adds the re-anchor: the law is the law, a task in flight resumes at its loop step, nothing from before the loss counts as proof |
 | `UserPromptSubmit` | `loop-reminder.sh` | one line into every prompt: `one loop · wait for yes unless "go" · proof required · risk zones need my yes` |
 | `PreToolUse` on reads and edits | `code-rules.sh` | the first time a session reads or edits a file the code rules' `paths:` globs name, hands it the code rules beside the tool result, once per session |
 | `PreToolUse` and `PostToolUse` on edits | `risk-zone.sh` | before the first edit in a session to a file whose path matches the risk regex (the map's `risk_regex:` line, else `settings/loop.json`), turns the edit into a permission prompt whose approval is the yes the law requires; after an edit that went through, records it, so the next edit to that file passes and a rejected one asks again |
@@ -193,7 +193,7 @@ runs the status line setup in fake config folders only, never against the real `
 ```
 .claude-plugin/plugin.json      the plugin: name, version, description
 .claude-plugin/marketplace.json this repository as its own marketplace, listing the plugin at "."
-law/engineering-law.md          the core law the session-start hook hands to every session
+law/engineering-law.md          the core law the session-start hook hands to every session, in two parts
 law/engineering-code.md         the code rules the code-rules hook hands in with the first code file
 settings/loop.json              the loop's defaults: the four checks, the discovery budget, the two regexes
 skills/<command>/               one folder per command, and the three standalone skills; typed as /oneloop:<name>
