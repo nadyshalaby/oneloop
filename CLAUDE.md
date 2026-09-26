@@ -31,7 +31,7 @@ The map for this repository: the checks, where things live, where to start. Read
 - `hooks/risk-zone.sh`: the first edit to a risk-zone file becomes a permission prompt.
 - `hooks/scope-check.sh`: an edit outside the scope on the `TODO.md` task line, or with no open line there, becomes a permission prompt.
 - `hooks/commit-check.sh`: a `git commit` that leaves `TODO.md` out becomes a permission prompt.
-- `hooks/edit-guard.sh`: the code-rules warning beside the tool result, never a block.
+- `hooks/edit-guard.sh`: an edit that adds a code-rule break (a ban, a name, a file kind, a cap, a new unlisted top-level folder) becomes a permission prompt; the user's yes is the exception, kept on the line as `law-exception:`.
 - `CHANGELOG.md`: one entry per version, newest first; the version is the top entry's, and the manifests carry the same one.
 
 ## Conventions

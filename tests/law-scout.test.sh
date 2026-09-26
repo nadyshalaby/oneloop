@@ -1,7 +1,8 @@
 #!/bin/bash
 # Runs the law scout's shell block straight out of 9.5 against a throwaway git repo with one
-# planted instance per construct ban and per banned equivalent, and expects every hit under its
-# own rule id, every allowed line left alone, every secret redacted, and an equal coverage pair.
+# planted instance per construct ban, per banned equivalent, and per name, file-kind and cap rule
+# (12.0.0), and expects every hit under its own rule id, every allowed line left alone, every
+# secret redacted, and an equal coverage pair.
 # Run: bash tests/law-scout.test.sh
 # LAW_SCOUT_MD points the test at another copy of 9.5, for a watched failure.
 # shellcheck source-path=SCRIPTDIR
@@ -140,12 +141,49 @@ plant_lookalike_directory() {
   printf '@pytest.mark.%s\ndef helper(): pass  # no%s\n' skip qa > weird/test_utils/markers.py
 }
 
+# One instance per name, file-kind and cap rule (12.0.0), each in the language its row reads, and
+# beside each the allowed form: the same constant, schema or class map in its home file, three
+# parameters plus `self`, a component file in PascalCase, a default export that agrees with its
+# file, and a line that states its exception, which is listed, not refused.
+plant_names_and_files() {
+  mkdir -p src/naming src/files src/utils
+  printf 'const user_id = 1\n' > src/naming/snake.ts
+  printf 'class user_repo {}\n' > src/naming/lower-type.ts
+  printf 'interface IUser { id: string }\n' > src/naming/iface.ts
+  printf 'const data = load()\n' > src/naming/refused.ts
+  printf 'class Manager {}\n' > src/naming/refused-type.ts
+  printf "<?php\n\$result = \$q->get();\n" > src/naming/refused.php
+  printf 'const enabled = false\n' > src/naming/bool.ts
+  printf 'const [open, setOpen] = useState(false)\n' > src/naming/BoolState.tsx
+  printf 'def getUser():\n    return 1\n' > src/naming/camel.py
+  printf 'myVar = 1\n' > src/naming/camel-assign.py
+  printf 'export default class UserService {}\n' > src/naming/user-profile.service.ts
+  printf 'function save(user: User, force: boolean) {}\n' > src/naming/flag.ts
+  printf 'def save(user, force=False):\n    return user\n' > src/naming/flag.py
+  printf 'function f(a: A, b: B, c: C, d: D) {}\n' > src/naming/four.ts
+  printf 'export function g(\n  a: A,\n  b: B,\n  c: C,\n  d: D,\n) {}\n' > src/naming/four-lines.ts
+  printf 'def h(self, a, b, c):\n    return a\n' > src/naming/three.py
+  printf 'class A {}\nclass B {}\n' > src/files/two-classes.ts
+  printf 'export default function TwoComponents() {}\nfunction Row() {}\n' > src/files/TwoComponents.tsx
+  printf 'export interface Repo {\n  find(): void\n  save(): void\n}\n' > src/files/user.repository.ts
+  printf 'export const MAX_RETRIES = 3\n' > src/files/limits.ts
+  printf 'export const MAX_RETRIES = 3\n' > src/files/app.constants.ts
+  printf 'const body = z.object({ name: z.string() })\n' > src/files/user.routes.ts
+  printf 'const body = z.object({ name: z.string() })\n' > src/files/user.schema.ts
+  printf "const variants = {\n  primary: 'bg-blue-500 text-white',\n}\n" > src/files/Chip.tsx
+  printf "const variants = {\n  primary: 'bg-blue-500 text-white',\n}\n" > src/files/chip.styles.ts
+  printf 'export const ok = 1\n' > src/files/userService.ts
+  printf 'export const ok = 1\n' > src/files/helpers.ts
+  printf 'export const ok = 1\n' > src/utils/format.ts
+  printf 'const n = count! + 1 // law-exception: the SDK types it nullable\n' > src/files/stated.ts
+}
+
 build_fixture() (
   git init -q "$WORK/repo" && cd "$WORK/repo" || return 1
   git -c user.name=t -c user.email=t@example.com commit -q --allow-empty -m base
   mkdir src
   plant_bans && plant_equivalents && plant_scoped && plant_tests_in_other_conventions && plant_lookalike_directory \
-    && plant_allowed_and_secrets && plant_bangs && plant_analogs || return 1
+    && plant_allowed_and_secrets && plant_bangs && plant_analogs && plant_names_and_files || return 1
   git add -- src tests spec pkg weird.test.dir weird test_user.py .env .envrc -dash.ts
   git -c user.name=t -c user.email=t@example.com commit -q -m planted
 )
@@ -163,8 +201,9 @@ test_finds_every_planted_ban() {
   assert_contains "bare throw" "ban.bare-error src/bare.ts:1:" "$out"
   assert_contains "debt marker" "clean.debt-marker src/todo.ts:1:" "$out"
   assert_missing "the clean file stays silent" "src/clean.ts" "$out"
-  assert_missing "no path text ever runs as code" "INJECTED" "$out"
-  untagged=$(printf '%s\n' "$out" | grep -vE '^(ban|cap|sec|test|clean)\.[a-z-]+ ' | grep -vE '^[[:space:]]*[0-9]+$')
+  assert_missing "no path text ever runs as code" "INJECTED" "$(printf '%s\n' "$out" | grep -vE '^file\.(name-case|refused-word) ')"
+  assert_contains "the path that would run as code is only ever printed, as a name finding" "file.name-case src/a\";echo INJECTED;\".ts:1:" "$out"
+  untagged=$(printf '%s\n' "$out" | grep -vE '^(ban|cap|sec|test|clean|name|file|note|style)\.[a-z-]+ ' | grep -vE '^[[:space:]]*[0-9]+$')
   assert_contains "every printed line carries its rule id, or is a coverage count" "<none>" "${untagged:-<none>}"
   pair=$(printf '%s\n' "$out" | tail -n 2 | tr -d ' ' | tr '\n' '/')
   assert_contains "coverage pair: every planted path handed in and readable" "$PLANTED/$PLANTED/" "$pair"
@@ -236,7 +275,42 @@ test_finds_every_language_analog() {
   assert_contains "ruby binding.pry" "clean.debug-artifact src/dbg-ruby.rb:1:" "$out"
 }
 
+test_finds_every_name_and_file_break() {
+  assert_contains "snake_case declared in TypeScript" "name.snake-in-camel src/naming/snake.ts:1:" "$out"
+  assert_contains "a lowercase class name" "name.type-case src/naming/lower-type.ts:1:" "$out"
+  assert_contains "an I-prefixed interface" "name.interface-prefix src/naming/iface.ts:1:" "$out"
+  assert_contains "a refused variable name" "name.refused-word src/naming/refused.ts:1:" "$out"
+  assert_contains "a refused class name" "name.refused-word src/naming/refused-type.ts:1:" "$out"
+  assert_contains "a refused PHP variable" "name.refused-word src/naming/refused.php:2:" "$out"
+  assert_contains "a boolean without its prefix" "name.boolean-prefix src/naming/bool.ts:1:" "$out"
+  assert_contains "a useState boolean without its prefix" "name.boolean-prefix src/naming/BoolState.tsx:1:" "$out"
+  assert_contains "camelCase def in Python" "name.camel-in-snake src/naming/camel.py:1:" "$out"
+  assert_contains "camelCase assignment in Python" "name.camel-in-snake src/naming/camel-assign.py:1:" "$out"
+  assert_contains "a default export that disagrees with the file name" "name.export-file-mismatch src/naming/user-profile.service.ts:1:" "$out"
+  assert_contains "a typed boolean flag parameter" "style.flag-parameter src/naming/flag.ts:1:" "$out"
+  assert_contains "a defaulted boolean flag parameter in Python" "style.flag-parameter src/naming/flag.py:1:" "$out"
+  assert_contains "a fourth parameter" "cap.fn-params src/naming/four.ts:1:" "$out"
+  assert_contains "a fourth parameter across lines" "cap.fn-params src/naming/four-lines.ts:1:" "$out"
+  assert_contains "a second class in a file" "file.two-things src/files/two-classes.ts:2:" "$out"
+  assert_contains "a second component in a file" "file.two-things src/files/TwoComponents.tsx:2:" "$out"
+  assert_contains "a two-member interface outside its types file" "file.type-home src/files/user.repository.ts:1:" "$out"
+  assert_contains "an exported constant outside its constants file" "file.constant-home src/files/limits.ts:1:" "$out"
+  assert_contains "a schema outside its schema file" "file.schema-home src/files/user.routes.ts:1:" "$out"
+  assert_contains "a class map outside its styles file" "file.style-home src/files/Chip.tsx:2:" "$out"
+  assert_contains "a camelCase file name" "file.name-case src/files/userService.ts:1:" "$out"
+  assert_contains "a file named for nothing" "file.refused-word src/files/helpers.ts:1:" "$out"
+  assert_contains "a folder named for nothing" "file.refused-word src/utils/format.ts:1:" "$out"
+  assert_contains "a stated exception is listed" "note.law-exception src/files/stated.ts:1:" "$out"
+}
+
 test_leaves_the_allowed_alone_and_redacts_secrets() {
+  assert_missing "self does not count toward the parameter cap" "three.py" "$out"
+  assert_missing "a constant in its constants file" "app.constants.ts" "$out"
+  assert_missing "a schema in its schema file" "user.schema.ts" "$out"
+  assert_missing "a class map in its styles file" "chip.styles.ts" "$out"
+  assert_missing "a component file in PascalCase" "file.name-case src/naming/BoolState.tsx" "$out"
+  assert_missing "a kebab-case file with a role" "file.name-case src/naming/user-profile.service.ts" "$out"
+  assert_missing "a default export that agrees with its file" "name.export-file-mismatch src/files/TwoComponents.tsx" "$out"
   assert_missing "interface in its own types file" "users.types.ts" "$out"
   assert_missing "a nested object literal is not an inline type" "orders.controller.ts" "$out"
   assert_missing "console outside a domain role" "Button.tsx" "$out"
@@ -291,6 +365,7 @@ test_finds_every_equivalent
 test_a_directory_named_like_a_test_file_is_not_one
 test_finds_every_test_file_convention
 test_finds_every_language_analog
+test_finds_every_name_and_file_break
 test_leaves_the_allowed_alone_and_redacts_secrets
 test_refuses_a_list_without_nul
 test_runs_under_set_u_with_no_ban_file

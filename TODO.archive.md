@@ -5,3 +5,4 @@
 - [x] 11.0.1: the law in two parts, each under Claude Code's hook-context limit
 - [x] 11.0.2: TODO.md named in a comment is not debt; 9.5 drops the docs/work exclusion
 - [x] 11.1.0: /oneloop:start, the loop's entry point on a task, typed or self-triggered
+- [x] 12.0.0: the edit guard prompts on every code-rule break, names, file kinds, folders and caps included; the user's yes is the exception, kept on the line as law-exception:

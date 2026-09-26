@@ -23,15 +23,20 @@ path_kind() {
   esac
 }
 
-# relative_path <path> <cwd>: the path as the project knows it, so the role and test globs see
-# the name a diff would show: relative to the git root, else to the session's cwd, else the
-# file name alone. Directories are resolved physically, so a symlinked temp dir matches, and a
-# result that still climbs with `..` falls back to the name alone, so nothing lands outside.
+# relative_path <path> <cwd>: the path as the project knows it, so the role, test, language and
+# folder globs see the name a diff would show: relative to the git root, else to the session's
+# cwd, else the file name alone. Directories are resolved physically from the nearest one that
+# exists (a new file's folder may not yet, and its name is judged too), so a symlinked temp dir
+# matches, and a result that still climbs with `..` falls back to the name alone, so nothing
+# lands outside.
 relative_path() {
   dir=${1%/*}
   [ "$dir" = "$1" ] && dir=.
-  physical="$(cd "$dir" 2>/dev/null && pwd -P)/${1##*/}"
-  top=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)
+  near=$dir
+  while [ ! -d "$near" ]; do case "$near" in */*) near=${near%/*} ;; *) near=.; break ;; esac; done
+  rest=${dir#"$near"}
+  physical="$(cd "$near" 2>/dev/null && pwd -P)${rest:+/${rest#/}}/${1##*/}"
+  top=$(git -C "$near" rev-parse --show-toplevel 2>/dev/null)
   if [ -n "$top" ] && [ "${physical#"$top"/}" != "$physical" ]; then known=${physical#"$top"/}
   elif [ -n "$2" ] && [ "${1#"$2"/}" != "$1" ]; then known=${1#"$2"/}
   else known=${1##*/}

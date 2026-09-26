@@ -33,11 +33,12 @@ dangling_ids() {
   comm -23 <(cited_ids "$@") <(catalog_rows)
 }
 
-# cited_rule_ids <dir>: every distinct two-segment <family>.<slug> written under the directory.
-# A third segment, or a trailing `.*`, marks a catalog id, which the check above owns; Jest's
-# own `test.only` / `test.skip` / `test.todo` / `test.each` share the prefix and are not rules.
+# cited_rule_ids <dir>: every distinct two-segment <family>.<slug> written under the directory,
+# the scanner's name., file. and note. families (12.0.0) included. A third segment, or a
+# trailing `.*`, marks a catalog id, which the check above owns; Jest's own `test.only` /
+# `test.skip` / `test.todo` / `test.each` share the prefix and are not rules.
 cited_rule_ids() {
-  grep -rhoE '(^|[^[:alnum:]_.-])(ban|cap|clean|scope|folder|solid|style|sec|perf|test)\.[a-z0-9-]+(\.[a-z0-9*-]+)*' --include='*.md' "$@" \
+  grep -rhoE '(^|[^[:alnum:]_.-])(ban|cap|clean|scope|folder|solid|style|sec|perf|test|name|file|note)\.[a-z0-9-]+(\.[a-z0-9*-]+)*' --include='*.md' "$@" \
     | sed -E 's/^[^a-z]*//' | grep -vE '\..*\.' | grep -vxE 'test\.(only|skip|todo|each|concurrent|failing)' | sort -u
 }
 

@@ -49,8 +49,10 @@ Plan mode is yours to enter for architectural work; the law never enters it for 
 planning layer of its own, and in it Scope is the plan.
 
 Always on, whatever the task: the risk-zone guard (the first edit to a path matching the risk
-regex becomes a permission prompt, even after "go"), the code-rules warning (a banned token an
-edit adds is named beside the tool result, never blocked), the proof rule (nothing is done
+regex becomes a permission prompt, even after "go"), the edit guard (an edit that adds a
+code-rule break, a ban, a name, a file kind, a cap or a new unlisted top-level folder, becomes a
+permission prompt; your yes is the exception, kept on the line as `law-exception: <what the
+technology needs>`), the proof rule (nothing is done
 without a check run this session), git safety (nothing discarded, no force push, files staged
 by name) and side finds (written down for the end list, never chased; a serious one reported
 at once). No helpers by default: the one exception is `oneloop:er-reader`, a read-only Sonnet
@@ -152,12 +154,12 @@ Wired in `hooks/hooks.json`, every command under `${CLAUDE_PLUGIN_ROOT}/hooks/`.
 | `PreToolUse` and `PostToolUse` on edits | `risk-zone.sh` | before the first edit in a session to a file whose path matches the risk regex (the map's `risk_regex:` line, else `settings/loop.json`), turns the edit into a permission prompt whose approval is the yes the law requires; after an edit that went through, records it, so the next edit to that file passes and a rejected one asks again |
 | `PreToolUse` on edits | `scope-check.sh` | reads the session transcript for the `- [ ] <task> (scope: <files>)` line Claude last added to `TODO.md` before you replied (whether you typed the reply, picked it in a pick-list or sent it while Claude was working), or the first one added after a message of yours saying "go", and turns an edit to a file not on that scope, an edit before any, or an edit while `TODO.md` has no open task line into a permission prompt; edits to `TODO.md` itself, files outside the repository and sessions with no readable transcript are not judged |
 | `PreToolUse` on the shell | `commit-check.sh` | turns a `git commit` that neither stages nor names `TODO.md` into a permission prompt; the repository is the one `git -C` names, else the session's folder |
-| `PreToolUse` on edits | `edit-guard.sh` | warns beside the tool result when an edit adds a banned token the scanner (9.5) can judge: suppressions, empty catches, bare `Error` throws in domain files, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets; it never blocks, and what was already in the file is never named |
+| `PreToolUse` on edits | `edit-guard.sh` | turns an edit that adds a code-rule break the scanner (9.5) can judge into a permission prompt: the bans (suppressions, empty catches, bare `Error` throws in domain files, non-null `!`, inline types, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets), the names (case, refused words, the `I` prefix, boolean prefixes, a default export that disagrees with its file), the file kinds (a second class or component, a type, constant, schema or class map outside its home, a file or folder in the wrong case or named for nothing), the caps (a fourth parameter, a flag parameter) and a new file under a top-level folder the map does not list; every rule the edit adds is named with its line and fix, your approval is the exception, recorded on the line as `law-exception: <what the technology needs>`, and what was already in the file is never named |
 | `Stop`, `StopFailure`, `SubagentStart`, `SubagentStop`, `Notification` | `progress-notify.sh` | one progress-log line per event, and a desktop notification when a turn ends, waits on you, or dies on an error |
 | status line (set by `bin/setup-statusline.sh`) | `statusline.sh` | two rows: folder, branch and model; then context, uptime, plan usage and compactions |
 
-No hook blocks: the risk-zone and scope hooks ask, the code-rules hook warns, and a hook that
-cannot judge exits 0 and says so in the progress log (`~/.claude/progress.log`). None of them
+No hook blocks: the risk-zone, scope and edit-guard hooks ask (your approval is the yes, or the
+exception), and a hook that cannot judge exits 0 and says so in the progress log (`~/.claude/progress.log`). None of them
 stands between you and your work on its own bug. One limit: a subagent gets no law, because no
 hook can inject context into one; the law allows only the read-only reader anyway.
 

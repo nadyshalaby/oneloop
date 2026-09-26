@@ -87,8 +87,9 @@ Scope is the plan and the rest is unchanged
 show what will change in at most 5 lines
 even after "go"
 turns that first edit into a permission prompt
-**The code-rules hook** warns
-never blocks
+**The edit guard** turns
+permission prompt naming rule, line and fix
+`law-exception: <what the technology needs>`
 never route around it
 # the checklist
 **The checklist**, mandatory

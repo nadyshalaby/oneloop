@@ -2,6 +2,45 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **12.0.0**: the edit guard prompts on everything the code rules ban, at the user's word ("these
+  laws are my own coding style, i want to enforce every single law. when anyone see the codebase.
+  he should see these all laws are applied cleanly. claude models can't ignore them unless the
+  target technology will break if it used them"; their pick among the offered bites: a prompt on
+  everything, no hard refusal). `hooks/edit-guard.sh` now returns `permissionDecision: ask` for
+  every rule an edit adds, with a reason that names each rule, its line, the evidence and the
+  law's words (the first four in full, the rest counted) and the same case beside the tool
+  result; the user's approval is the exception, recorded on that line as a comment
+  `law-exception: <what the technology needs>`, which the scanner lists (`note.law-exception`)
+  and the audit shows; a line that already states one still prompts, with the exception quoted,
+  so nothing passes on its own say-so. The guard judges every row of the scanner now
+  (`ban.non-null` and `ban.inline-type` included, which 10.0.0 left to the diff read), a new
+  file whole (its name and folder included, since it has no old text to compare against), and
+  one rule of its own, `folder.unlisted`: a Write that creates a file under a top-level folder
+  the map's Key directories do not list. The scanner (9.5) gains the rows the naming and
+  placement law can judge without a parser: `name.type-case`, `name.interface-prefix`,
+  `name.snake-in-camel`, `name.camel-in-snake`, `name.refused-word`, `name.boolean-prefix`,
+  `name.export-file-mismatch`, `style.flag-parameter`, `cap.fn-params`, `file.two-things`,
+  `file.type-home`, `file.constant-home`, `file.schema-home`, `file.style-home`,
+  `file.name-case`, `file.refused-word` and the `note.law-exception` listing, each in the
+  languages whose convention is the law's (Go's symbol case is visibility and C#'s `I` prefix is
+  its own convention, so neither is judged; a Python or Ruby module holds many classes by its
+  own convention; PascalCase file names stay where the language demands them, snake_case where
+  it does; a name a framework fixes, a callback's boolean or an injector-filled constructor is
+  weighed at the prompt). `hooks/path-kind.sh` resolves a path from the nearest folder that
+  exists, so a new file's folder is judged too. The audit rule catalog (16.4) gains a row per
+  new id (`cap.fn-params`'s row now says the scanner counts a declared function or arrow), a
+  `note.*` listing table with a `none` severity, and `tests/catalog-ids.test.sh` checks the
+  `name.`, `file.` and `note.` families against it too. The law's Guards bullet, the code rules' hook
+  line, the 1.1 long form, 2.2's Enforcement, the README and the map say prompt where they said
+  warn; "The code-rules hook warns", "never blocks" and "warning, not a block" join the retired
+  wording. Tests: `tests/law-scout.test.sh` plants one instance per new rule and its allowed form
+  (130 checks), `hooks/tests/edit-guard.test.sh` reads `ask` where it read `warn`, one case per
+  rule, the stated exception, the multi-rule prompt, the folder rule, and a pin that every
+  scanner rule has the law's words in the prompt (116 checks). For every session: an edit that
+  breaks a code rule now waits for the user instead of going through with a note; no protection
+  is removed. Law 11,997 → 11,980 characters, 88 lines ("never an instruction", "of your own",
+  "of that scope line", "never fixed mid-task", "(by id)" and "banned-token" trimmed to make
+  room); code rules 7,484 → 7,593 characters, 49 lines ("documented" and "exact" trimmed).
 - **11.1.0**: `/oneloop:start <task>`, the loop's entry point, at the user's word ("sometimes
   claude might ingnore the oneloop. i need some entrypoint skill to trigger on a task .e.g.
   (start, do, go, or ...etc.)"; their picks: typed and self-triggered, named `start`). The skill
