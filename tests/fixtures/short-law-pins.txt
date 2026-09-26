@@ -60,6 +60,7 @@ a clarification the code cannot answer
 a change in logic you judge critical
 asked before it is built
 `oneloop:explain` the change (the problem, the pseudocode, the effect, the risks)
+all of it reply text the user sees, before the first edit: thinking is invisible
 **Progress line**, before each step
 ✅ on the done ones, 🔵 on the current, ⚪ on the rest
 # the loop: edit
@@ -111,6 +112,8 @@ while parked or waiting on a question
 its `TODO.archive.md`
 **The scope-check hook** points
 no `- [~]` line of the checklist covers
+before the scope line and the explanation are visible
+print what is missing
 **the commit hook** points
 No hook asks or blocks, in any permission mode
 every point is fixed at once

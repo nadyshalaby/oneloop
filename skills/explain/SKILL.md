@@ -29,6 +29,9 @@ Write, in this order and short:
 - **Effect.** What changes for the user and in the code, in a line or two.
 - **Risks.** What could go wrong for the user or in the code, or is given up, one line each.
 
+The explanation is the text of your reply, sent before the next tool call; a plan inside your
+thinking is not an explanation, the user never sees it.
+
 Inside the loop, Edit follows at once. Asked on its own, stop here: the build, when the user
 wants it, runs the loop (the always-on law), whose Scope step prints the scope line and the
 note; an explanation already given for the same change stands and is not repeated.

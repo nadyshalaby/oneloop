@@ -5,16 +5,30 @@
 # user's words: "nothing should block file edits, the model shall strictly apply the engineering
 # rules/laws without asking for edit permissions or to correct it. it should be in auto-pilot
 # mode with self-control"; "hooks shall point and claude fixes raised problems"). The scope is
-# what the checklist says: the `scope:` of every `- [~]`
-# line (a task in flight) of `docs/oneloop-todos/TODO.md`; a `- [ ]` line is parked and counts
-# for nothing until it is flipped, and a `TODO.md` anywhere else, the root included, is not the
-# checklist. An edit to a file no in-flight line covers (by name, or by a folder it is under)
-# is pointed at with the fix: put it on the task line; an edit while no line is in flight is
-# pointed at with the fix: add or flip a line (and, while a root TODO.md exists with no
-# checklist, git mv it and its archive into docs/oneloop-todos/ first). Nothing blocks the edit,
-# in any permission mode; Claude fixes what was pointed at, at once. Nothing to judge (another
-# tool or event, no repository, a file outside it, the checklist and its archive themselves,
-# unreadable input): exit 0 with no output.
+# what the checklist says: the `scope:` of every `- [~]` line (a task in flight) of
+# `docs/oneloop-todos/TODO.md`; a `- [ ]` line is parked and counts for nothing until it is
+# flipped, and a `TODO.md` anywhere else, the root included, is not the checklist. An edit to a
+# file no in-flight line covers (by name, or by a folder it is under) is pointed at with the
+# fix: put it on the task line; an edit while no line is in flight is pointed at with the fix:
+# add or flip a line (and, while a root TODO.md exists with no checklist, git mv it and its
+# archive into docs/oneloop-todos/ first).
+# 14.1.0, the Scope step's visible output too: Claude's thinking is invisible, and a dry run
+# showed a model writing the scope line and the explanation there and believing it had printed
+# them. So, once the scope passes, the hook reads the session transcript for this turn's reply
+# text (the assistant text blocks after the last human message: one typed, a string or text
+# blocks with no tool result, not injected, not a compaction summary; or one queued mid-turn)
+# and points when that text carries no `scope:`, or no explanation (the problem with the effect
+# or the risks): print what is missing as chat text, then go on. A turn with NO stored reply text
+# is not judged: some sessions' transcripts keep none of the text sent along with a tool call
+# (seen 2026-09-26 in the session that built this), so silence there is not proof of a missing
+# line, and the one case this catches is text that was stored and lacks the line, the dry run's
+# very case (a progress line printed, the rest thought). A transcript that is missing or
+# unreadable skips the check the same way; of a big one only the last 2 MB
+# are read, minus the cut first line, since the turn is at its end; a line the reader cannot
+# make sense of (not JSON, or an odd shape) is skipped, never an abort. Nothing blocks the edit, in any permission mode;
+# Claude fixes what was pointed at, at once. Nothing to judge (another tool or event, no
+# repository, a file outside it, the checklist and its archive themselves, unreadable input):
+# exit 0 with no output.
 set -u
 umask 077
 
@@ -27,6 +41,7 @@ here=${BASH_SOURCE[0]%/*}
 
 TODO=docs/oneloop-todos/TODO.md
 ARCHIVE=docs/oneloop-todos/TODO.archive.md
+TRANSCRIPT_TAIL=2000000
 
 # in_flight_scope <checklist>: the files of every `- [~]` line, joined with `, `; empty when none.
 in_flight_scope() {
@@ -55,6 +70,43 @@ existing_parent() {
   printf '%s' "${probe:-/}"
 }
 
+# transcript_lines <transcript>: the whole file, or the last TRANSCRIPT_TAIL bytes of a big one
+# without the line the cut may have broken.
+transcript_lines() {
+  size=$(wc -c < "$1" | tr -d ' ')
+  if [ "$size" -le "$TRANSCRIPT_TAIL" ]; then cat "$1"; else tail -c "$TRANSCRIPT_TAIL" "$1" | sed '1d'; fi
+}
+
+# turn_text <transcript>: this turn's reply text, the assistant text blocks after the last human
+# message, one block per line with its line breaks folded; empty when the turn has none.
+turn_text() {
+  transcript_lines "$1" | jq -rR '
+    def human: .type == "user" and ((.isMeta // false) | not) and ((.isCompactSummary // false) | not)
+      and (((.message.content | type) == "string")
+        or (((.message.content | type) == "array") and any(.message.content[]?; .type == "text")
+            and (any(.message.content[]?; .type == "tool_result") | not)));
+    def queued: .type == "attachment" and .attachment.type == "queued_command" and (.attachment.humanTurn // false);
+    (fromjson? // empty) | try (if human or queued then "H"
+         elif .type == "assistant" then (.message.content[]? | select(.type == "text") | "T " + (.text | gsub("[\n\r]"; " ")))
+         else empty end) catch empty' 2>/dev/null \
+    | awk '/^H$/ { turn = ""; next } { turn = turn substr($0, 3) "\n" } END { printf "%s", turn }'
+}
+
+# missing_output <transcript>: sets text and why when this turn's stored reply text lacks the
+# scope line or the explanation; leaves them empty when both are there, or when the transcript
+# kept no reply text for the turn at all.
+missing_output() {
+  turn=$(turn_text "$1")
+  [ -n "$turn" ] || return 0
+  if ! printf '%s' "$turn" | grep -q 'scope:'; then
+    text="no scope line is visible in this turn (your thinking is invisible). Fix it now: print the progress line, \`scope: <files>\`, the note of at most 3 lines and the explanation (the problem, the pseudocode, the effect, the risks) as chat text, then go on; nothing blocks this edit."
+    why="scope line not visible"
+  elif ! printf '%s' "$turn" | grep -qi 'problem' || ! printf '%s' "$turn" | grep -qiE 'effect|risk'; then
+    text="the explanation is not visible in this turn (your thinking is invisible). Fix it now: print it as chat text, the problem, the pseudocode, the effect, the risks, then go on; nothing blocks this edit."
+    why="explanation not visible"
+  fi
+}
+
 # emit_pointer <text>: the context Claude reads beside the tool result; no decision, so nothing blocks.
 emit_pointer() {
   jq -cn --arg c "engineering law (the loop): $1" '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:$c}}'
@@ -73,6 +125,8 @@ case "$physical" in "$root"/*) rel=${physical#"$root"/} ;; *) exit 0 ;; esac
 case "$rel" in "$TODO"|"$ARCHIVE") exit 0 ;; esac
 project="${cwd##*/}"
 scope=$(in_flight_scope "$root/$TODO")
+text=""
+why=""
 if [ -z "$scope" ]; then
   moved=""
   [ -e "$root/TODO.md" ] && [ ! -e "$root/$TODO" ] && moved="git mv the root TODO.md and its archive into docs/oneloop-todos/ (their old home), then "
@@ -82,8 +136,10 @@ elif ! in_scope "$rel" "$scope" "$root $cwd"; then
   text="$rel is outside the scope of the task in flight (scope: $scope). Fix it now: add $rel to that task line in $TODO and restate the scope in one line, then go on; nothing blocks this edit."
   why="outside scope"
 else
-  exit 0
+  transcript=$(hook_field '.transcript_path // empty')
+  [ -n "$transcript" ] && [ -r "$transcript" ] && missing_output "$transcript"
 fi
+[ -n "$text" ] || exit 0
 append_log "$project" "guard | scope | fix | $rel | $why"
 emit_pointer "$text"
 exit 0

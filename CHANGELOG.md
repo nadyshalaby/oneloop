@@ -2,6 +2,48 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **14.1.0**: the scope guard points when the Scope step's output is not visible, after the first
+  real dry run of 14.0.0 (a fresh Sonnet session driven by expect through a plain rename: the
+  progress lines, the checklist line at Scope, the edit, the lint, the commit with the checklist
+  ticked and archived, the final reply, no hook prompt, no guard pointer, one permission prompt
+  from Claude Code itself for a `node` one-liner the test's allow-list did not cover) showed the
+  child writing the scope line, the note and the explanation inside its thinking and believing it
+  had printed them; the user's pick: "Wording fix plus a machine pointer". Once an edit passes the
+  scope, `hooks/scope-check.sh` reads the session transcript for this turn's reply text (the
+  assistant text blocks after the last human message: one typed, a string or text blocks with no
+  tool result, not injected, not a compaction summary; or one queued mid-turn) and points when
+  that stored text carries no `scope:` ("no scope line is visible in this turn (your thinking is
+  invisible). Fix it now: print the progress line, `scope: <files>`, the note of at most 3 lines
+  and the explanation … as chat text, then go on; nothing blocks this edit"), or when none carries
+  the explanation (the word problem with effect or risk: "the explanation is not visible in this
+  turn"); the log says `scope line not visible` or `explanation not visible`. A turn with no stored
+  reply text is not judged: the session that built this showed its own transcript keeping none
+  of the text sent along with a tool call (only text-only closing messages), while the dry run's
+  child kept all of it, and the cause is not known; so silence is not proof of a missing line,
+  and the pointer fires on the dry run's exact case only, text stored without the line. The
+  reader fails open: a missing or unreadable transcript skips the check, a big transcript is read from its
+  last 2 MB minus the cut line (0.12 s on a 150 MB one), each line is parsed with `fromjson?` so
+  a line that is not JSON or has an odd shape is skipped (the 13.1.0 reader aborted on one).
+  Known edge: a Stop hook's feedback arrives as a user message and counts as a new turn, so the
+  next edit may be pointed at once more. The law's Scope step says "all of it reply text the user
+  sees, before the first edit: thinking is invisible", the Guards bullet names the new pointer
+  ("or made before the scope line and the explanation are visible … print what is missing"), the
+  start skill's Scope step and the explain skill say the same ("a plan inside your thinking is
+  not an explanation"); the README's loop step, hook row and the map follow. Minor: a new check
+  that points, nothing removed or loosened. Trims that paid for the law's new words: "whatever
+  the message named" (the ratchet already says a needed file goes on the scope), ", only to
+  search" (the helper is already "a read-only Sonnet search"), "a behaviour the user did not ask
+  to change" → "an unasked behaviour change", "3.1 to 3.4" → "3.1-3.4", "the frontend design
+  law" → "the design law". Tests: `hooks/tests/scope-check.test.sh` gains the visible-output
+  cases (a turn with no stored reply text passes, a progress line alone is pointed at, the scope
+  line without the explanation, both visible, a new typed or queued message starting a new turn, a task
+  notification, an injected text, a compaction summary and a tool result not being the user, a
+  message with an image stored as blocks, `scope:` inside a tool result, the pointer order, a
+  missing transcript) and a big-transcript case (a 2.7 MB fixture read from its tail, a
+  non-JSON line skipped): 77 checks, main's hook fails 12; `tests/explain.test.sh` pins the new
+  sentence (main's skill fails it); the law's pins gain three (main's law fails them). Law: 88
+  lines and 12,408 characters before, 88 and 12,498 after (cap 12,500); code rules unchanged at
+  49 and 7,596.
 - **14.0.0**: auto-pilot with self-control, at the user's word ("whether i am in bypass-permissions
   mode or any other modes there is nothing should block file edits, the model shall strictly apply
   the engineering rules/laws without asking for edit permissions or to correct it. it should be in

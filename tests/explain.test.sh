@@ -1,7 +1,7 @@
 #!/bin/bash
 # Guard: the explain skill keeps the shape the user chose for every explanation: the problem,
 # what I'd build, the effect and the risks; inside the loop it is the Scope step's explanation
-# and Edit follows at once, no yes waited for (14.0.0); asked on its own it stops (the build runs
+# and Edit follows at once, no yes waited for (14.0.0), as reply text, never a plan in the thinking (14.1.0); asked on its own it stops (the build runs
 # the loop; the skill is no gate of its own since 10.0.0); never about tests, reviews or specs,
 # and read-only (nothing run to try an idea). Run: bash tests/explain.test.sh
 # EXPLAIN_MD points the test at another copy of the skill, for a watched failure.
@@ -15,6 +15,7 @@ PINS="**The problem.**
 **Effect.**
 **Risks.**
 Inside the loop, Edit follows at once
+a plan inside your thinking is not an explanation
 Asked on its own, stop here: the build, when the user wants it, runs the loop
 no yes is waited for
 Never about tests, reviews, specs or process

@@ -57,7 +57,9 @@ the scope line and that one line are the status output.
    order: the line `scope: <files>`; a note of at most 3 lines (what changes, which files, what
    could go wrong); the line `- [~] <task> (scope: <files>)` appended to the checklist; then
    `oneloop:explain` on the change (the problem, the pseudocode, the effect, the risks), so the
-   user can follow the work; then straight on to Edit. A risk-zone file in the scope: say what changes there in at most 5
+   user can follow the work. All of it is reply text the user sees, in the message that carries
+   the progress line or right after it, before the first edit: your thinking is invisible, and
+   the scope guard points at an edit made before they are visible. Then straight on to Edit. A risk-zone file in the scope: say what changes there in at most 5
    lines in the final reply, and ask first only a change you judge critical.
 2. **Edit.** One grep for something to reuse, then the smallest diff inside the scoped files;
    an existing test file for the area is extended in the same edit. A file outside the scope,

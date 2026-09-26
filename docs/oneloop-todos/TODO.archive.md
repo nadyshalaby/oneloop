@@ -9,3 +9,4 @@
 - [x] 13.0.0: the checklist lives in docs/oneloop-todos/ (TODO.md, TODO.archive.md), out of the project's root; the hooks, the law and the skills read it there; an older root pair moves with git mv at the next Scope
 - [x] 13.1.0: /oneloop:start starts a new task, resumes an in-flight one or picks up a parked line; the open lines as one pick-list whose options carry the scope, and the scope-check hook takes the picked option's scope as the yes
 - [x] 14.0.0: auto-pilot with self-control: no hook asks or blocks in any mode, a guard points and Claude fixes at once, Scope explains the change and proceeds with no yes, a progress line before each step, the scope read from the checklist's [~] lines, /oneloop:start resumes without a question
+- [x] 14.1.0: the scope guard points when the scope line or the explanation is not visible in the turn (reply text read from the session transcript, failing open); the law, the start and explain skills say thinking is invisible
