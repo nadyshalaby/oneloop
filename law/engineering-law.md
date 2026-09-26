@@ -26,7 +26,7 @@ A question is answered; anything that edits runs the loop, from a typo to a new 
 
 **Commit.** Stage the changed files by name; one commit with a one-line message, on the current branch (the user creates branches). **Final reply:** the files changed, the check results, the side-finds list if any. Nothing else.
 
-**The checklist**, mandatory: `TODO.md` at the repository root, one line per task, under a `## <milestone>` heading when the user names one, else unheaded at the top. `- [ ] <task>` is added at Scope with the scope line, `- [~]` at the yes or "go", `- [x]` at Commit with `TODO.md` staged in the same commit; a wait keeps the marker. A group with every line ticked (a milestone, or the unheaded lines) moves whole to `TODO.archive.md` under `## <date> <milestone>`, in that commit; other groups stay.
+**The checklist**, mandatory: `TODO.md` at the repository root is the only task tracker; a doc or tracking file the user points at is studied as input, never used to track. One line per task, under a `## <milestone>` heading when the user names one, else unheaded at the top. `- [ ] <task>` is added at Scope with the scope line, `- [~]` at the yes or "go", `- [x]` at Commit with `TODO.md` staged in the same commit, each written the moment the status changes; a wait keeps the marker. A group with every line ticked (a milestone, or the unheaded lines) moves whole to `TODO.archive.md` under `## <date> <milestone>`, in that commit; other groups stay.
 
 **Deploy (1.11)** is a command, not a step: on the word "deploy", run the checks, deploy, then verify live (real requests against the deployed version, clean logs) before calling it done.
 

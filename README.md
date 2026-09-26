@@ -32,9 +32,11 @@ typo runs the same four steps as a new module.
 4. **Commit.** The changed files staged by name, one commit, a one-line message, on the current
    branch. The final reply is the files changed, the check results and the side finds.
 
-Every task is one line in the repository's `TODO.md`, a plain checklist, under a
+Every task is one line in the repository's `TODO.md`, a plain checklist and the only task
+tracker (a doc or tracking file you point at is read as input, never used to track), under a
 `## <milestone>` heading when you name one: `- [ ]` written at Scope with the scope line, `- [~]`
-at the yes or "go", `- [x]` at Commit and staged in the same commit; when every line of a group
+at the yes or "go", `- [x]` at Commit and staged in the same commit, each the moment the status
+changes; when every line of a group
 is ticked (a milestone, or the lines under no heading), that group moves whole to
 `TODO.archive.md` under a dated heading and the other groups stay. Two hooks make it hard to skip: the scope-check hook turns an edit
 outside the approved scope line (or before any, or while `TODO.md` has no open line) into a
@@ -150,7 +152,7 @@ renamed or loosened, minor for a new rule, check, hook or command, patch for wor
 |---|---|---|
 | `UserPromptSubmit` | `loop-reminder.sh` | one line into every prompt: `one loop · wait for yes unless "go" · proof required · risk zones need my yes` |
 | `PreToolUse` and `PostToolUse` on edits | `risk-zone.sh` | before the first edit in a session to a file whose path matches the risk regex (the map's `risk_regex:` line, else `settings/loop.json`), turns the edit into a permission prompt whose approval is the yes the law requires; after an edit that went through, records it, so the next edit to that file passes and a rejected one asks again |
-| `PreToolUse` on edits | `scope-check.sh` | reads the session transcript for the approved scope line (the one you replied after, or the first one after a message of yours saying "go") and turns an edit to a file not on it, an edit before any scope line, or an edit while `TODO.md` has no open task line into a permission prompt; edits to `TODO.md` itself, files outside the repository and sessions with no readable transcript are not judged |
+| `PreToolUse` on edits | `scope-check.sh` | reads the session transcript for the approved scope line (the one you replied after, whether you typed the reply, picked it in a pick-list or sent it while Claude was working, or the first one after a message of yours saying "go") and turns an edit to a file not on it, an edit before any scope line, or an edit while `TODO.md` has no open task line into a permission prompt; edits to `TODO.md` itself, files outside the repository and sessions with no readable transcript are not judged |
 | `PreToolUse` on the shell | `commit-check.sh` | turns a `git commit` that neither stages nor names `TODO.md` into a permission prompt; the repository is the one `git -C` names, else the session's folder |
 | `PreToolUse` on edits | `edit-guard.sh` | warns beside the tool result when an edit adds a banned token the scanner (9.5) can judge: suppressions, empty catches, bare `Error` throws in domain files, focused or ownerless skipped tests, debug artifacts, ownerless `TODO`s, removed-code comments, hardcoded secrets; it never blocks, and what was already in the file is never named |
 | `SessionStart` after a compaction or resume | `re-anchor.sh` | tells Claude to read the law from disk again, the code rules before writing code, and to resume a task at the loop step it was in, with nothing from before the loss counting as proof |

@@ -4,9 +4,11 @@
 # a reply Claude wrote, a tool call and its result, a skill's injected text, a compaction
 # summary) and feeds the guard one edit event against a scratch git repo, then reads the
 # decision: an edit before any approved scope line asks; the user's reply after a scope line is
-# the yes; "go" in the user's message pre-approves the first scope line after it and no later
-# one; a folder on the line covers the files under it; a scope line quoted in a tool result, a
-# summary or an injected text is not a reply; TODO.md must hold an open line; TODO.md and
+# the yes, whether typed, picked in a pick-list (stored as the AskUserQuestion tool's result) or
+# sent while Claude was working (stored as a queued command); "go" in the user's message
+# pre-approves the first scope line after it and no later one; a folder on the line covers the
+# files under it; a scope line quoted in a tool result, a summary or an injected text is not a
+# reply, nor is another tool's result or a queued task notification; TODO.md must hold an open line; TODO.md and
 # TODO.archive.md themselves, files outside the repository, other tools and events, a missing
 # transcript and unreadable input are nothing to judge. SCOPE_CHECK_SH points the test at
 # another copy of the script, for a watched failure; the copy needs hook-input.sh and
@@ -35,6 +37,26 @@ summary_line() { jq -cn --arg t "$1" '{type: "user", isCompactSummary: true, mes
 
 # meta_line <text>: a skill's or hook's injected text, marked isMeta.
 meta_line() { jq -cn --arg t "$1" '{type: "user", isMeta: true, message: {role: "user", content: [{type: "text", text: $t}]}}'; }
+
+# ask_line <id> <question>: Claude asking through AskUserQuestion, as the transcript stores the call.
+ask_line() {
+  jq -cn --arg i "$1" --arg q "$2" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: $i, name: "AskUserQuestion", input: {questions: [{question: $q}]}}]}}'
+}
+
+# answer_line <id> <text>: the user's pick-list answer, which Claude Code stores as that call's result.
+answer_line() {
+  jq -cn --arg i "$1" --arg t "$2" '{type: "user", message: {role: "user", content: [{type: "tool_result", tool_use_id: $i, content: ("Your questions have been answered: " + $t)}]}}'
+}
+
+# queued_line <text>: a message the user typed while Claude was working, delivered as a queued command.
+queued_line() {
+  jq -cn --arg t "$1" '{type: "attachment", attachment: {type: "queued_command", humanTurn: true, origin: {kind: "human"}, commandMode: "prompt", prompt: $t}}'
+}
+
+# notification_line <text>: a queued task notification, the same attachment shape without a human turn.
+notification_line() {
+  jq -cn --arg t "$1" '{type: "attachment", attachment: {type: "queued_command", commandMode: "task-notification", prompt: $t}}'
+}
 
 # open_task: TODO.md with one task in flight.
 open_task() { printf -- '- [~] rename runningSum to sum\n' > "$P/TODO.md"; }
@@ -98,6 +120,21 @@ test_go_pre_approves_the_first_scope_line_after_it_only() {
   assert_eq "and the earlier file is now outside it" ask "$(decide Edit "$P/src/util/math.ts")"
   { human_line "Rename it in golang style too."; reply_line "scope: src/util/math.ts"; } >> "$T"
   assert_eq "golang is not the word go" ask "$(decide Edit "$P/src/util/math.ts")"
+}
+
+test_a_pick_list_answer_and_a_queued_message_are_replies() {
+  { human_line "Rename runningSum to sum in src/util/math.ts."; reply_line "scope: src/util/math.ts"; ask_line q1 "Approve this scope?"; answer_line q1 "\"Approve this scope?\"=\"Yes (Recommended)\""; } > "$T"; open_task
+  assert_eq "a pick-list answer approves the line that stood" pass "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Rename it."; reply_line "scope: src/util/math.ts"; quoted_line "yes"; } > "$T"
+  assert_eq "another tool's result is not a reply" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Rename it."; reply_line "scope: src/util/math.ts"; queued_line "yes"; } > "$T"
+  assert_eq "a message typed while Claude worked is a reply" pass "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Rename it."; reply_line "scope: src/util/math.ts"; queued_line "also the caller, go"; reply_line "scope: src/util/math.ts, src/cart/summary.ts"; } > "$T"
+  assert_eq "a queued go pre-approves the first scope line after it" pass "$(decide Edit "$P/src/cart/summary.ts")"
+  { human_line "Rename it."; reply_line "scope: src/util/math.ts"; notification_line "<task-notification>the job is done, go on</task-notification>"; } > "$T"
+  assert_eq "a queued task notification is not a reply" ask "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Rename it, go."; reply_line "scope: src/util/math.ts"; ask_line q2 "Widen to the caller?"; answer_line q2 "\"Widen to the caller?\"=\"go\""; reply_line "scope: src/util/math.ts, src/cart/summary.ts"; } > "$T"
+  assert_eq "a pick-list answer saying go pre-approves the next scope line" pass "$(decide Edit "$P/src/cart/summary.ts")"
 }
 
 test_folders_globs_and_markdown_on_the_line() {
@@ -172,6 +209,7 @@ test_no_transcript_is_nothing_to_judge
 test_a_scope_line_waits_for_the_yes
 test_the_users_reply_is_the_yes_for_the_line_that_stood
 test_go_pre_approves_the_first_scope_line_after_it_only
+test_a_pick_list_answer_and_a_queued_message_are_replies
 test_folders_globs_and_markdown_on_the_line
 test_quoted_injected_and_summary_lines_are_not_replies
 test_the_checklist_must_hold_an_open_line

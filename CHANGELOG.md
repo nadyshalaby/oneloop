@@ -2,6 +2,23 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **10.1.1**: `TODO.md` is the only task tracker, at the user's word ("if the user asked to work
+  from old docs or tracking files. the harness shall only study his file(s). but strictly use our
+  main todo to reflect this work. TODO.md is the only main trusted task tracking in the harness.
+  that why updating it is a god law not optional after each task change"): the checklist
+  paragraph now says a doc or tracking file the user points at is studied as input and never
+  used to track, and that each marker is written the moment the status changes; four pins for
+  it, one reworded. The scope check learns two more shapes of the user's reply, both read off a
+  real transcript this session: a pick-list answer (Claude Code stores an `AskUserQuestion`
+  answer as that call's result, so the yes the law requires through `AskUserQuestion` never
+  counted and the first edit after it still asked) and a message typed while Claude was working
+  (stored as a `queued_command` attachment with `humanTurn: true`, never as a user message; in
+  the session that shipped 10.1.0 every message after the first was one of these, so the hook
+  saw none of them). Another tool's result and a queued task notification are still not replies.
+  The transcript is now read in one pass that keeps the ids of the pick-lists asked
+  (`hooks/tests/scope-check.test.sh`, 48 to 54 checks, the four new ones watched failing on the
+  10.1.0 hook). Sizes: the core law 11,786 to 11,939 bytes (88 lines), its cap 11,800 to 12,000
+  (the tracker rule is always-on, asked for by name); the code rules unchanged at 7,598.
 - **10.1.0**: the checklist, at the user's word ("add very very simple checklist one liner per
   task like most of simple todos out there and the flow must tick each task when its status
   change and achieve the whole list once its done. updating this list each task change is a

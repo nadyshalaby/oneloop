@@ -4,7 +4,9 @@
 # edit inside a git repository: the file must be on the approved scope line, and the
 # repository's TODO.md must hold an open task line. The approved scope line comes from the
 # session transcript: the `scope: <files>` line that stood when the user last replied (their
-# reply is the yes), or, when that reply says "go", the first scope line printed after it (the
+# reply is the yes, whether typed, picked in a pick-list, which Claude Code stores as the
+# AskUserQuestion tool's result, or sent while Claude was working, which it stores as a queued
+# command), or, when that reply says "go", the first scope line printed after it (the
 # pre-approval). A scope line restated later waits for a new yes, even after "go". An edit
 # before any approved scope line, to a file the line does not name (a path, or a folder it is
 # under), or while TODO.md has no `- [ ]` or `- [~]` line, becomes a permission prompt
@@ -22,23 +24,36 @@ here=${BASH_SOURCE[0]%/*}
 . "$here/progress-log.sh"
 
 # The jq program that reduces the transcript to the events that matter, in order: `H<tab>text`
-# for a message the user typed (not a tool result, not a skill's injected text, not a
-# compaction summary) and `S<tab>files` for a scope line in a reply Claude wrote.
+# for a message from the user (typed while Claude was idle: a user line that is not a tool
+# result, an injected text or a compaction summary; picked: the result of an AskUserQuestion
+# call Claude made; typed while Claude worked: a queued_command attachment with a human turn)
+# and `S<tab>files` for a scope line in a reply Claude wrote. One pass, keeping the ids of the
+# pick-lists asked so far.
 read -r -d '' EVENTS <<'JQ'
-def human: .message.content
+def text_of: if type == "string" then . elif type == "array" then ([.[]? | .text? // ""] | join(" ")) else "" end;
+def typed: .message.content
   | if type == "string" then .
     elif type == "array" then (if any(.[]; .type == "tool_result") then null else ([.[] | select(.type == "text") | .text] | join(" ")) end)
     else null end;
-if .type == "user" and (.isMeta // false) == false and (.isCompactSummary // false) == false then
-  (human) as $t | if $t == null then empty else "H\t" + ($t | gsub("[\n\t]"; " ") | .[0:2000]) end
-elif .type == "assistant" then
-  [.message.content[]? | select(.type == "text") | .text] | join("\n") | split("\n")[]
-  | select(test("^[^A-Za-z]*scope:")) | "S\t" + (sub("^[^A-Za-z]*scope:[[:space:]]*"; "") | gsub("[`*]"; ""))
-else empty end
+def asked: [.message.content[]? | select(.type == "tool_use" and .name == "AskUserQuestion") | .id];
+def answered($ids): [.message.content[]? | select(.type == "tool_result" and (.tool_use_id as $i | any($ids[]; . == $i))) | .content | text_of] | join(" ");
+def scopes: [.message.content[]? | select(.type == "text") | .text] | join("\n") | split("\n")[]
+  | select(test("^[^A-Za-z]*scope:")) | "S\t" + (sub("^[^A-Za-z]*scope:[[:space:]]*"; "") | gsub("[`*]"; ""));
+def h: "H\t" + (gsub("[\n\t]"; " ") | .[0:2000]);
+foreach inputs as $l ({ids: [], out: []};
+  .out = []
+  | if $l.type == "user" and ($l.isMeta // false) == false and ($l.isCompactSummary // false) == false then
+      .ids as $ids | ($l | typed) as $t | ($l | answered($ids)) as $a
+      | if $t != null then .out = [$t | h] elif $a != "" then .out = [$a | h] else . end
+    elif $l.type == "attachment" and $l.attachment.type == "queued_command" and $l.attachment.humanTurn == true then
+      ($l.attachment.prompt // "") as $q | if $q != "" then .out = [$q | h] else . end
+    elif $l.type == "assistant" then .ids += ($l | asked) | .out = [$l | scopes]
+    else . end;
+  .out[])
 JQ
 
 # events <transcript>: the H and S lines, oldest first.
-events() { jq -r "$EVENTS" "$1" 2>/dev/null; }
+events() { jq -n -r "$EVENTS" "$1" 2>/dev/null; }
 
 # says_go <text>: the word "go" in the user's message, as the law reads it.
 says_go() { printf '%s' "$1" | grep -qiE '(^|[^[:alnum:]_])go([^[:alnum:]_]|$)'; }
