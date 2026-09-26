@@ -1,6 +1,7 @@
 #!/bin/bash
 # Guard: the explain skill keeps the shape the user chose for every explanation: the problem,
-# what I'd build, the effect and the risks; inside the loop it is the Scope step's explanation
+# the pseudocode as a fenced block (14.2.0: numbered steps in prose are not it, and a
+# plain-language rule never removes the block), the effect and the risks; inside the loop it is the Scope step's explanation
 # and Edit follows at once, no yes waited for (14.0.0), as reply text, never a plan in the thinking (14.1.0); asked on its own it stops (the build runs
 # the loop; the skill is no gate of its own since 10.0.0); never about tests, reviews or specs,
 # and read-only (nothing run to try an idea). Run: bash tests/explain.test.sh
@@ -11,7 +12,10 @@
 ROOT=$(repo_root) || exit 1
 SKILL="${EXPLAIN_MD:-$ROOT/skills/explain/SKILL.md}"
 PINS="**The problem.**
-**What I'd build.** Pseudocode of the core logic
+**Pseudocode.** The core logic only, in a fenced block
+A numbered list of steps in prose is not pseudocode
+the one place code-shaped text belongs
+never removes the block
 **Effect.**
 **Risks.**
 Inside the loop, Edit follows at once

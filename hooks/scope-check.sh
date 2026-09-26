@@ -18,7 +18,9 @@
 # text (the assistant text blocks after the last human message: one typed, a string or text
 # blocks with no tool result, not injected, not a compaction summary; or one queued mid-turn)
 # and points when that text carries no `scope:`, or no explanation (the problem with the effect
-# or the risks): print what is missing as chat text, then go on. A turn with NO stored reply text
+# or the risks), or, 14.2.0, no pseudocode (a fenced block, ```: a session printed numbered prose
+# steps in its place, the user's screenshot of 2026-09-26): print what is missing as chat text,
+# then go on. A turn with NO stored reply text
 # is not judged: some sessions' transcripts keep none of the text sent along with a tool call
 # (seen 2026-09-26 in the session that built this), so silence there is not proof of a missing
 # line, and the one case this catches is text that was stored and lacks the line, the dry run's
@@ -93,17 +95,20 @@ turn_text() {
 }
 
 # missing_output <transcript>: sets text and why when this turn's stored reply text lacks the
-# scope line or the explanation; leaves them empty when both are there, or when the transcript
-# kept no reply text for the turn at all.
+# scope line, the explanation, or the explanation's pseudocode (a fenced block); leaves them
+# empty when all are there, or when the transcript kept no reply text for the turn at all.
 missing_output() {
   turn=$(turn_text "$1")
   [ -n "$turn" ] || return 0
   if ! printf '%s' "$turn" | grep -q 'scope:'; then
-    text="no scope line is visible in this turn (your thinking is invisible). Fix it now: print the progress line, \`scope: <files>\`, the note of at most 3 lines and the explanation (the problem, the pseudocode, the effect, the risks) as chat text, then go on; nothing blocks this edit."
+    text="no scope line is visible in this turn (your thinking is invisible). Fix it now: print the progress line, \`scope: <files>\`, the note of at most 3 lines and the explanation (the problem, the pseudocode as a fenced block, the effect, the risks) as chat text, then go on; nothing blocks this edit."
     why="scope line not visible"
   elif ! printf '%s' "$turn" | grep -qi 'problem' || ! printf '%s' "$turn" | grep -qiE 'effect|risk'; then
-    text="the explanation is not visible in this turn (your thinking is invisible). Fix it now: print it as chat text, the problem, the pseudocode, the effect, the risks, then go on; nothing blocks this edit."
+    text="the explanation is not visible in this turn (your thinking is invisible). Fix it now: print it as chat text, the problem, the pseudocode as a fenced block, the effect, the risks, then go on; nothing blocks this edit."
     why="explanation not visible"
+  elif ! printf '%s' "$turn" | grep -q '```'; then
+    text="the pseudocode is not visible in this turn: the explanation has no fenced block, and numbered steps in prose are not pseudocode. Fix it now: print the pseudocode as chat text, a fenced block in IF, FOR, RETURN and ←, then go on; nothing blocks this edit."
+    why="pseudocode not visible"
   fi
 }
 

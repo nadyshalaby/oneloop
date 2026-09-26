@@ -2,6 +2,38 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **14.2.0**: the explanation's pseudocode is a fenced block at every layer, and the scope guard
+  points when it is missing. The user's Freeziana session (Sonnet, the evening 14.1.0 shipped)
+  printed an explanation as "The problem", "How it will work" with numbered prose steps, "The
+  effect" and "The risks", and the user reported it with a screenshot: "no pseudocode found".
+  That session's transcript holds no call of the explain skill at all: the model wrote the
+  explanation from the law's one-line list "(the problem, the pseudocode, the effect, the
+  risks)", which named pseudocode without saying what it looks like, while the user's standing
+  plain-talk rule ("no technical section anywhere") pushed toward prose; why the skill was
+  skipped is not known, the thinking is not stored. So the shape now says what pseudocode is
+  wherever it is named: the law's Scope step reads "the pseudocode as a fenced block" (the same
+  words in the start skill, the README, 5.3 and the explain skill's description, the layer every
+  session sees without loading it); the explain skill's second part is named **Pseudocode.**
+  ("The core logic only, in a fenced block … written in `IF`, `FOR`, `RETURN`, `←` … A numbered
+  list of steps in prose is not pseudocode, however plain its words") and its plain-words rule
+  says the block is the one place code-shaped text belongs, a plain-language rule keeps the words
+  around it plain and never removes it; `hooks/scope-check.sh` gains a third pointer after the two
+  of 14.1.0: stored reply text that carries the explanation's words but no fenced block (```) is
+  pointed at ("the pseudocode is not visible in this turn: the explanation has no fenced block,
+  and numbered steps in prose are not pseudocode. Fix it now: print the pseudocode as chat text,
+  a fenced block in IF, FOR, RETURN and ←, then go on; nothing blocks this edit"), logged
+  `pseudocode not visible`; the two older pointers name "the pseudocode as a fenced block" too.
+  Same limits as 14.1.0: a turn with no stored reply text is not judged, and the check is a
+  heuristic (any fenced block passes it; pseudocode written without a fence draws one needless
+  pointer, and nothing blocks). Tests: `hooks/tests/scope-check.test.sh` 77 → 80 checks (the
+  screenshot's prose-steps shape is pointed at and logged, the fenced fixture passes; 5 fail on
+  the 14.1.0 hook), `tests/explain.test.sh` pins the new section name and the two new sentences
+  (2 fail on the 14.1.0 skill), `tests/fixtures/short-law-pins.txt` pins the new Scope words
+  (1 fails on the 14.1.0 law). The law stays at 88 lines / 12,498 characters: "as a fenced
+  block" (18 characters) was paid for by dropping ", for architecture" from the plan-mode
+  sentence, a purpose note, not a rule (the rule, never enter plan mode for the user or add a
+  planning layer, and its pins are unchanged); the code rules are untouched (49 / 7,596).
+  Nothing loosened.
 - **14.1.0**: the scope guard points when the Scope step's output is not visible, after the first
   real dry run of 14.0.0 (a fresh Sonnet session driven by expect through a plain rename: the
   progress lines, the checklist line at Scope, the edit, the lint, the commit with the checklist

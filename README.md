@@ -21,8 +21,8 @@ typo runs the same four steps as a new module.
    discovery; otherwise grep the symbol, open its file, then its direct callers and imports, and
    stop, within a budget of 10 tool calls (at the budget with the scope still unclear, a
    pick-list of files). One line `scope: <files>`, a note of at most 3 lines, then
-   `oneloop:explain` on the change (the problem, the pseudocode, the effect, the risks), so you
-   can follow the work, all of it as reply text you see (a plan inside Claude's thinking is not
+   `oneloop:explain` on the change (the problem, the pseudocode as a fenced block, the effect,
+   the risks), so you can follow the work, all of it as reply text you see (a plan inside Claude's thinking is not
    printed, and the scope guard points at an edit made before they are visible); then straight
    on. No step waits for a yes: the loop runs on auto-pilot
    and asks only two things, a clarification the code cannot answer, or a change in logic Claude
@@ -188,7 +188,7 @@ hook can inject context into one; the law allows only the read-only reader anywa
 | `/oneloop:triage <findings>` | a batch of review findings, each accepted, pushed back, deferred or sent back for restatement |
 | `/oneloop:design-spec [author, extract or refresh]` | the project's design spec |
 | `/oneloop:release-notes` | the release notes of the task in flight, printed only when you ask |
-| `oneloop:explain` | how code, a flow or a feature works, or a change before it is built: the problem, pseudocode, the effect, the risks; it triggers on its own when you ask, and the loop's Scope step runs it on every change, after the scope line and the note, so you can follow the work |
+| `oneloop:explain` | how code, a flow or a feature works, or a change before it is built: the problem, pseudocode as a fenced block, the effect, the risks; it triggers on its own when you ask, and the loop's Scope step runs it on every change, after the scope line and the note, so you can follow the work |
 | `/oneloop:update-rules` | changes these rules and ships the change |
 | `/oneloop:status-report` | where things stand: Doing, Done (each item tagged Shipped, Pushed not verified or Local, checked against git and the live system) and Todo; it also shapes the ten-minute check-in brief |
 

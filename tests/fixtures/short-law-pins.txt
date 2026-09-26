@@ -59,7 +59,7 @@ never ask permission to edit or to fix
 a clarification the code cannot answer
 a change in logic you judge critical
 asked before it is built
-`oneloop:explain` the change (the problem, the pseudocode, the effect, the risks)
+`oneloop:explain` the change (the problem, the pseudocode as a fenced block, the effect, the risks)
 all of it reply text the user sees, before the first edit: thinking is invisible
 **Progress line**, before each step
 ✅ on the done ones, 🔵 on the current, ⚪ on the rest

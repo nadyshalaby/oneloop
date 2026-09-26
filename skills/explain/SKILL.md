@@ -1,7 +1,8 @@
 ---
 name: explain
 description: >-
-  Explains logic short and plain: the problem, pseudocode, the effect, the risks. Use it whenever
+  Explains logic short and plain: the problem, pseudocode as a fenced block, the effect, the
+  risks. Use it whenever
   the user asks how code, a flow or a feature works, or asks you to explain a change before it is
   built, and at the loop's Scope step on every change, after the scope line and the note (the law).
 ---
@@ -24,8 +25,10 @@ Write, in this order and short:
 
 - **The problem.** What happens today and why it is wrong or missing, in two or three plain
   sentences.
-- **What I'd build.** Pseudocode of the core logic only: what goes in, the decisions in order,
-  what comes out. Comments mark what is unchanged, what is new and any switch that guards it.
+- **Pseudocode.** The core logic only, in a fenced block: what goes in, the decisions in order,
+  what comes out, written in `IF`, `FOR`, `RETURN`, `←`; comments mark what is unchanged, what
+  is new and any switch that guards it. A numbered list of steps in prose is not pseudocode,
+  however plain its words.
 - **Effect.** What changes for the user and in the code, in a line or two.
 - **Risks.** What could go wrong for the user or in the code, or is given up, one line each.
 
@@ -39,7 +42,7 @@ note; an explanation already given for the same change stands and is not repeate
 ## Explaining existing code
 
 When the user asks how something works, write short: what it does in plain words, how it works
-as pseudocode of the real flow in order, what it touches, and the gotchas. Nothing changes, and
+as pseudocode of the real flow in order, in a fenced block, what it touches, and the gotchas. Nothing changes, and
 no question follows.
 
 ## Keep it plain
@@ -50,7 +53,8 @@ no question follows.
 - Never about tests, reviews, specs or process, not even as a risk (a missing test setup
   included); the rules already cover those.
 - Pseudocode reads like the logic: real names for the domain things, `IF`, `FOR`, `RETURN`, `←`
-  for a value taken, `--` for a comment.
+  for a value taken, `--` for a comment. Its block is the one place code-shaped text belongs: a
+  plain-language rule keeps the words around it plain and never removes the block.
 
 ## Example
 

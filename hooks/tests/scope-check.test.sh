@@ -13,7 +13,9 @@
 # counts for nothing, a ticked line too, and a TODO.md anywhere else, the root included, is not
 # the checklist; backticks, bold marks and the closing parenthesis around the files are stripped,
 # and an absolute path inside the repository counts by its relative form. Once the scope passes
-# (14.1.0), the reply text stored for the turn must carry the scope line and the explanation: the
+# (14.1.0), the reply text stored for the turn must carry the scope line and the explanation, and
+# (14.2.0) the explanation's pseudocode as a fenced block, since numbered steps in prose are not
+# it (a real session printed those in its place): the
 # turn is what follows the last human message (typed, as a string or as text blocks, or queued
 # mid-turn; injected text, compaction summaries, tool results and task notifications are not
 # human messages), its reply text is the assistant text blocks alone, a progress line is not a
@@ -71,10 +73,21 @@ text_line() { jq -cn --arg t "$1" '{type: "assistant", message: {role: "assistan
 edit_line() { jq -cn --arg p "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "e1", name: "Edit", input: {file_path: $p, old_string: "a", new_string: "b"}}]}}'; }
 
 EXPLANATION="The problem. runningSum says how, not what.
+${TICK}${TICK}${TICK}
 FUNCTION computeTotal(prices)
   sum ← 0                      -- renamed
   RETURN sum
+${TICK}${TICK}${TICK}
 Effect: the same total, a clearer name. Risk: a string reference to the old name."
+
+# The shape a real session printed on 2026-09-26: the four parts, the pseudocode as numbered
+# prose steps, no fenced block.
+PROSE_EXPLANATION="The problem: the sum's name says how, not what.
+How it will work:
+1. computeTotal starts the sum at 0.
+2. It returns the sum.
+The effect: the same total, a clearer name.
+The risks: a string reference to the old name."
 
 # event_json <tool> <path>: the edit event as Claude Code sends it, with the transcript when the
 # case has one.
@@ -164,17 +177,21 @@ test_the_scope_line_and_the_explanation_must_be_visible() {
   text_line "🔵 Scope ⚪ Edit ⚪ Check ⚪ Commit" >> "$T"
   assert_eq "stored reply text without a scope line is pointed at (a progress line is not one)" fix "$(decide Edit "$P/src/util/math.ts")"
   assert_eq "with no decision" "" "$(last permissionDecision)"
-  assert_contains "the pointer says what to print" "no scope line is visible in this turn (your thinking is invisible). Fix it now: print the progress line, ${TICK}scope: <files>${TICK}, the note of at most 3 lines and the explanation (the problem, the pseudocode, the effect, the risks) as chat text, then go on; nothing blocks this edit." "$(last additionalContext)"
+  assert_contains "the pointer says what to print" "no scope line is visible in this turn (your thinking is invisible). Fix it now: print the progress line, ${TICK}scope: <files>${TICK}, the note of at most 3 lines and the explanation (the problem, the pseudocode as a fenced block, the effect, the risks) as chat text, then go on; nothing blocks this edit." "$(last additionalContext)"
   assert_contains "and is logged" " p | guard | scope | fix | src/util/math.ts | scope line not visible" "$(tail -n 1 "$LOG")"
   text_line "Renaming it now." >> "$T"
   assert_eq "more text without the line is still pointed at" fix "$(decide Edit "$P/src/util/math.ts")"
   text_line "scope: src/util/math.ts
 - runningSum becomes sum in computeTotal, one file, nothing else reads it." >> "$T"
   assert_eq "the scope line and the note alone are still pointed at" fix "$(decide Edit "$P/src/util/math.ts")"
-  assert_contains "for the explanation" "the explanation is not visible in this turn (your thinking is invisible). Fix it now: print it as chat text, the problem, the pseudocode, the effect, the risks, then go on; nothing blocks this edit." "$(last additionalContext)"
+  assert_contains "for the explanation" "the explanation is not visible in this turn (your thinking is invisible). Fix it now: print it as chat text, the problem, the pseudocode as a fenced block, the effect, the risks, then go on; nothing blocks this edit." "$(last additionalContext)"
   assert_contains "and logged as such" " p | guard | scope | fix | src/util/math.ts | explanation not visible" "$(tail -n 1 "$LOG")"
+  text_line "$PROSE_EXPLANATION" >> "$T"
+  assert_eq "an explanation whose pseudocode is numbered prose steps, no fenced block, is pointed at" fix "$(decide Edit "$P/src/util/math.ts")"
+  assert_contains "for the pseudocode" "the pseudocode is not visible in this turn: the explanation has no fenced block, and numbered steps in prose are not pseudocode. Fix it now: print the pseudocode as chat text, a fenced block in IF, FOR, RETURN and ←, then go on; nothing blocks this edit." "$(last additionalContext)"
+  assert_contains "and logged as pseudocode not visible" " p | guard | scope | fix | src/util/math.ts | pseudocode not visible" "$(tail -n 1 "$LOG")"
   text_line "$EXPLANATION" >> "$T"
-  assert_eq "scope line, note and explanation visible: the edit passes" pass "$(decide Edit "$P/src/util/math.ts")"
+  assert_eq "scope line, note and the explanation with its fenced pseudocode visible: the edit passes" pass "$(decide Edit "$P/src/util/math.ts")"
   edit_line "$P/src/util/math.ts" >> "$T"
   assert_eq "and the next edit in the same turn passes too" pass "$(decide Edit "$P/src/util/math.ts")"
   { human_line "Also do the cart summary."; text_line "✅ Scope 🔵 Edit ⚪ Check ⚪ Commit"; } >> "$T"
