@@ -25,10 +25,11 @@ The map for this repository: the checks, where things live, where to start. Read
 - `law/engineering-code.md`: the caps, the bans, the principles; copied into `~/.claude/rules/`.
 - `settings/loop.json`: lint, typecheck, test, ui_check, discovery_budget, risk_regex, ui_path_regex.
 - `hooks/risk-zone.sh`: the first edit to a risk-zone file becomes a permission prompt.
+- `hooks/scope-check.sh`: an edit outside the approved scope line, or with no open line in `TODO.md`, becomes a permission prompt.
+- `hooks/commit-check.sh`: a `git commit` that leaves `TODO.md` out becomes a permission prompt.
 - `hooks/edit-guard.sh`: the code-rules hook, which warns beside the tool result and never blocks.
 - `hooks/loop-reminder.sh`: the one-line reminder on every prompt.
 - `install.sh`: install, `--check`, `--uninstall`.
-- `tests/fixtures/short-law-pins.txt`: what the law must keep saying, one string per line.
 - `CHANGELOG.md`: one entry per version, newest first; the version is the top entry's.
 
 ## Conventions

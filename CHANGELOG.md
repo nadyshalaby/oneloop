@@ -2,6 +2,43 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **10.1.0**: the checklist, at the user's word ("add very very simple checklist one liner per
+  task like most of simple todos out there and the flow must tick each task when its status
+  change and achieve the whole list once its done. updating this list each task change is a
+  must not nogotiatable mandatory thing"), and the scope ratchet as a hook (the pick, "Add a
+  scope hook", after the 10.0.x dry runs showed the text rule not holding: Sonnet sessions
+  given "go" widened to a second file and committed both). The loop gains the checklist:
+  `TODO.md` at the repository root, one line per task, `- [ ]` at Scope with the scope line,
+  `- [~]` at the yes or "go", `- [x]` at Commit with `TODO.md` staged in the same commit (no
+  hash on the line: it does not exist until the commit it must sit in); a task sits under a
+  `## <milestone>` heading when the user names one (their question mid-build, "i may work on
+  multiple milestones how the todo will manage that", and their pick, "Milestone headings,
+  archive per group"), else unheaded at the top, and a group whose every line is ticked moves
+  whole to `TODO.archive.md` under a dated heading while the other groups stay, in that commit;
+  the checklist joins the never-waivable list. Two new hooks, both asking and
+  never blocking: `hooks/scope-check.sh` (PreToolUse on the four edit tools, second in line
+  after the risk-zone prompt) reads the session transcript for the approved scope line, the
+  `scope:` line that stood when the user last replied, or, after a message of theirs saying
+  "go", the first one printed after it, so a restated scope waits for a new yes even after
+  "go"; it turns an edit to a file not on that line (a path, or a folder it is under), an edit
+  before any approved line, or an edit while `TODO.md` has no `[ ]` or `[~]` line into a
+  permission prompt. `hooks/commit-check.sh`, the first hook on the Bash tool, turns a `git
+  commit` that neither stages nor names `TODO.md` into one. Nothing to judge stays silent: no
+  repository, a file outside it, `TODO.md` and `TODO.archive.md` themselves, no readable
+  transcript, a command with no commit in it. Tests: `hooks/tests/scope-check.test.sh` (48
+  checks on transcripts built from the harness's real-shape lines, where replies, tool
+  results, injected texts and compaction summaries are told apart) and
+  `hooks/tests/commit-check.test.sh` (21); `tests/hooks-wiring.test.sh` now allows exactly
+  the commit check on Bash and pins the edit-hook order (risk-zone, scope-check, edit-guard);
+  nine new pins. The status-report skill reads `TODO.md`; this repository keeps its own
+  `TODO.md` and `TODO.archive.md`; the README and the map name the two hooks. Sizes: the core
+  law 11,084 to 11,786 bytes (85 to 88 lines), its cap 11,200 to 11,800 (the checklist and the
+  two guards are always-on rules; the side-find definition and the conventions line lost their
+  example lists to pay for part of it, and the two new hooks say "your approval is the yes" in
+  their own prompt text rather than in the law); the code rules unchanged at 7,598. Two limits, said
+  plainly: the scope check judges only what the transcript holds, so a `claude -p` run without
+  session persistence is not judged, and a `git -C` whose folder is a shell variable is judged
+  against the session's folder instead.
 - **10.0.1**: the reader runs on Sonnet, at the user's word ("replace haiku with sonet"):
   `agents/er-reader.md` (`model: sonnet`), the law's Helpers line, 1.8, the README, the agents
   test (which now refuses any other model) and the fresh-session recipe in

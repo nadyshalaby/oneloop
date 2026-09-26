@@ -23,7 +23,7 @@ CODE="${CODE_MD:-$ROOT/law/engineering-code.md}"
 CODE_PINS="${CODE_PINS:-$ROOT/tests/fixtures/code-rules-pins.txt}"
 ABSENT="${ABSENT:-$ROOT/tests/fixtures/short-law-absent.txt}"
 LINE_CAP=90
-CHAR_CAP=11200
+CHAR_CAP=11800
 CODE_LINE_CAP=60
 CODE_CHAR_CAP=7600
 

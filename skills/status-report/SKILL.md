@@ -45,7 +45,7 @@ Work with no git remote (a change made on a server over ssh, a config edit, a re
 
 Notes, commit messages, PR titles and earlier messages say "deployed" when someone hoped it was. Treat them as claims to test, not as checks.
 
-1. **What's happening.** Read the task list (TaskList) and the conversation for Doing, Done and Todo. If the task list disagrees with reality, fix it with TaskUpdate while you're here.
+1. **What's happening.** Read the task list (TaskList), the repository's `TODO.md` checklist (an open `[ ]` or `[~]` line is Doing or Todo; a `[x]` line is a Done candidate, still to be tagged) and the conversation for Doing, Done and Todo. If the task list disagrees with reality, fix it with TaskUpdate while you're here.
 2. **Local versus pushed**, in every repo the work touched:
    ```
    git status --short --branch                      # unfinished edits, ahead/behind
