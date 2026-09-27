@@ -34,7 +34,7 @@ task needs, the code rules for what only writing code needs (the core keeps a on
 of the caps and bans), a command's skill for what only that command needs, a reference for the
 detail. A new code language or file type goes into the code rules' `paths:` globs.
 A hook is for what a machine can judge without a model; a judgment call stays in the text. A
-hook warns or asks, never blocks (the law, Guards).
+hook points and Claude fixes; no hook asks or blocks (the law, Guards).
 
 ## The ethics, none of them waivable
 
@@ -56,7 +56,7 @@ hook warns or asks, never blocks (the law, Guards).
   follow-up and reported, not fixed inside this change unless it blocks it.
 - **A hook must never be the outage.** A hook that cannot judge exits 0 with one log line; it
   warns only about what the law bans, and only about what the edit adds, never what was
-  already there; the risk-zone and scope hooks ask, they never deny.
+  already there; the risk-zone and scope hooks point, like every hook, and never block.
 - **Evidence, safety and questions as the law says.** Every claim in the report has output run
   this session behind it (1.5); git safety holds throughout (1.7); a fork only the user can
   decide (which layer, whether a loosening is wanted, a name) goes through `AskUserQuestion`
@@ -101,7 +101,7 @@ hook warns or asks, never blocks (the law, Guards).
 8. **Commit in the worktree**, explicit paths only, a message that says what and why, no
    attribution trailer (1.7).
 9. **Prove the release before making it.** The law's deploy command (1.11), read for a harness:
-   the suite green on this commit (step 6); a new hook warns or asks and never blocks, and is
+   the suite green on this commit (step 6); a new hook points and never asks or blocks, and is
    watched on one real event before it is called done; rule text has no switch, so its rollback
    is the revert below; there are no migrations; nothing else is in flight (step 1); and the
    rollback is named: the `main` commit before this one, undone with

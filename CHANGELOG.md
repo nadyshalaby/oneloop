@@ -2,6 +2,19 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **15.1.1**: the side finds of 15.1.0, at the user's word ("fix finds"): the pages that still
+  described a hook as asking, which 14.0.0 retired (no hook asks or blocks; a guard points and
+  Claude fixes). 9.5's scan section ("The guard's run judges one edit and asks the user", a name
+  "weighed at the prompt", a known false positive's "one answer at the guard's prompt", the See
+  also's edit guard that "runs this block over every edit and asks") and one comment inside its
+  scanner block ("a candidate the prompt weighs", found by the family search), and the
+  update-rules skill ("A hook warns or asks, never blocks", "the risk-zone and scope hooks ask,
+  they never deny", "a new hook warns or asks") now say the hook points and Claude fixes.
+  `tests/old-words.test.sh` retires the old phrases (`warns or asks`, `guard's prompt`, `edit
+  and asks`, `weighed at the prompt`, `the prompt weighs`, `hooks ask`) from everything the model
+  and the user read, with a planted line it names; pointed at 15.1.0's tree it names exactly
+  those eight lines. Patch: wording, nothing added to or loosened in the law; the comment in the
+  scanner block changes no pattern the edit guard runs. Both law files untouched.
 - **15.1.0**: the side finds of 15.0.0, at the user's word ("fix finds"). The Idiom rule gets its
   check: `style.idiom` in the audit rule catalog (16.4, code-style, medium by default), a
   judgment pass in 16.6 (read the pinned version first; then a deprecated API, a hand-rolled
