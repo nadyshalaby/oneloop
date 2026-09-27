@@ -2,6 +2,40 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **15.0.0**: two new code rules, Generic contracts and Idiom, at the user's word ("Codebase
+  should be architected in generic abstracted approach through oop and target language
+  equivalent logic so that new modules can inherit that generic implementation such as CRUD
+  Contracts (following dont repeat your self and SOLID principles). Coding must follow best
+  practices and incorporate all main and latest APIs provided by the language and its core
+  features … i mean core patterns and coding styles followed and covered by the community or the
+  language itself"). The law said otherwise in five places (extract on the second use, never
+  speculatively; no single-use abstractions; no hierarchy built to share code; extracting on the
+  first use is speculation; the audit's `solid.yagni`), so the user picked how far it goes
+  ("Contract-first, closed list") and how it fits ("Raise the cap to ~8,500"). **Generic
+  contracts (DRY, SOLID)**: what every module of a kind repeats (CRUD over an entity through its
+  repository, service and handler; validation, pagination, error mapping; an API client) is one
+  generic contract from the first module, in the language's own form, the framework's own first;
+  modules depend on it, extend or compose it and write only what differs; it is split by role
+  (read, write) so no module refuses a method; it is the one abstraction built before its second
+  use. **Idiom**: each language in its current idiom, as its own docs and its community write it,
+  the repository's conventions first: its style guide and formatter, built-ins and the standard
+  library before hand-rolled code or a new dependency, the newest stable features and APIs the
+  project's pinned version allows, each verified (1.5), never a deprecated one. The long form in
+  1.1 carries the reasons, the closed list, the form per language and where a pin is read; every
+  layer that said otherwise now names the exception: 1.1's prime directive and clean-code line 9,
+  1.6's Simplicity First, 2.1's prime directive, composition rule and "When in doubt" line, 3.4's
+  deep-inheritance and interface-per-class rows and three of its "Deliberately not adopted" rows,
+  16.4's `style.dry` and `solid.yagni` rows, and 16.6's dry check (a kind every module repeats,
+  written again in each module with no contract, is a finding even before a contract exists),
+  its solid check and its object-design check. Major, because it loosens: for the closed list,
+  the second-use wait, the ban on inheritance built to share code and the ask-before-an-
+  abstraction line no longer hold, and `solid.yagni` no longer flags such a contract; the code
+  rules' size cap widens from 7,600 to 8,600 characters. Code rules: 49 lines and 7,596
+  characters before, 53 and 8,540 after, still under the 10,000 Claude Code shows whole once the
+  hook adds its header line (`hooks/tests/code-rules.test.sh` checks it); the core law is
+  untouched at 88 and 12,498. Tests: 13 new code-rule pins, all 13 failing against 14.2.0's code
+  rules; the size check fails on the new text at the old cap (8,540 over 7,600). Not in it: the
+  Idiom rule has no audit check yet, and modules already written are not moved onto contracts.
 - **14.2.0**: the explanation's pseudocode is a fenced block at every layer, and the scope guard
   points when it is missing. The user's Freeziana session (Sonnet, the evening 14.1.0 shipped)
   printed an explanation as "The problem", "How it will work" with numbered prose steps, "The

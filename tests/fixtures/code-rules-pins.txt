@@ -43,6 +43,20 @@ second caller
 paste the search that found none
 Leave nothing behind
 Dead code that was there before your change is a follow-up
+# generic contracts and idiom
+Generic contracts (DRY, SOLID)
+What every module of a kind repeats
+CRUD over an entity through its repository, service and handler
+one generic contract from the first module
+the framework's own first
+write only what differs
+split it by role (read, write) so no module refuses a method
+The one abstraction built before its second use
+Write each language in its current idiom
+the repository's conventions first
+built-ins and the standard library before hand-rolled code or a new dependency
+the newest stable features and APIs the project's pinned version allows
+each verified (1.5), never a deprecated one
 # clean-code floor
 does or answers, never both
 No flag parameters
