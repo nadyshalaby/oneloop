@@ -19,7 +19,7 @@ release it in one step, the same way the law's 1.11 ships anything else.
 
 | The rule | Its file | Who pays for it |
 |---|---|---|
-| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and again after a compaction | every session, from its first turn; capped at 90 lines and 12,000 characters |
+| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and again after a compaction | every session, from its first turn; capped at 90 lines and 12,500 characters |
 | Binds every line of code written | `law/engineering-code.md`, handed to a session by `hooks/code-rules.sh` with the first code file it reads or edits (its `paths:` globs say which files count) | every session that touches code, once; capped at 60 lines and 8,600 characters |
 | The reasons and procedures behind an always-on rule | `references/01-always-on-law/1.x-*.md`, the long forms | only when read |
 | The loop's defaults: the four checks, the discovery budget, the two regexes | `settings/loop.json`, read by the hooks and named by the law | nothing per turn |

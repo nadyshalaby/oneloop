@@ -2,6 +2,27 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **15.1.0**: the side finds of 15.0.0, at the user's word ("fix finds"). The Idiom rule gets its
+  check: `style.idiom` in the audit rule catalog (16.4, code-style, medium by default), a
+  judgment pass in 16.6 (read the pinned version first; then a deprecated API, a hand-rolled
+  version of a built-in, a construct older than the pinned version's idiom where the codebase
+  sets no convention, a feature or API newer than the pin; each deprecated or newer API cited
+  from its notice or docs, read this session; high for a feature past the pin, medium for a
+  deprecated API, low for the rest), a lens in 9.5's semantic tier so the loop's Check step
+  reads a diff for it too, 16.6's project-tools-first line naming a linter's deprecation or
+  modernization rules, and a pointer in 1.1's long form. 2.1's two "When in doubt" lines, which
+  asked before every new abstraction and every new dependency, now follow the core's auto-pilot:
+  name it in the Scope note with its reason, ask first only when judged critical. What that
+  removes: 2.1's standing question before a new abstraction, a dependency or a major bump, which
+  the core's question rule (a clarification or a critical change only) has overruled since
+  14.0.0. The README's core-law size reads 12,498 in both places (12,408 since 14.1.0), and the
+  update-rules skill's core cap reads 12,500 (12,000 since 14.0.0). The fifth find, both law
+  files near their caps, is not a defect: each addition trims or raises to pay for itself, and
+  the user's 15.0.0 pick was to raise rather than reword, so nothing changed there. Minor: a new
+  check; the 2.1 change brings a long form in line with the core, which already ruled. Both law
+  files untouched: the core 88 lines and 12,498 characters, the code rules 53 and 8,540. Tests:
+  `tests/catalog-ids.test.sh` fails with the pass's `style.idiom` cited before its 16.4 row
+  existed ("dangling rule ids … style.idiom") and passes with it.
 - **15.0.0**: two new code rules, Generic contracts and Idiom, at the user's word ("Codebase
   should be architected in generic abstracted approach through oop and target language
   equivalent logic so that new modules can inherit that generic implementation such as CRUD

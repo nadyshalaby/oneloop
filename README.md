@@ -9,7 +9,7 @@ same rules.
 
 It grew out of the same author's earlier plugin (2.21.0 and before) and the installer-era
 harness (3.0.0 to 10.1.1, wired into `~/.claude` by a script; both in the history). Here the core law is
-88 lines and 12,408 characters, the code rules 53 lines and 8,540, and everything else stays on
+88 lines and 12,498 characters, the code rules 53 lines and 8,540, and everything else stays on
 disk until a rule sends Claude to it.
 
 ## One loop, for everything
@@ -75,7 +75,7 @@ search, sent only after grep has failed twice on an unfamiliar codebase.
 
 | What | File | When, and what it costs |
 |---|---|---|
-| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 12,408 characters, capped at 90 and 12,500 by `tests/short-law.test.sh` |
+| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 12,498 characters, capped at 90 and 12,500 by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, handed to the session by `hooks/code-rules.sh` | the first time a session reads or edits a file its `paths:` globs match (the common code extensions), once per session; 53 lines and 8,540 characters, capped at 60 and 8,600 |
 | The loop's defaults: the four checks, the discovery budget, the risk regex, the UI path regex | `settings/loop.json` | read by the risk-zone hook; the law states the same defaults, and `tests/loop-config.test.sh` keeps the two equal |
 | The one helper, `oneloop:er-reader` | `agents/er-reader.md` | its one-line description in every session's agent list; its body only when it is sent |

@@ -1,6 +1,6 @@
 {
   "name": "oneloop",
-  "version": "15.0.0",
+  "version": "15.1.0",
   "description": "One loop for every task in Claude Code: scope, edit, check, commit. An always-on engineering law, guards as hooks (risk zones, scope, checklist, code rules), a docs/oneloop-todos/TODO.md checklist and typed commands.",
   "author": {
     "name": "nadyshalaby"
