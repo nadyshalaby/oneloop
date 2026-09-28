@@ -9,7 +9,7 @@ same rules.
 
 It grew out of the same author's earlier plugin (2.21.0 and before) and the installer-era
 harness (3.0.0 to 10.1.1, wired into `~/.claude` by a script; both in the history). Here the core law is
-88 lines and 12,498 characters, the code rules 53 lines and 8,540, and everything else stays on
+88 lines and 12,730 characters, the code rules 53 lines and 8,540, and everything else stays on
 disk until a rule sends Claude to it.
 
 ## One loop, for everything
@@ -28,14 +28,17 @@ typo runs the same four steps as a new module.
    and asks only two things, a clarification the code cannot answer, or a change in logic Claude
    judges critical, before it is built. Before each step, one progress line shows the four
    steps, ✅ on the done ones, 🔵 on the current, ⚪ on the rest.
-2. **Edit.** One grep for something to reuse; the smallest diff; an existing test file for the
-   area is extended in the same edit, otherwise there is no test ritual. The scope ratchet
+2. **Edit.** One grep for something to reuse; the smallest diff, code first: the working code,
+   and a new test only when you ask for one or for money, auth or data-loss code, written once
+   the code runs (a test of behaviour changed on purpose is updated with it). The scope ratchet
    restates the scope, in at most 3 lines and on the task line, when the change needs a file
    outside the scope, more than double the files stated, or a risk-zone file, then goes on.
    Stuck twice on the same error: stop, state the root cause, ask.
 3. **Check.** Lint on the changed files, typecheck, the test command, then `ui_check` when a
    changed file is under a UI path, all taken from the map (`settings/loop.json` holds the
-   defaults); then one read of `git diff`. No separate reviewer.
+   defaults); then what changed runs once for real (a command, a request, a call; `ui_check`
+   counts for the UI), its output pasted as the proof it works; then one read of `git diff`.
+   No separate reviewer.
 4. **Commit.** The changed files staged by name, one commit, a one-line message, on the current
    branch. The final reply is the files changed, the check results, what each guard pointed at
    and its fix, and the side finds.
@@ -75,7 +78,7 @@ search, sent only after grep has failed twice on an unfamiliar codebase.
 
 | What | File | When, and what it costs |
 |---|---|---|
-| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 12,498 characters, capped at 90 and 12,500 by `tests/short-law.test.sh` |
+| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 12,730 characters, capped at 90 and 12,750 by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, handed to the session by `hooks/code-rules.sh` | the first time a session reads or edits a file its `paths:` globs match (the common code extensions), once per session; 53 lines and 8,540 characters, capped at 60 and 8,600 |
 | The loop's defaults: the four checks, the discovery budget, the risk regex, the UI path regex | `settings/loop.json` | read by the risk-zone hook; the law states the same defaults, and `tests/loop-config.test.sh` keeps the two equal |
 | The one helper, `oneloop:er-reader` | `agents/er-reader.md` | its one-line description in every session's agent list; its body only when it is sent |
@@ -147,7 +150,8 @@ orients. `tests/claude-md.test.sh` keeps this repository's own map in that shape
 Ask Claude to change a rule, or type `/oneloop:update-rules`. The skill carries the ethics (your
 words are the specification, nothing is loosened quietly or lost by accident, both law files'
 sizes are reported before and after, one source of truth) and the release: the change is made
-and tested in a git worktree of the dev checkout (`~/Code/oneloop`) while your sessions keep
+and tested in a git worktree of the dev checkout (`~/Code/oneloop`), code first (the change,
+then the suite, and a new test file only for a hook), while your sessions keep
 running the installed version, then merged, pushed (the marketplace is the GitHub repository, so
 the push is the publish), installed with `claude plugin update`, and verified in a fresh session.
 Each change gets a `CHANGELOG.md` entry and a version, written into `.claude-plugin/plugin.json`
@@ -202,7 +206,7 @@ claude plugin validate --strict .
 
 Every test file ends with a `N passed, M failed` line and exits non-zero on a failure. Each can
 be pointed at a broken copy of what it checks through an environment variable named in its
-header, which is how every check here was shown to be able to fail. `tests/setup-statusline.test.sh`
+header. `tests/setup-statusline.test.sh`
 runs the status line setup in fake config folders only, never against the real `~/.claude`.
 
 ## Layout

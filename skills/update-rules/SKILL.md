@@ -19,7 +19,7 @@ release it in one step, the same way the law's 1.11 ships anything else.
 
 | The rule | Its file | Who pays for it |
 |---|---|---|
-| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and again after a compaction | every session, from its first turn; capped at 90 lines and 12,500 characters |
+| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and again after a compaction | every session, from its first turn; capped at 90 lines and 12,750 characters |
 | Binds every line of code written | `law/engineering-code.md`, handed to a session by `hooks/code-rules.sh` with the first code file it reads or edits (its `paths:` globs say which files count) | every session that touches code, once; capped at 60 lines and 8,600 characters |
 | The reasons and procedures behind an always-on rule | `references/01-always-on-law/1.x-*.md`, the long forms | only when read |
 | The loop's defaults: the four checks, the discovery budget, the two regexes | `settings/loop.json`, read by the hooks and named by the law | nothing per turn |
@@ -78,14 +78,15 @@ hook points and Claude fixes; no hook asks or blocks (the law, Guards).
    new version is released.
 4. **Make the smallest change that does it**, in every file the old wording lives in, the long
    form beside the short law included, and keep both law files under their caps.
-5. **Change the tests with it.** New always-on wording gets pins; wording that must never come
-   back goes into `tests/fixtures/short-law-absent.txt`; a hook change gets a test beside it
-   (`hooks/tests/`); a new command is listed in `tests/commands.test.sh` (a typed command in
-   `COMMANDS`, a standalone skill in `STANDALONE`); a new loop default is checked in
-   `tests/loop-config.test.sh`; a new hook is wired in `hooks/hooks.json` and pinned in
-   `tests/hooks-wiring.test.sh`. Watch each new check fail on the old text: point the test's
-   override (`LAW_MD`, `CODE_MD`, `LOOP_JSON`, `SCOPE_CHECK_SH`, `SESSION_START_SH`,
-   `CODE_RULES_SH` and the like) at `git -C "$ER" show main:<path>` saved to a scratch file.
+5. **Code first on the tests too** (the law's Edit step). The change comes first; the suite
+   (step 6) then names what it broke, and each broken check is updated with it. New always-on
+   wording gets its pin and wording that must never come back its line in
+   `tests/fixtures/short-law-absent.txt`, one line each; a new command is listed in
+   `tests/commands.test.sh` (a typed command in `COMMANDS`, a standalone skill in
+   `STANDALONE`); a new loop default is checked in `tests/loop-config.test.sh`; a new hook is
+   wired in `hooks/hooks.json` and pinned in `tests/hooks-wiring.test.sh`. A new test file only
+   for a new or changed hook (`hooks/tests/`), since a hook runs on every event of every
+   session, or on the user's word; no new check is watched failing on the old text.
 6. **Run everything, on the exact commit you will ship.** Every `*.test.sh` in the worktree
    (`find . -name '*.test.sh' -not -path './.git/*'`, each run, each result line pasted),
    `shellcheck -x -P SCRIPTDIR -S style bin/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh`, and

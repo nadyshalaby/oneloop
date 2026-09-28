@@ -38,7 +38,7 @@ The map for this repository: the checks, where things live, where to start. Read
 ## Conventions
 
 - Bash as macOS ships it (3.2): `set -u`, no arrays, no `[[`-only features; every hook exits 0 and never blocks on its own bug.
-- A test file ends with `N passed, M failed`; each check is shown failing on a broken copy through the override its header names.
+- A test file ends with `N passed, M failed`, and its header names the override that points it at another copy; code first: a rule change runs the suite and updates what it breaks, and only a hook change gets a new test file.
 - A rule lives on the cheapest layer that binds: the core, the code rules, a command's skill, a reference page.
 - Rule changes ship through `/oneloop:update-rules`: worktree, tests, changelog and version, push, `claude plugin update`, fresh-session check.
 - Commits: explicit paths, one-line message, no attribution trailer.

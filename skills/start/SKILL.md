@@ -61,13 +61,16 @@ the scope line and that one line are the status output.
    the progress line or right after it, before the first edit: your thinking is invisible, and
    the scope guard points at an edit made before they are visible. Then straight on to Edit. A risk-zone file in the scope: say what changes there in at most 5
    lines in the final reply, and ask first only a change you judge critical.
-2. **Edit.** One grep for something to reuse, then the smallest diff inside the scoped files;
-   an existing test file for the area is extended in the same edit. A file outside the scope,
-   more than double the files, or a risk-zone file: restate the scope on the task line and in
-   one line, then go on. Stuck twice on the same error: stop, state the root cause, ask.
+2. **Edit.** One grep for something to reuse, then the smallest diff inside the scoped files,
+   code first: the working code, and a new test only when the user asks or for money, auth or
+   data-loss code, written once the code runs; a test of behaviour changed on purpose is
+   updated with it. A file outside the scope, more than double the files, or a risk-zone file:
+   restate the scope on the task line and in one line, then go on. Stuck twice on the same
+   error: stop, state the root cause, ask.
 3. **Check.** Lint on the changed files, typecheck, the test command, `ui_check` when a UI path
    changed, in that order, from the map or `settings/loop.json`; none configured, say so once.
-   Then one read of `git diff`, and the obvious fixed.
+   Then what changed runs once for real (a command, a request, a call; `ui_check` counts for
+   the UI), its output pasted, and one read of `git diff`, the obvious fixed.
 4. **Commit.** The changed files staged by name, the checklist ticked `- [x]` among them (a
    group with every line ticked moves whole to `docs/oneloop-todos/TODO.archive.md` in the same
    commit); one commit, one line, on the current branch. The reply: the files changed, the

@@ -4,9 +4,10 @@
 # folder away from it), since 10.0.0 the phases, lanes, scouts, sweep, helpers, gates, advisor
 # and plan note the loop replaced, and since 11.0.0 the installer era (the engineering-rules
 # name, install.sh, the CLAUDE.md block, the rules copy, the re-anchor hook) the plugin
-# replaced, and since 14.0.0 the hooks that asked (a hook that warns or asks, the guard's
-# prompt) the pointing guards replaced. It proves names, not rules: an old rule written in new
-# words passes it. Allowed on
+# replaced, since 14.0.0 the hooks that asked (a hook that warns or asks, the guard's prompt)
+# the pointing guards replaced, and since 16.0.0 the test-first words code first replaced (a
+# watched failure, red to green, the area's test file extended in the same edit). It proves
+# names, not rules: an old rule written in new words passes it. Allowed on
 # purpose: the changelog and the tests (history and data), the two `Phase 01` examples of a bad
 # section label (15.22, 15.24), the status line setup's handling of the old status line, and
 # the README's one line on unwiring the old install.
@@ -16,7 +17,7 @@
 # shellcheck source=harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT="${OLD_WORDS_ROOT:-$(repo_root)}" || exit 1
-OLD='Phase [0-9]|Sprint Backlog|Sprint Review|\bsprint\b|[Aa]cceptance [Cc]riteri|Daily Updates?\b|Evidence Ledger|Retrospective|wizard tool|question tool|stage end|stage-end|every stage\b|update log|update-log|full mode|quick mode|[Ss]ub-command|Approach section|phase agents?|phase-[0-9]|phase-discipline|fast lane|careful lane|lane\.sh|[Pp]hase ledger|Verify & Deploy|work-doc|plan note|the advisor\b|advisor tool|advisor cue|advisor-cue|er-builder|er-reviewer|build is the default|the workflow skill|/engineering-rules:workflow|logic gate|logic-first|ship gate|cleanup sweep|scout\.sh|sweep\.sh|Implement step|Plan step|Done-when|Done when|engineering-rules|engineering_rules|ENGINEERING_RULES|install\.sh|claude-md-block|re-anchor\.sh|~/\.claude/rules|warns or asks|guard.s prompt|edit and asks|weighed at the prompt|the prompt weighs|hooks ask\b'
+OLD='Phase [0-9]|Sprint Backlog|Sprint Review|\bsprint\b|[Aa]cceptance [Cc]riteri|Daily Updates?\b|Evidence Ledger|Retrospective|wizard tool|question tool|stage end|stage-end|every stage\b|update log|update-log|full mode|quick mode|[Ss]ub-command|Approach section|phase agents?|phase-[0-9]|phase-discipline|fast lane|careful lane|lane\.sh|[Pp]hase ledger|Verify & Deploy|work-doc|plan note|the advisor\b|advisor tool|advisor cue|advisor-cue|er-builder|er-reviewer|build is the default|the workflow skill|/engineering-rules:workflow|logic gate|logic-first|ship gate|cleanup sweep|scout\.sh|sweep\.sh|Implement step|Plan step|Done-when|Done when|engineering-rules|engineering_rules|ENGINEERING_RULES|install\.sh|claude-md-block|re-anchor\.sh|~/\.claude/rules|warns or asks|guard.s prompt|edit and asks|weighed at the prompt|the prompt weighs|hooks ask\b|watched failure|red to green|[Tt]est-first|(extend it|is extended) in the same edit|test file for the area'
 TICK=$(printf '\140')
 ALLOWED="${TICK}Phase 01${TICK}|^bin/setup-statusline\\.sh:[0-9]+:.*engineering-rules|^README\\.md:[0-9]+:.*install\\.sh --uninstall"
 READ="references skills agents law README.md CLAUDE.md hooks settings bin .claude-plugin"

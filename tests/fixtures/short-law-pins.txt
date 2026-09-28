@@ -67,7 +67,10 @@ all of it reply text the user sees, before the first edit: thinking is invisible
 One grep for an existing component or util to reuse
 The smallest diff that satisfies the request
 no refactor outside the scoped files
-extend it in the same edit; otherwise no test ritual
+**Code first:** write the working code
+a new test only when the user asks or for money, auth or data-loss code
+written once the code runs
+a test of behaviour changed on purpose is updated with it
 **Scope ratchet:**
 more than double the files stated
 never widen silently, never narrow to fit
@@ -80,6 +83,8 @@ lint on the changed files; typecheck; the test command
 run the other two and say so once
 `ui_check` only when a changed file is under a UI path
 `src/components|src/app|src/pages|app/|components/`
+then run what changed once for real (a command, a request, a call
+`ui_check` counts for the UI) and paste its output
 read `git diff` once and fix anything obvious
 No separate reviewer
 Stage the changed files by name

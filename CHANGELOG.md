@@ -2,6 +2,49 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **16.0.0**: code first, not test-first, at the user's word ("I want to convert oneloop from TDD
+  to Code First approach. the framework spend too much in writing tests instead of delivering the
+  actual working code", under the goal "One loop is very fast development loop that ships very
+  efficient software very quickly"; their picks: "Asked, or money/auth/data-loss", "Yes, same
+  rule" for the harness's own releases, and "Raise the cap to 12,750"). The loop's Edit step no
+  longer extends the area's test file with every edit. **Code first**: write the working code; a
+  new test only when the user asks or for money, auth or data-loss code, written once the code
+  runs; a test of behaviour changed on purpose is updated with it. The Check step gains the proof
+  that replaces the new test: after `ui_check`, what changed runs once for real (a command, a
+  request, a call; `ui_check` counts for the UI) and its output is pasted. Every layer that still
+  drove tests follows: the start skill's Edit and Check steps; 1.6's Goal-Driven Execution (the
+  proof is the code running; its test asks for the run that shows it working, where it asked
+  for the check that flips from red to green); 2.1's litmus (testable, not tested: could a test
+  drive it with nothing else running) and its Timely rule (written once the code runs, where
+  the loop asks for one, where it said written with the change, with a watched failure); 3.3,
+  read only when a test is written, its Check-step row only for a money, auth or data-loss diff,
+  its bug-fix row proven by the real run unless the fix gets a test; 3.4's test-hygiene intro;
+  9.5's Test coverage lens, which the Check step reads over a diff, asks for a test only on
+  money, auth or data-loss logic; the audit's `test.untested` and `test.edge-cases` (16.3, 16.4,
+  16.6) narrow to the same logic, so an audit no longer reports every untested service method;
+  14.1's fourth example proves its fix by one real run and pins it with a test after, since it
+  is auth code, and its second and seventh examples no longer owe a test per diff. The harness's
+  own releases go code first too: the update-rules skill's step 5 runs the suite and updates what
+  it breaks, keeps a pin for new always-on wording and a retired line for old, and asks a new
+  test file only for a new or changed hook (a hook runs on every event of every session) or on
+  the user's word; no new check is watched failing on the old text any more; the map's
+  conventions line and the README say so. What it removes, said plainly: the test file extended
+  with every edit in a tested area, the watched failure before a test counts, the test-scenario
+  breadth and the Check step's and the audit's call for a test on code outside money, auth and
+  data loss, "the reproduction is the test" for a bug fix, and the harness's watched failure for
+  every new check; new code outside money, auth and data loss is covered by the project's
+  existing suite and one real run, not by a test of its own. Kept: the test command at every
+  Check, the test-hygiene rules on every test that is written, the focused and skipped-test
+  bans, and 1.5's claim rule (a zero is shown finding a planted instance). Major: a rule is
+  loosened. The core law's cap widens from 12,500 to 12,750 characters, the user's pick; law: 88
+  lines and 12,498 characters before, 88 and 12,730 after; code rules untouched at 53 and 8,540.
+  Tests: the pins move with the law (four for the Code first sentence, two for the real run;
+  "extend it in the same edit; otherwise no test ritual" goes), `tests/fixtures/short-law-absent.txt`
+  retires "A test file for the area exists" and "extend it in the same edit", and
+  `tests/old-words.test.sh` retires `watched failure`, `red to green`, `test-first`, the area's
+  test file and its extension in the same edit from everything the model and the user read;
+  pointed at 15.1.1's tree it names seven lines (the law, the start skill, the README, 1.6, 2.1,
+  3.3 and 3.4).
 - **15.1.1**: the side finds of 15.1.0, at the user's word ("fix finds"): the pages that still
   described a hook as asking, which 14.0.0 retired (no hook asks or blocks; a guard points and
   Claude fixes). 9.5's scan section ("The guard's run judges one edit and asks the user", a name

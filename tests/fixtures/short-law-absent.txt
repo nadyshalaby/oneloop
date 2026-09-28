@@ -49,6 +49,9 @@ the risk-zone yes
 their approval is the yes
 # 13.0.0, the checklist lives in docs/oneloop-todos/ ("so they can mess with the projects main files", read as: so they do not): the root location is retired.
 at the repository root
+# 16.0.0, code first ("the framework spend too much in writing tests instead of delivering the actual working code"): the area's test file extended with every edit is retired.
+A test file for the area exists
+extend it in the same edit
 # 11.0.0, the plugin: the law is handed to the session by a hook, so no fixed install path may come back.
 ~/.claude/engineering-rules
 ~/.claude/rules/engineering-code.md
