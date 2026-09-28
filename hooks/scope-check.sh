@@ -23,8 +23,13 @@
 # then go on. A turn with NO stored reply text
 # is not judged: some sessions' transcripts keep none of the text sent along with a tool call
 # (seen 2026-09-26 in the session that built this), so silence there is not proof of a missing
-# line, and the one case this catches is text that was stored and lacks the line, the dry run's
-# very case (a progress line printed, the rest thought). A transcript that is missing or
+# line. 16.0.1: nor is a turn with a message stored REWORDED, a thinking block with text in
+# place of its text block: in the 60 newest transcripts read on 2026-09-28 the ones checked held
+# a reworded copy of the printed text, 227 of the 416 turns with an edit had one before their
+# first edit, and a scope line printed in one was pointed at as missing; what was printed there
+# cannot be read back. The one case this catches is text that was all stored as written and
+# lacks the line, the dry run's very case (a progress line printed, the rest thought). A
+# transcript that is missing or
 # unreadable skips the check the same way; of a big one only the last 2 MB
 # are read, minus the cut first line, since the turn is at its end; a line the reader cannot
 # make sense of (not JSON, or an odd shape) is skipped, never an abort. Nothing blocks the edit, in any permission mode;
@@ -80,7 +85,9 @@ transcript_lines() {
 }
 
 # turn_text <transcript>: this turn's reply text, the assistant text blocks after the last human
-# message, one block per line with its line breaks folded; empty when the turn has none.
+# message, one block per line with its line breaks folded; empty when the turn has none, or when
+# one of its messages was stored reworded (a thinking block with text), since what was printed
+# there cannot be read back.
 turn_text() {
   transcript_lines "$1" | jq -rR '
     def human: .type == "user" and ((.isMeta // false) | not) and ((.isCompactSummary // false) | not)
@@ -89,14 +96,19 @@ turn_text() {
             and (any(.message.content[]?; .type == "tool_result") | not)));
     def queued: .type == "attachment" and .attachment.type == "queued_command" and (.attachment.humanTurn // false);
     (fromjson? // empty) | try (if human or queued then "H"
-         elif .type == "assistant" then (.message.content[]? | select(.type == "text") | "T " + (.text | gsub("[\n\r]"; " ")))
+         elif .type == "assistant" then (.message.content[]?
+           | if .type == "text" then "T " + (.text | gsub("[\n\r]"; " "))
+             elif .type == "thinking" and ((.thinking // "") | length) > 0 then "R"
+             else empty end)
          else empty end) catch empty' 2>/dev/null \
-    | awk '/^H$/ { turn = ""; next } { turn = turn substr($0, 3) "\n" } END { printf "%s", turn }'
+    | awk '/^H$/ { turn = ""; reworded = 0; next } /^R$/ { reworded = 1; next }
+        { turn = turn substr($0, 3) "\n" } END { if (!reworded) printf "%s", turn }'
 }
 
 # missing_output <transcript>: sets text and why when this turn's stored reply text lacks the
 # scope line, the explanation, or the explanation's pseudocode (a fenced block); leaves them
-# empty when all are there, or when the transcript kept no reply text for the turn at all.
+# empty when all are there, or when the transcript kept no reply text for the turn, or kept
+# part of it reworded.
 missing_output() {
   turn=$(turn_text "$1")
   [ -n "$turn" ] || return 0

@@ -11,7 +11,7 @@
       "name": "oneloop",
       "source": ".",
       "description": "One loop for every task in Claude Code: scope, edit, check, commit. An always-on engineering law, guards as hooks, a docs/oneloop-todos/TODO.md checklist and typed commands.",
-      "version": "16.0.0"
+      "version": "16.0.1"
     }
   ]
 }

@@ -7,7 +7,9 @@
 # replaced, since 14.0.0 the hooks that asked (a hook that warns or asks, the guard's prompt)
 # the pointing guards replaced, and since 16.0.0 the test-first words code first replaced (a
 # watched failure, red to green, the area's test file extended in the same edit). It proves
-# names, not rules: an old rule written in new words passes it. Allowed on
+# names, not rules: an old rule written in new words passes it. Since 16.0.1 a name split over a
+# line break is caught too, by each paragraph joined into one line: 16.3 carried `the wizard` /
+# `tool` that way past the line scan. Allowed on
 # purpose: the changelog and the tests (history and data), the two `Phase 01` examples of a bad
 # section label (15.22, 15.24), the status line setup's handling of the old status line, and
 # the README's one line on unwiring the old install.
@@ -28,6 +30,19 @@ old_hits() {
   (builtin cd "$1" && for p in $READ; do [ -e "$p" ] && grep -rnE --exclude-dir=tests "$OLD" "$p"; done) | grep -vE "$ALLOWED"
 }
 
+# split_hits <root>: every old-flow word split over a line break in what is read, which the line
+# scan cannot see: the words found once each paragraph is joined into one line (a line's leading
+# spaces and #, > and * marks dropped) minus the ones its lines hold, each after its file.
+split_hits() {
+  (builtin cd "$1" && for p in $READ; do [ -e "$p" ] && find "$p" -type f -not -path '*/tests/*'; done \
+    | while read -r f; do
+        joined=$(awk 'BEGIN { RS = "" } { gsub(/\n[[:space:]>#*]*/, " "); print }' "$f" | grep -oE "$OLD" | sort)
+        [ -n "$joined" ] || continue
+        printf '%s\n' "$joined" > "$WORK/joined"
+        grep -oE "$OLD" "$f" | sort | comm -23 "$WORK/joined" - | awk -v f="$f" '{ print f ": " $0 }'
+      done)
+}
+
 # old_paths <root>: every folder or file still named for the old flow, for what 10.0.0 removed
 # (the workflow skill's folder, the scripts folder, the advisor, the ledger, the lanes, the
 # scouts and the sweep) or for the installer era 11.0.0 replaced (install.sh and its test, the
@@ -41,6 +56,11 @@ test_no_old_word_is_read() {
   assert_eq "no old-flow word in what is read" "<none>" "${hits:-<none>}"
 }
 
+test_no_old_word_is_split_over_a_line() {
+  hits=$(split_hits "$ROOT")
+  assert_eq "no old-flow word split over a line break in what is read" "<none>" "${hits:-<none>}"
+}
+
 test_no_old_name_is_left() {
   paths=$(old_paths "$ROOT")
   assert_eq "no folder or file named for the old flow" "<none>" "${paths:-<none>}"
@@ -48,8 +68,9 @@ test_no_old_name_is_left() {
 
 # The checks can fail: an old word, an old folder name, an old word in a hook and the names
 # 10.0.0 removed (a lane, a helper, a gate, the sweep; the workflow folder, the scripts folder,
-# an advisor hook) and a hook that asks (14.0.0) each come back and are named; an allowed line
-# stays quiet.
+# an advisor hook), a hook that asks (14.0.0) and an old word split over a line break (16.0.1),
+# in prose and over two comment lines, each come back and are named; an allowed line stays
+# quiet, and a word on one line is left to the line scan.
 test_planted_names_are_caught() {
   mkdir -p "$WORK/tree/references/13-phase-6-finish" "$WORK/tree/hooks" "$WORK/tree/skills/workflow" "$WORK/tree/scripts"
   printf 'Read it at Phase 4.\n' > "$WORK/tree/references/13-phase-6-finish/x.md"
@@ -61,6 +82,12 @@ test_planted_names_are_caught() {
   : > "$WORK/tree/hooks/advisor-cue.sh"
   : > "$WORK/tree/hooks/re-anchor.sh"
   : > "$WORK/tree/install.sh"
+  printf 'For each finding, through the wizard\ntool: state the problem.\n' > "$WORK/tree/references/split.md"
+  printf '# ask it through the wizard\n#   tool, then go on\n' > "$WORK/tree/hooks/split.sh"
+  split=$(split_hits "$WORK/tree")
+  assert_contains "an old word split over a line break is named" "references/split.md: wizard tool" "$split"
+  assert_contains "and over two comment lines" "hooks/split.sh: wizard tool" "$split"
+  assert_missing "a word on one line is left to the line scan" "hooks/z.sh" "$split"
   out=$(old_hits "$WORK/tree")
   assert_contains "an old word is named" "references/13-phase-6-finish/x.md:1:Read it at Phase 4." "$out"
   assert_contains "an old word in a hook is named" "hooks/z.sh:1:# ask through the wizard tool" "$out"
@@ -78,6 +105,7 @@ test_planted_names_are_caught() {
 }
 
 test_no_old_word_is_read
+test_no_old_word_is_split_over_a_line
 test_no_old_name_is_left
 test_planted_names_are_caught
 report

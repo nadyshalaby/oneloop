@@ -21,10 +21,12 @@
 # human messages), its reply text is the assistant text blocks alone, a progress line is not a
 # scope line, and a big transcript is read from its tail; a turn with no stored reply text, no
 # transcript, or one that cannot be read, is not judged (some transcripts keep none of the text
-# sent along with a tool call). The checklist and its archive themselves, files outside the
-# repository, other tools and events and unreadable input are nothing to judge, and the guard
-# never prints a decision. SCOPE_CHECK_SH points the test at another copy of the script, for a
-# watched failure; the copy needs hook-input.sh and progress-log.sh beside it.
+# sent along with a tool call), nor (16.0.1) is a turn with a message stored reworded, a thinking
+# block with text in place of its text block, as real transcripts keep it, while an empty signed
+# thinking block beside a text block changes nothing. The checklist and its archive themselves,
+# files outside the repository, other tools and events and unreadable input are nothing to
+# judge, and the guard never prints a decision. SCOPE_CHECK_SH points the test at another copy
+# of the script, for a watched failure; the copy needs hook-input.sh and progress-log.sh beside it.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=../../tests/harness.sh
 . "$(dirname "${BASH_SOURCE[0]}")/../../tests/harness.sh"
@@ -68,6 +70,19 @@ notification_line() { jq -cn --arg t "$1" '{type: "attachment", attachment: {typ
 
 # text_line <text>: reply text Claude wrote, one assistant text block.
 text_line() { jq -cn --arg t "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "text", text: $t}]}}'; }
+
+# thinking_line <text>: one thinking block under the message id the reworded lines share; empty,
+# with its signature, it is the shape most thinking blocks are kept in (seen 2026-09-28).
+thinking_line() { jq -cn --arg t "$1" '{type: "assistant", message: {id: "msg_r1", role: "assistant", content: [{type: "thinking", thinking: $t, signature: "c2ln"}]}}'; }
+
+# reworded_lines <text>: a message as real transcripts keep some of them (seen 2026-09-28), one
+# block per line under one message id: the empty signed thinking block, a thinking block holding
+# a reworded copy of the text Claude printed, and the tool call; no text block.
+reworded_lines() {
+  thinking_line ""
+  thinking_line "$1"
+  jq -cn '{type: "assistant", message: {id: "msg_r1", role: "assistant", content: [{type: "tool_use", id: "r1", name: "Read", input: {file_path: "src/util/math.ts"}}]}}'
+}
 
 # edit_line <path>: an edit Claude made, as the transcript stores the call.
 edit_line() { jq -cn --arg p "$1" '{type: "assistant", message: {role: "assistant", content: [{type: "tool_use", id: "e1", name: "Edit", input: {file_path: $p, old_string: "a", new_string: "b"}}]}}'; }
@@ -218,6 +233,20 @@ test_the_scope_line_and_the_explanation_must_be_visible() {
   assert_eq "no transcript path skips the check" pass "$(decide Edit "$P/src/util/math.ts")"
 }
 
+test_a_turn_stored_reworded_is_not_judged() {
+  checklist "- [~] rename runningSum (scope: src/util/math.ts)"
+  T="$WORK/reworded.jsonl"
+  { human_line "Rename runningSum to sum."; thinking_line ""; text_line "🔵 Scope ⚪ Edit ⚪ Check ⚪ Commit"; } > "$T"
+  assert_eq "an empty signed thinking block beside kept text changes nothing: no scope line is pointed at" fix "$(decide Edit "$P/src/util/math.ts")"
+  reworded_lines "Printed the scope line and explained the rename before editing." >> "$T"
+  assert_eq "a message stored reworded, a thinking block with text and no text block, leaves the turn unjudged" pass "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Now the caller."; text_line "scope: src/util/math.ts"; reworded_lines "Explained the problem, the effect and the risks."; } >> "$T"
+  assert_eq "so does one after a kept scope line, where the explanation may have been" pass "$(decide Edit "$P/src/util/math.ts")"
+  { human_line "Go on."; text_line "On it."; } >> "$T"
+  assert_eq "a reworded message in an earlier turn does not count in the next one" fix "$(decide Edit "$P/src/util/math.ts")"
+  T=""
+}
+
 test_a_big_transcript_is_read_from_its_tail() {
   checklist "- [~] rename runningSum (scope: src/util/math.ts)"
   T="$WORK/big.jsonl"
@@ -271,6 +300,7 @@ test_no_task_in_flight_is_pointed_at
 test_the_in_flight_lines_are_the_scope
 test_the_forms_a_scope_is_written_in
 test_the_scope_line_and_the_explanation_must_be_visible
+test_a_turn_stored_reworded_is_not_judged
 test_a_big_transcript_is_read_from_its_tail
 test_the_checklist_itself_and_files_outside_are_not_judged
 test_a_new_file_in_a_new_folder_is_judged_by_its_repository

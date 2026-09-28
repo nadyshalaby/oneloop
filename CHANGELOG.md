@@ -2,6 +2,22 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **16.0.1**: the two side finds of 16.0.0, at the user's word ("proceed with side finds"). The
+  scope guard pointed at a scope line that had been printed: the session transcript keeps some
+  messages reworded, an empty signed thinking block, then a thinking block holding a reworded
+  copy of the printed text, then the tool call, and no text block (in the 60 newest transcripts
+  read on 2026-09-28, 227 of the 416 turns with an edit had one before their first edit, and in
+  167 of those the kept text had no `scope:`). So `hooks/scope-check.sh` no longer judges a turn
+  with a thinking block that holds text: what was printed there can't be read back. What it
+  removes: a scope line truly missing from such a turn is no longer pointed at; the guard still
+  points when all of the turn was kept as written, an empty signed thinking block changing
+  nothing. And 16.3 said "through the wizard / tool" split over a line break, which the line scan
+  of `tests/old-words.test.sh` could not see: it says `AskUserQuestion` now, and the test also
+  joins each paragraph into one line (a line's leading spaces and `#`, `>` and `*` marks dropped)
+  and names any old word found only that way. Patch. Tests: the scope-check test gains the
+  reworded shape (84 checks; the 16.0.0 copy of the hook fails its two reworded cases), the
+  old-words test the split scan and three planted cases (18 checks; on the 16.0.0 tree it names
+  16.3).
 - **16.0.0**: code first, not test-first, at the user's word ("I want to convert oneloop from TDD
   to Code First approach. the framework spend too much in writing tests instead of delivering the
   actual working code", under the goal "One loop is very fast development loop that ships very
