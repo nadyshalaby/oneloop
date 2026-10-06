@@ -1,5 +1,5 @@
 #!/bin/bash
-# Guard: the skills directory holds exactly the commands the law names and the three standalone
+# Guard: the skills directory holds exactly the commands the law names and the standalone
 # skills, and nothing else, so a removed skill (the workflow, quick, full, an agents switch)
 # cannot linger; each command keeps its shape (a name equal to its directory, which the plugin
 # serves as `/oneloop:<name>`; user-only invocation; no argument list; under the cap); a
@@ -17,7 +17,7 @@ LAW="${LAW_MD:-$ROOT/law/engineering-law.md}"
 # The commands the user types, each `/oneloop:<name>`, space-separated.
 COMMANDS="audit brainstorm design-spec release-notes triage"
 # Skills that ship beside the law and trigger on their own description.
-STANDALONE="explain update-rules status-report start"
+STANDALONE="explain update-rules status-report start browser"
 LINE_CAP=500
 TICK=$(printf '\140')
 
@@ -108,7 +108,7 @@ test_planted_breaches_are_named() {
   assert_contains "a standalone skill with model invocation off is named" "explain: model invocation is disabled" "$defects"
   assert_contains "a skill over the cap is named" "status-report: 505 lines" "$defects"
   printf '%s\n' "Typed commands: ${TICK}/oneloop:brainstorm${TICK}, ${TICK}:audit${TICK}, ${TICK}:status-report${TICK}." > "$WORK/law.md"
-  assert_eq "the commands a law does not name are named" "design-spec explain release-notes start triage update-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
+  assert_eq "the commands a law does not name are named" "browser design-spec explain release-notes start triage update-rules " "$(unnamed_in_law "$WORK/law.md" | tr '\n' ' ')"
 }
 
 test_every_skill_directory_is_listed

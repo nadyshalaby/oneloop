@@ -19,7 +19,7 @@ release it in one step, the same way the law's 1.11 ships anything else.
 
 | The rule | Its file | Who pays for it |
 |---|---|---|
-| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and again after a compaction | every session, from its first turn; capped at 90 lines and 12,750 characters |
+| Binds every task in every session | `law/engineering-law.md`, handed to every session by `hooks/session-start.sh` as it starts, in two parts (Claude Code keeps only a preview of a hook context over 10,000 characters), and again after a compaction | every session, from its first turn; capped at 90 lines and 13,000 characters |
 | Binds every line of code written | `law/engineering-code.md`, handed to a session by `hooks/code-rules.sh` with the first code file it reads or edits (its `paths:` globs say which files count) | every session that touches code, once; capped at 60 lines and 8,600 characters |
 | The reasons and procedures behind an always-on rule | `references/01-always-on-law/1.x-*.md`, the long forms | only when read |
 | The loop's defaults: the four checks, the discovery budget, the two regexes | `settings/loop.json`, read by the hooks and named by the law | nothing per turn |
@@ -90,8 +90,12 @@ hook points and Claude fixes; no hook asks or blocks (the law, Guards).
 6. **Run everything, on the exact commit you will ship.** Every `*.test.sh` in the worktree
    (`find . -name '*.test.sh' -not -path './.git/*'`, each run, each result line pasted),
    `shellcheck -x -P SCRIPTDIR -S style bin/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh`, and
-   `claude plugin validate --strict .` in the worktree. Every file green, no finding; a red one
-   sends you back to step 4.
+   `claude plugin validate --strict .` in the worktree. Every file green, no finding, with one
+   named exception at the user's word: the strict validation may show the warning "CLAUDE.md at
+   the plugin root is not loaded as project context" (that file is this repository's own map,
+   not shipped context) and nothing else, which
+   `claude plugin validate --strict --json . | jq -r '[.manifest, .contents[]] | map((.errors + .warnings)[] | .message) | .[]'`
+   proves by printing that one line only. A red one sends you back to step 4.
 7. **Write it into the history.** A new top entry in `CHANGELOG.md` with the next version:
    major when a rule or a command is removed, renamed or loosened; minor for a new rule, check,
    hook or command; patch for wording and fixes. It says what changed, why in the user's words,

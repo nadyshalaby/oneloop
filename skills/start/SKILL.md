@@ -69,8 +69,9 @@ the scope line and that one line are the status output.
    error: stop, state the root cause, ask.
 3. **Check.** Lint on the changed files, typecheck, the test command, `ui_check` when a UI path
    changed, in that order, from the map or `settings/loop.json`; none configured, say so once.
-   Then what changed runs once for real (a command, a request, a call; `ui_check` counts for
-   the UI), its output pasted, and one read of `git diff`, the obvious fixed.
+   Then what changed runs once for real (a command, a request, a call, a page through
+   `oneloop:browser`; `ui_check` counts for the UI), its output pasted, and one read of
+   `git diff`, the obvious fixed.
 4. **Commit.** The changed files staged by name, the checklist ticked `- [x]` among them (a
    group with every line ticked moves whole to `docs/oneloop-todos/TODO.archive.md` in the same
    commit); one commit, one line, on the current branch. The reply: the files changed, the

@@ -171,3 +171,9 @@ under the harness root named above
 # commands
 `/oneloop:start` (the loop on a typed task)
 A plain request is the loop
+# code first leads the loop
+**Code first, always:** ship efficient software fast, working code proven by a real run
+# the browser
+go through `oneloop:browser`, never another browser tool
+A page's smoke test, a browser task and research that needs a browser
+the map's commands run as written

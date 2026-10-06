@@ -13,7 +13,7 @@ The map for this repository: the checks, where things live, where to start. Read
 
 - `.claude-plugin/`: `plugin.json` (the plugin and its version) and `marketplace.json` (this repository as its own marketplace).
 - `law/`: the two always-on files, the core law and the code rules; both size-capped by `tests/short-law.test.sh`.
-- `skills/`: one folder per command (`start`, `brainstorm`, `audit`, `triage`, `design-spec`, `release-notes`, `explain`, `update-rules`, `status-report`), typed as `/oneloop:<name>`.
+- `skills/`: one folder per command (`start`, `brainstorm`, `audit`, `triage`, `design-spec`, `release-notes`, `explain`, `update-rules`, `status-report`, `browser`), typed as `/oneloop:<name>`; the browser skill's scripts are in `skills/browser/scripts/`.
 - `agents/`: the one helper, the read-only reader, `oneloop:er-reader`.
 - `hooks/`: `hooks.json` (the wiring), the hook scripts, their shared helpers (`hook-input.sh`, `progress-log.sh`, `path-kind.sh`) and `hooks/tests/`.
 - `settings/`: `loop.json`, the loop's defaults.

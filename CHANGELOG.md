@@ -2,6 +2,52 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **16.1.0**: the browser skill joins the plugin as `oneloop:browser`, the law sends browser work
+  through it, and code first leads the loop, at the user's words ("enhance the "stealth-browser"
+  skill to serve as general purpose browser automation skill with no automation flags and act as
+  human like behavior", "rename the skill to something easier", "append the skill to the oneloop
+  plugin at ~/Code/oneloop then publish it and refresh locally installed version and remove the
+  global one", "tell oneloop when it should smoke test or doing browser based tasks or research
+  it must do it through the browser skill", "close gaps and update related docs to have
+  consistent plugin. and enphesis the code-first convension and approach to have powerful task
+  execusion plugin", "always use latest version of playwright"; their picks: "Raise the cap to
+  13,000" and "Research that needs a browser"). **The skill** (`skills/browser/`): the real
+  Google Chrome with its own saved profile and no automation flags, through patchright, which
+  `setup.sh` now moves to its latest release on every run (1.63.0, the same number as
+  Playwright's latest, on 2026-10-06). New: `browse.mjs`, one command per action (`tabs`, `open`
+  and `goto` with the HTTP status and every failed request, `close` that refuses the last tab,
+  `text`, `fields`, `fill`, `click`, `press`, `scroll`, `wait`, `shot`, `eval` in a hidden world
+  and `evalpage` in the page's own); `forms.mjs`, which finds a field by css, name, role,
+  placeholder or label in any frame, fills it by kind (text, select, check, pick, combo, date,
+  file) and reads back what it shows, so a range typed into a number box is reported as
+  `DIFFERS` with exit code 1, a password comes back as dots and a secret is read from an
+  environment variable; `human.mjs` gains curved mouse paths from the last pointer position,
+  wheel scrolling in uneven steps, a hold time on every key and uneven gaps between them, and a
+  click made by patchright itself, so a banner over the target fails loudly; `connect` opens a
+  window first when every window was closed, and `launch.sh` reuses the running Chrome, opens
+  the URL in it and focuses the process that listens on the port. The runtime and the saved
+  profile move to `~/.local/share/oneloop-browser`; the variables are `BROWSER_PORT`,
+  `BROWSER_PROFILE` and `BROWSER_RUNTIME`. Verified on the page it cannot see: a page's own
+  console messages and script errors do not reach patchright, so a smoke test judges the status,
+  the failed requests and what the page shows. **The law**: a new line, "**Browser.** A page's
+  smoke test, a browser task and research that needs a browser go through `oneloop:browser`,
+  never another browser tool; the map's commands run as written.", and the loop now opens with
+  "**Code first, always:** ship efficient software fast, working code proven by a real run."
+  What it costs: the core law goes from 88 lines and 12,730 characters to 90 and 12,996, and its
+  character cap from 12,750 to 13,000, so every session reads 266 more characters; the code
+  rules stay at 53 lines and 8,540. **The docs follow**: the README (code first in its first
+  lines and at the head of the loop, the browser rule, a browser section, the true sizes, and
+  the skills table, which had left `start` out of the skills the model can call), the map, the
+  `start` and `update-rules` skills, 15.1 (`ui_check` no longer names "a browser or a Playwright
+  script") and 1.11 (a live check of a page goes through the skill); both manifests say code
+  first and name the browser skill. Minor. Tests: `tests/commands.test.sh` lists `browser` as a
+  standalone skill, the pins gain four lines for the two new rules, and the size test's cap is
+  13,000; no new test file, since no hook changed. **The release check**, at the user's pick
+  ("Allow this one warning"): Claude Code 2.1.291 warns that the `CLAUDE.md` at the plugin root is
+  not loaded as project context, on 16.0.1 as on this version, so the strict plugin validation
+  can no longer be clean; the README and the `update-rules` skill now allow that one named
+  warning and nothing else. What it removes: a release no longer stops on that warning; every
+  other finding still stops it.
 - **16.0.1**: the two side finds of 16.0.0, at the user's word ("proceed with side finds"). The
   scope guard pointed at a scope line that had been printed: the session transcript keeps some
   messages reworded, an empty signed thinking block, then a thinking block holding a reworded

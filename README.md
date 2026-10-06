@@ -1,21 +1,29 @@
 # oneloop
 
-The engineering law and working method for Claude Code, as a plugin. One short law is handed to
+The engineering law and working method for Claude Code, as a plugin: one fast development loop
+that ships efficient software quickly. It is **code first**: the working code comes first and a
+real run proves it, and a test is written only when you ask for one or when the code moves
+money, guards access or can lose data. One short law is handed to
 every session as it starts; the code rules join it with the first code file the session reads or
 edits; nine hooks carry the law in and point at what a machine can see; every task is one line in a
-`docs/oneloop-todos/TODO.md` checklist; and a handful of typed commands cover what is not a
-plain task. Install it once from GitHub, update it with one command, and every project gets the
-same rules.
+`docs/oneloop-todos/TODO.md` checklist; a handful of typed commands cover what is not a
+plain task; and anything in a browser, a smoke test of a page included, goes through the
+plugin's own real-Chrome skill, `oneloop:browser`. Install it once from GitHub, update it with
+one command, and every project gets the same rules.
 
 It grew out of the same author's earlier plugin (2.21.0 and before) and the installer-era
 harness (3.0.0 to 10.1.1, wired into `~/.claude` by a script; both in the history). Here the core law is
-88 lines and 12,730 characters, the code rules 53 lines and 8,540, and everything else stays on
+90 lines and 12,996 characters, the code rules 53 lines and 8,540, and everything else stays on
 disk until a rule sends Claude to it.
 
 ## One loop, for everything
 
 A plain request runs the loop. It is the only workflow: no modes, no lanes, no tiers, and a
 typo runs the same four steps as a new module.
+
+The loop is **code first, always**, and the law opens it with those words: it exists to ship
+efficient software fast, so the working code comes first and one real run proves it. A test is
+the exception the Edit step names, never the way in.
 
 1. **Scope.** Read the project's `CLAUDE.md`, the map. Files named in the request need no
    discovery; otherwise grep the symbol, open its file, then its direct callers and imports, and
@@ -28,7 +36,7 @@ typo runs the same four steps as a new module.
    and asks only two things, a clarification the code cannot answer, or a change in logic Claude
    judges critical, before it is built. Before each step, one progress line shows the four
    steps, ✅ on the done ones, 🔵 on the current, ⚪ on the rest.
-2. **Edit.** One grep for something to reuse; the smallest diff, code first: the working code,
+2. **Edit.** One grep for something to reuse; the smallest diff, **code first**: the working code,
    and a new test only when you ask for one or for money, auth or data-loss code, written once
    the code runs (a test of behaviour changed on purpose is updated with it). The scope ratchet
    restates the scope, in at most 3 lines and on the task line, when the change needs a file
@@ -36,8 +44,9 @@ typo runs the same four steps as a new module.
    Stuck twice on the same error: stop, state the root cause, ask.
 3. **Check.** Lint on the changed files, typecheck, the test command, then `ui_check` when a
    changed file is under a UI path, all taken from the map (`settings/loop.json` holds the
-   defaults); then what changed runs once for real (a command, a request, a call; `ui_check`
-   counts for the UI), its output pasted as the proof it works; then one read of `git diff`.
+   defaults); then what changed runs once for real (a command, a request, a call, a page
+   through `oneloop:browser`; `ui_check` counts for the UI), its output pasted as the proof it
+   works; then one read of `git diff`.
    No separate reviewer.
 4. **Commit.** The changed files staged by name, one commit, a one-line message, on the current
    branch. The final reply is the files changed, the check results, what each guard pointed at
@@ -60,6 +69,9 @@ telling Claude to tick, stage and commit it right after. Neither asks you anythi
 permission mode: Claude fixes what they point at, at once.
 
 Deploy is a command, not a step: on the word "deploy", the checks, the deploy, the live check.
+The browser is one tool: a smoke test of a page, a browser-based task and research that needs a
+browser all go through `oneloop:browser`, never another browser tool, while a check command the
+map configures still runs as written.
 Plan mode is yours to enter for architectural work; the law never enters it for you or adds a
 planning layer of its own, and in it Scope is the plan.
 
@@ -78,12 +90,12 @@ search, sent only after grep has failed twice on an unfamiliar codebase.
 
 | What | File | When, and what it costs |
 |---|---|---|
-| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 88 lines and 12,730 characters, capped at 90 and 12,750 by `tests/short-law.test.sh` |
+| The core law: definitions, the loop, the guards, the map rule, the helpers rule, 1.2, 1.4, 1.5, 1.7, 1.9, 1.10 | `law/engineering-law.md`, handed to the session by `hooks/session-start.sh` in two parts (Claude Code keeps only a 2KB preview of a hook context over 10,000 characters) | every session, from its first turn, and again after a compaction, a resume or a clear; 90 lines and 12,996 characters, capped at 90 and 13,000 by `tests/short-law.test.sh` |
 | The code rules: 1.1, 1.3 and 1.6 in full | `law/engineering-code.md`, handed to the session by `hooks/code-rules.sh` | the first time a session reads or edits a file its `paths:` globs match (the common code extensions), once per session; 53 lines and 8,540 characters, capped at 60 and 8,600 |
 | The loop's defaults: the four checks, the discovery budget, the risk regex, the UI path regex | `settings/loop.json` | read by the risk-zone hook; the law states the same defaults, and `tests/loop-config.test.sh` keeps the two equal |
 | The one helper, `oneloop:er-reader` | `agents/er-reader.md` | its one-line description in every session's agent list; its body only when it is sent |
 | The commands | `skills/<command>/SKILL.md` | only when you type one; the model cannot invoke them |
-| `explain`, `update-rules`, `status-report` | `skills/<name>/SKILL.md` | the description is always listed; the body loads when it triggers or you type it |
+| `start`, `explain`, `update-rules`, `status-report`, `browser` | `skills/<name>/SKILL.md`, and for the browser its scripts in `skills/browser/scripts/` | the description is always listed; the body loads when it triggers or you type it; the scripts cost nothing until they run |
 | 72 reference pages, the long forms included | `references/**` | only when a rule names one; `tests/references.test.sh` fails on a cited section with no page and on a page nothing reaches |
 | Hooks | `hooks/hooks.json`, `hooks/*.sh` | a short process on each matching event; the reminder adds one line of 121 bytes to every prompt |
 
@@ -140,8 +152,8 @@ four lines, the way this repository's own `CLAUDE.md` does:
 
 A `risk_regex: <regex>` line in the map replaces the default risk regex for that project; the
 risk-zone hook reads it there first. `ui_check` is a command whose result is a screenshot or a
-one-line visual outcome, such as the Claude Code Chrome extension or a Playwright script; unset,
-the Check step skips it and says so once. The map also holds the key directories, the 5 to 10
+one-line visual outcome; a page is opened through `oneloop:browser`, never another browser tool
+(the law, Browser); unset, the Check step skips it and says so once. The map also holds the key directories, the 5 to 10
 entry-point files and the house conventions, under 60 lines: hooks enforce rules, the map only
 orients. `tests/claude-md.test.sh` keeps this repository's own map in that shape.
 
@@ -194,7 +206,22 @@ hook can inject context into one; the law allows only the read-only reader anywa
 | `/oneloop:release-notes` | the release notes of the task in flight, printed only when you ask |
 | `oneloop:explain` | how code, a flow or a feature works, or a change before it is built: the problem, pseudocode as a fenced block, the effect, the risks; it triggers on its own when you ask, and the loop's Scope step runs it on every change, after the scope line and the note, so you can follow the work |
 | `/oneloop:update-rules` | changes these rules and ships the change |
+| `oneloop:browser` | a real Chrome that sites do not flag as automated, one command per action (open, read, fill with a read-back, click, wait, screenshot); it triggers on its own for a smoke test of a page, a browser-based task or research that needs a browser, and you can type it too |
 | `/oneloop:status-report` | where things stand: Doing, Done (each item tagged Shipped, Pushed not verified or Local, checked against git and the live system) and Todo; it also shapes the ten-minute check-in brief |
+
+## The browser
+
+`oneloop:browser` drives the Google Chrome already on the machine (macOS), started plainly with
+its own saved profile and no automation flags, through patchright: Playwright with the known
+giveaways patched out, moved to its latest release by `skills/browser/scripts/setup.sh` on every
+run. The mouse travels a curved path, the page scrolls by wheel, keys have uneven gaps, and
+every value it enters is read back before anything is submitted, so a number box that turns
+`3,000 - 3,500` into `30,003,500` is caught, not sent. `skills/browser/scripts/browse.mjs` is
+the one-command driver (`tabs`, `open`, `goto`, `close`, `text`, `fields`, `fill`, `click`,
+`press`, `scroll`, `wait`, `shot`, `eval`, `evalpage`), and `botcheck.mjs` proves the window clean on two public
+bot-check pages. Sign-ins, human checks and anything outward-facing stay yours. The runtime and
+the saved profile live outside the plugin, in `~/.local/share/oneloop-browser`, so an update
+keeps your logins.
 
 ## Tests
 
@@ -203,6 +230,11 @@ find . -name '*.test.sh' -not -path './.git/*' | while read -r t; do bash "$t" |
 shellcheck -x -P SCRIPTDIR -S style bin/*.sh hooks/*.sh hooks/tests/*.sh tests/*.sh
 claude plugin validate --strict .
 ```
+
+The strict validation shows one warning, and only that one: "CLAUDE.md at the plugin root is not
+loaded as project context". That file is this repository's own map, not context shipped with the
+plugin, so the warning is expected and a release goes out with it; any other finding stops the
+release.
 
 Every test file ends with a `N passed, M failed` line and exits non-zero on a failure. Each can
 be pointed at a broken copy of what it checks through an environment variable named in its
@@ -217,7 +249,8 @@ runs the status line setup in fake config folders only, never against the real `
 law/engineering-law.md          the core law the session-start hook hands to every session, in two parts
 law/engineering-code.md         the code rules the code-rules hook hands in with the first code file
 settings/loop.json              the loop's defaults: the four checks, the discovery budget, the two regexes
-skills/<command>/               one folder per command, and the three standalone skills; typed as /oneloop:<name>
+skills/<command>/               one folder per command and per standalone skill; typed as /oneloop:<name>
+skills/browser/scripts/         the browser skill's scripts: setup, launch, the one-command driver, the bot check
 agents/er-reader.md             the one helper, read-only, with its model and turn cap; sent as oneloop:er-reader
 hooks/hooks.json                the wiring: which script runs on which event
 hooks/                          the nine hook scripts, their shared helpers and their tests
@@ -236,7 +269,8 @@ points into it, and nothing in the working method depends on it.
 The repository is private. Add a friend as a collaborator on GitHub, and they install it the
 same way. Their own `CLAUDE.md`, settings and rules stay theirs: the plugin adds its hooks, its
 skills and its agent, the status line setup adds one settings entry, and the uninstall takes
-exactly those back out.
+exactly those back out. The browser skill's runtime and saved profile, in
+`~/.local/share/oneloop-browser`, are the one thing left behind, yours to delete.
 
 ## History
 
