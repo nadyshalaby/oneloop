@@ -131,6 +131,24 @@ claude plugin update oneloop@oneloop      # the newest version from GitHub; rest
 claude plugin uninstall oneloop@oneloop   # then bin/setup-statusline.sh --remove, if you set the status line
 ```
 
+### OpenCode
+
+The same law, guards and skills run in OpenCode 2.x (1.x has another plugin system), from the
+same hook scripts: `opencode/plugin.js` hands every request the law, registers each skill as
+`oneloop:<name>` and feeds every edit, write, patch, read and shell call to the guards, whose
+pointers arrive at the end of the tool's output. Needs bash, `jq` and git access to the
+repository; OpenCode runs the plugin itself (only `tests/opencode.test.sh` needs `node`).
+
+```
+opencode plugin add git+https://github.com/nadyshalaby/oneloop.git
+opencode plugin update git+https://github.com/nadyshalaby/oneloop.git   # the newest commit from GitHub
+opencode plugin remove git+https://github.com/nadyshalaby/oneloop.git
+```
+
+Two things stay Claude Code's: the read-only helper `oneloop:er-reader` (an OpenCode 2.x plugin
+cannot add an agent) and the scope guard's check that the scope line and the explanation were
+printed (it reads Claude Code's transcript).
+
 Coming from the installer-era harness: unwire it first with `bash <old checkout>/install.sh --uninstall`,
 which puts your `CLAUDE.md` and `settings.json` back and removes its links and its copy of the
 code rules; then install the plugin as above. `CLAUDE_CONFIG_DIR`, when set, replaces `~/.claude`
@@ -255,6 +273,8 @@ agents/er-reader.md             the one helper, read-only, with its model and tu
 hooks/hooks.json                the wiring: which script runs on which event
 hooks/                          the nine hook scripts, their shared helpers and their tests
 bin/setup-statusline.sh         the one-time status line setup, the one thing a plugin cannot wire
+opencode/plugin.js              the OpenCode 2.x entry: the law, the skills and the guards through the same hook scripts
+package.json                    the OpenCode package `opencode plugin add` installs, exporting opencode/plugin.js
 docs/oneloop-todos/             this repository's own checklist: TODO.md, one line per task, and TODO.archive.md, the ticked ones
 references/                     72 pages, one file each, numbered as the law cites them
 CLAUDE.md                       this repository's own map, in the shape the law asks of every project

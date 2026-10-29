@@ -23,3 +23,5 @@
 
 ## 2026-10-06
 - [x] 16.1.0: the browser skill joins oneloop as oneloop:browser (general browser automation: a one-command driver, read-back form filling, curved mouse paths, wheel scrolling, uneven typing; reconnects when every window was closed); the law sends every smoke test of a page, browser task and browser research through it and opens the loop with code first; the docs follow (scope: skills/browser/, law/engineering-law.md, tests/commands.test.sh, tests/short-law.test.sh, tests/fixtures/short-law-pins.txt, README.md, CLAUDE.md, CHANGELOG.md, skills/start/SKILL.md, skills/update-rules/SKILL.md, references/15-design/15.1-frontend-design.md, references/01-always-on-law/1.11-shipping-and-deployment.md, .claude-plugin/plugin.json, .claude-plugin/marketplace.json)
+## 2026-10-29
+- [x] 16.2.0: oneloop in OpenCode 2.x: opencode/plugin.js hands OpenCode the law, the skills and the bash guards' pointers; package.json so `opencode plugin add` installs it from GitHub

@@ -3,7 +3,8 @@
 # the plugin oneloop, with a semantic version equal to the top CHANGELOG entry's and to the
 # marketplace entry's; .claude-plugin/marketplace.json names the marketplace and its owner and
 # lists this repository (source ".") as its one plugin; hooks/hooks.json parses; every skill
-# folder carries a SKILL.md named after its folder; and the installer era's files are gone
+# folder carries a SKILL.md named after its folder; package.json, the OpenCode package, is named
+# oneloop at the manifest's version with an entry that exists; and the installer era's files are gone
 # (install.sh, settings/hooks.json, settings/claude-md-block.md, hooks/re-anchor.sh, a rules
 # folder). Run: bash tests/plugin.test.sh
 # PLUGIN_ROOT points the test at another tree, for a watched failure.
@@ -13,6 +14,7 @@
 ROOT="${PLUGIN_ROOT:-$(repo_root)}" || exit 1
 MANIFEST="$ROOT/.claude-plugin/plugin.json"
 MARKET="$ROOT/.claude-plugin/marketplace.json"
+PACKAGE="$ROOT/package.json"
 GONE="install.sh settings/hooks.json settings/claude-md-block.md hooks/re-anchor.sh rules tests/install.test.sh"
 
 # parses <file>: yes when the file is JSON.
@@ -60,6 +62,15 @@ test_the_installer_era_is_gone() {
   assert_eq "no installer-era file is left" "" "$(left_over "$ROOT")"
 }
 
+# The OpenCode package: package.json at the root is what `opencode plugin add` installs.
+test_the_opencode_package() {
+  assert_eq "package.json parses" yes "$(parses "$PACKAGE")"
+  assert_eq "the package is named oneloop" oneloop "$(jq -r .name "$PACKAGE")"
+  assert_eq "with the manifest's version" "$(jq -r .version "$MANIFEST")" "$(jq -r .version "$PACKAGE")"
+  entry=$(jq -r '.exports["."] // empty' "$PACKAGE")
+  assert_eq "its entry exists" yes "$([ -n "$entry" ] && [ -f "$ROOT/$entry" ] && echo yes || echo no)"
+}
+
 # The checks can fail: a version behind the changelog, a marketplace pointing elsewhere, a
 # leftover installer and a skill named after something else are each named.
 test_planted_breaches_are_named() {
@@ -82,5 +93,6 @@ test_the_plugin_manifest
 test_the_marketplace_manifest
 test_hooks_and_skills
 test_the_installer_era_is_gone
+test_the_opencode_package
 test_planted_breaches_are_named
 report

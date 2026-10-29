@@ -16,6 +16,7 @@ The map for this repository: the checks, where things live, where to start. Read
 - `skills/`: one folder per command (`start`, `brainstorm`, `audit`, `triage`, `design-spec`, `release-notes`, `explain`, `update-rules`, `status-report`, `browser`), typed as `/oneloop:<name>`; the browser skill's scripts are in `skills/browser/scripts/`.
 - `agents/`: the one helper, the read-only reader, `oneloop:er-reader`.
 - `hooks/`: `hooks.json` (the wiring), the hook scripts, their shared helpers (`hook-input.sh`, `progress-log.sh`, `path-kind.sh`) and `hooks/tests/`.
+- `opencode/`: `plugin.js`, the OpenCode 2.x entry that `package.json` exports for `opencode plugin add`: it hands OpenCode the law, the skills and the guards' pointers through the same hook scripts.
 - `settings/`: `loop.json`, the loop's defaults.
 - `bin/`: `setup-statusline.sh`, the one-time status line setup, the one thing a plugin cannot wire.
 - `references/`: the numbered pages the law cites, one file each, grouped by number.

@@ -1,0 +1,15 @@
+{
+  "name": "oneloop",
+  "version": "16.2.0",
+  "description": "One loop for every task in OpenCode 2.x, code first: the oneloop engineering law, its guards and its skills, from the same hook scripts as the Claude Code plugin.",
+  "type": "module",
+  "homepage": "https://github.com/nadyshalaby/oneloop",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nadyshalaby/oneloop.git"
+  },
+  "exports": {
+    ".": "./opencode/plugin.js"
+  },
+  "keywords": ["opencode", "opencode-plugin", "engineering", "law", "workflow", "checklist", "code-first"]
+}

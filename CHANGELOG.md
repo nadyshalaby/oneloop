@@ -2,6 +2,24 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **16.2.0**: oneloop runs in OpenCode 2.x too, at the user's words ("I want to configure our
+  oneloop plugin ~/Code/oneloop for opencode as we support claude code then install it there and
+  push to repo"). `opencode/plugin.js` is an OpenCode 2.x plugin (its v2 API: `ctx.skill.transform`,
+  the session `context` hook, the tool `execute.before`/`execute.after` hooks, read from the
+  v2.2.1 source) that keeps every rule in the existing bash hooks: it runs `hooks/session-start.sh`
+  1 and 2 and `hooks/loop-reminder.sh` once and adds their text, after one line mapping Claude
+  Code's names to OpenCode's (AskUserQuestion is the `question` tool, Edit/Write/Read/Bash are
+  `edit` or `patch`/`write`/`read`/`shell`, skills load through the `skill` tool), to the system
+  parts of every request; it registers every `skills/<name>` as the skill `oneloop:<name>`; and it
+  feeds each `edit`, `write`, `patch` (one call per file it touches), `read` and `shell` call to
+  the PreToolUse scripts `hooks/hooks.json` names, in Claude Code's JSON, then appends their
+  pointers to the tool's output, and records a finished edit through risk-zone's PostToolUse.
+  A plugin cannot add an agent in OpenCode 2.x, so `oneloop:er-reader` stays Claude Code's; the
+  scope guard's visibility check reads a Claude Code transcript, so it stays silent there.
+  `package.json` exports the entry, so `opencode plugin add` installs the repository from GitHub;
+  `tests/opencode.test.sh` (16 checks, through `tests/opencode-driver.mjs`, a stand-in OpenCode)
+  and `tests/plugin.test.sh` (the package's name, version and entry) guard it; the map lists
+  `opencode/`.
 - **16.1.0**: the browser skill joins the plugin as `oneloop:browser`, the law sends browser work
   through it, and code first leads the loop, at the user's words ("enhance the "stealth-browser"
   skill to serve as general purpose browser automation skill with no automation flags and act as
