@@ -146,9 +146,9 @@ opencode plugin update git+https://github.com/nadyshalaby/oneloop.git   # the ne
 opencode plugin remove git+https://github.com/nadyshalaby/oneloop.git
 ```
 
-A second `add` keeps the copy OpenCode already cached; `update` is what fetches a new commit.
-Open sessions take it up after `opencode reload`, which rebuilds the background server's
-plugins and lets running sessions carry on.
+A second `add` keeps the copy OpenCode already cached; `update` is what fetches a new commit. It
+runs inside OpenCode's background server, which loads the new copy at once: open sessions carry
+on with it, nothing to restart.
 
 One thing stays Claude Code's: the read-only helper `oneloop:er-reader` (an OpenCode 2.x plugin
 cannot add an agent).

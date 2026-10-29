@@ -1,7 +1,9 @@
 #!/bin/bash
 # Guard: no raw control byte in any tracked file. A NUL, a backspace or an escape byte inside
 # a reference is an escape sequence that lost its backslash on the way in, and a shell
-# snippet carrying one fails silently. Run: bash tests/no-control-bytes.test.sh
+# snippet carrying one fails silently. A PNG (the listing icon) is binary by nature and is not
+# scanned; skipped by name, never by content, since a NUL is what makes text look binary.
+# Run: bash tests/no-control-bytes.test.sh
 # Needs git and perl. Tab, newline and carriage return are the only control bytes allowed.
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=harness.sh
@@ -19,8 +21,8 @@ PERL
 
 test_no_control_bytes_in_tracked_files() {
   local hits
-  count=$(git ls-files | wc -l | tr -d ' ')
-  hits=$(git ls-files -z | xargs -0 perl -ne "$FIND_CONTROL_BYTES" 2>&1) || { printf 'FAIL the scan itself failed\n'; failures=1; return; }
+  count=$(git ls-files -- . ':(exclude)*.png' | wc -l | tr -d ' ')
+  hits=$(git ls-files -z -- . ':(exclude)*.png' | xargs -0 perl -ne "$FIND_CONTROL_BYTES" 2>&1) || { printf 'FAIL the scan itself failed\n'; failures=1; return; }
   [ -z "$hits" ] && return
   printf '%s\n' "$hits" | awk -F '\t' 'NF == 2 { print "FAIL control byte in " $1 " line " $2; next } { print "FAIL scan: " $0 }'
   failures=$(printf '%s\n' "$hits" | awk -F '\t' 'NF == 2 { print $1; next } { print "scan-error" }' | sort -u | wc -l | tr -d ' ')
