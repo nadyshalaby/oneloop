@@ -135,8 +135,9 @@ claude plugin uninstall oneloop@oneloop   # then bin/setup-statusline.sh --remov
 
 The same law, guards and skills run in OpenCode 2.x (1.x has another plugin system), from the
 same hook scripts: `opencode/plugin.js` hands every request the law, registers each skill as
-`oneloop:<name>` and feeds every edit, write, patch, read and shell call to the guards, whose
-pointers arrive at the end of the tool's output. Needs bash, `jq` and git access to the
+`oneloop:<name>` and as the typed command `/oneloop:<name>`, and feeds every edit, write, patch,
+read and shell call to the guards, whose pointers arrive at the end of the tool's output; the
+scope guard reads the turn's text from the session's own messages. Needs bash, `jq` and git access to the
 repository; OpenCode runs the plugin itself (only `tests/opencode.test.sh` needs `node`).
 
 ```
@@ -145,9 +146,8 @@ opencode plugin update git+https://github.com/nadyshalaby/oneloop.git   # the ne
 opencode plugin remove git+https://github.com/nadyshalaby/oneloop.git
 ```
 
-Two things stay Claude Code's: the read-only helper `oneloop:er-reader` (an OpenCode 2.x plugin
-cannot add an agent) and the scope guard's check that the scope line and the explanation were
-printed (it reads Claude Code's transcript).
+One thing stays Claude Code's: the read-only helper `oneloop:er-reader` (an OpenCode 2.x plugin
+cannot add an agent).
 
 Coming from the installer-era harness: unwire it first with `bash <old checkout>/install.sh --uninstall`,
 which puts your `CLAUDE.md` and `settings.json` back and removes its links and its copy of the

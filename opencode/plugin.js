@@ -2,7 +2,8 @@
 // one the JSON Claude Code would send and hands its additionalContext to the model, so the law,
 // the pointers and the skills match the Claude Code plugin with one copy of each rule.
 import { spawn } from "node:child_process"
-import { readdir, readFile } from "node:fs/promises"
+import { readdir, readFile, rm, writeFile } from "node:fs/promises"
+import os from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -132,15 +133,62 @@ function guardsOf(toolName) {
   return ["risk-zone.sh", "scope-check.sh", "code-rules.sh", "edit-guard.sh"]
 }
 
+// transcriptLines: one OpenCode message as the Claude Code transcript lines the scope guard reads:
+// a user message is a human turn, an assistant message its text blocks; nothing else counts.
+function transcriptLines(message) {
+  if (message.type === "user") return [{ type: "user", message: { role: "user", content: message.text } }]
+  if (message.type !== "assistant") return []
+  return message.content
+    .filter((part) => part.type === "text")
+    .map((part) => ({ type: "assistant", message: { role: "assistant", content: [{ type: "text", text: part.text }] } }))
+}
+
+// writeTranscript: this turn of the session (from its last user message on) as a Claude Code
+// transcript file, so the scope guard can see whether the scope line and the explanation were printed;
+// one file per tool call, so calls running at once never remove each other's.
+async function writeTranscript(session, event) {
+  const messages = await session.context({ sessionID: event.sessionID })
+  const start = messages.findLastIndex((message) => message.type === "user")
+  const lines = messages.slice(Math.max(start, 0)).flatMap(transcriptLines)
+  const file = path.join(os.tmpdir(), `oneloop-opencode-${event.sessionID}-${event.id}.jsonl`)
+  await writeFile(file, lines.map((line) => `${JSON.stringify(line)}\n`).join(""))
+  return file
+}
+
+async function guardContexts(call, payload, directory) {
+  return Promise.all(guardsOf(call.tool_name).map((script) => hookContext({ script, payload, cwd: directory })))
+}
+
 // pointersFor: every guard's pointer for one OpenCode tool call, joined; empty when none points.
-async function pointersFor(event, directory) {
+async function pointersFor(event, ctx) {
+  const directory = ctx.location.directory
+  const calls = claudeCalls(event.tool, event.input ?? {}, directory)
+  const isEdit = calls.some((call) => call.tool_name === "Edit" || call.tool_name === "Write")
   const texts = []
-  for (const call of claudeCalls(event.tool, event.input ?? {}, directory)) {
-    const payload = { ...call, hook_event_name: "PreToolUse", session_id: event.sessionID, cwd: directory }
-    const contexts = await Promise.all(guardsOf(call.tool_name).map((script) => hookContext({ script, payload, cwd: directory })))
-    texts.push(...contexts.filter(Boolean))
+  let transcript = ""
+  try {
+    if (isEdit) transcript = await writeTranscript(ctx.session, event)
+  } catch (error) {
+    texts.push(`oneloop: the scope guard could not read this session's messages (${error.message}), so it did not check the scope line.`)
   }
+  for (const call of calls) {
+    const payload = { ...call, hook_event_name: "PreToolUse", session_id: event.sessionID, cwd: directory, transcript_path: transcript }
+    texts.push(...(await guardContexts(call, payload, directory)).filter(Boolean))
+  }
+  if (transcript) await rm(transcript, { force: true })
   return texts.join("\n\n")
+}
+
+// runSkillCommand: what typing /oneloop:<name> sends: the typed words with the skill attached, as
+// Claude Code loads a skill typed as a command.
+function runSkillCommand(session, skillID, invocation) {
+  return session.prompt({
+    ...invocation.prompt,
+    sessionID: invocation.sessionID,
+    text: `/${skillID} ${invocation.prompt.text ?? ""}`.trim(),
+    skills: [...(invocation.prompt.skills ?? []), { id: skillID }],
+    delivery: invocation.delivery,
+  })
 }
 
 // recordEdits: the PostToolUse half of the risk-zone guard, so an edited file is not pointed at again.
@@ -166,11 +214,18 @@ export default {
     await ctx.skill.transform((editor) => {
       skills.filter((skill) => !editor.get(skill.id)).forEach((skill) => editor.add(skill))
     })
+    await ctx.command.transform((editor) => {
+      skills.forEach((skill) => editor.add({
+        name: skill.id,
+        description: skill.description,
+        execute: (invocation) => runSkillCommand(ctx.session, skill.id, invocation),
+      }))
+    })
     await ctx.session.hook("context", (event) => {
       event.system.push(...system) // law-exception: an OpenCode hook takes its change by mutating the event
     })
     await ctx.tool.hook("execute.before", async (event) => {
-      const text = await pointersFor(event, directory)
+      const text = await pointersFor(event, ctx)
       if (text) pointers.set(event.id, text)
     })
     await ctx.tool.hook("execute.after", async (event) => {

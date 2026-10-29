@@ -2,6 +2,15 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **16.3.0**: the OpenCode entry closes two gaps, at the user's pick ("Typed /oneloop commands",
+  "Scope-line check"). Every skill is also the typed command `/oneloop:<name>`
+  (`ctx.command.transform`), which sends the typed words with the skill attached
+  (`session.prompt`, `skills: [{ id }]`), the way OpenCode's own template commands prompt; and before
+  an edit, write or patch the entry reads the session's messages (`session.context`) from the last
+  user message on and writes them as the Claude Code transcript lines `hooks/scope-check.sh` reads
+  (a user message a human line, an assistant message its text blocks), so the scope guard's
+  scope-line, explanation and pseudocode pointers work in OpenCode too; a session it cannot read
+  is said in the pointer and the check is skipped. `tests/opencode.test.sh` 16 to 23 checks.
 - **16.2.0**: oneloop runs in OpenCode 2.x too, at the user's words ("I want to configure our
   oneloop plugin ~/Code/oneloop for opencode as we support claude code then install it there and
   push to repo"). `opencode/plugin.js` is an OpenCode 2.x plugin (its v2 API: `ctx.skill.transform`,
