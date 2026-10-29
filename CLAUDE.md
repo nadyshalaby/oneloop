@@ -11,7 +11,7 @@ The map for this repository: the checks, where things live, where to start. Read
 
 ## Key directories
 
-- `.claude-plugin/`: `plugin.json` (the plugin and its version) and `marketplace.json` (this repository as its own marketplace).
+- `.claude-plugin/`: `plugin.json` (the plugin and its version), `marketplace.json` (this repository as its own marketplace) and `icon.png` (the listing icon).
 - `law/`: the two always-on files, the core law and the code rules; both size-capped by `tests/short-law.test.sh`.
 - `skills/`: one folder per command (`start`, `brainstorm`, `audit`, `triage`, `design-spec`, `release-notes`, `explain`, `update-rules`, `status-report`, `browser`), typed as `/oneloop:<name>`; the browser skill's scripts are in `skills/browser/scripts/`.
 - `agents/`: the one helper, the read-only reader, `oneloop:er-reader`.

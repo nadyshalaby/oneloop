@@ -2,6 +2,11 @@
 
 One entry per version, newest first. The README says what the setup is now; this file says how it got there.
 
+- **16.3.1**: what the plugin directory's checks asked for, at the user's word ("proceed with side
+  finds", MIT picked): a `LICENSE` (MIT, as iron-shield's) with `license` in `plugin.json` and
+  `package.json`, and a 1024 px listing icon at `.claude-plugin/icon.png`; the README says that a
+  second `opencode plugin add` keeps the copy OpenCode already cached, so `update` is what fetches a
+  new commit (seen twice while shipping 16.3.0). No rule or hook changes.
 - **16.3.0**: the OpenCode entry closes two gaps, at the user's pick ("Typed /oneloop commands",
   "Scope-line check"). Every skill is also the typed command `/oneloop:<name>`
   (`ctx.command.transform`), which sends the typed words with the skill attached

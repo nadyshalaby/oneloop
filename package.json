@@ -1,8 +1,9 @@
 {
   "name": "oneloop",
-  "version": "16.3.0",
+  "version": "16.3.1",
   "description": "One loop for every task in OpenCode 2.x, code first: the oneloop engineering law, its guards and its skills, from the same hook scripts as the Claude Code plugin.",
   "type": "module",
+  "license": "MIT",
   "homepage": "https://github.com/nadyshalaby/oneloop",
   "repository": {
     "type": "git",

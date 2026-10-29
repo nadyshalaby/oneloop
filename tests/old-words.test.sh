@@ -32,10 +32,12 @@ old_hits() {
 
 # split_hits <root>: every old-flow word split over a line break in what is read, which the line
 # scan cannot see: the words found once each paragraph is joined into one line (a line's leading
-# spaces and #, > and * marks dropped) minus the ones its lines hold, each after its file.
+# spaces and #, > and * marks dropped) minus the ones its lines hold, each after its file; a
+# binary file (the listing icon) has no paragraphs and is skipped.
 split_hits() {
   (builtin cd "$1" && for p in $READ; do [ -e "$p" ] && find "$p" -type f -not -path '*/tests/*'; done \
     | while read -r f; do
+        grep -Iq . "$f" || continue
         joined=$(awk 'BEGIN { RS = "" } { gsub(/\n[[:space:]>#*]*/, " "); print }' "$f" | grep -oE "$OLD" | sort)
         [ -n "$joined" ] || continue
         printf '%s\n' "$joined" > "$WORK/joined"

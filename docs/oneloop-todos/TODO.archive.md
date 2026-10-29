@@ -26,3 +26,4 @@
 ## 2026-10-29
 - [x] 16.2.0: oneloop in OpenCode 2.x: opencode/plugin.js hands OpenCode the law, the skills and the bash guards' pointers; package.json so `opencode plugin add` installs it from GitHub
 - [x] 16.3.0: typed /oneloop:<name> commands in OpenCode, and the scope guard's scope-line check fed from the OpenCode session's own messages (scope: opencode/plugin.js, tests/opencode-driver.mjs, tests/opencode.test.sh, package.json, .claude-plugin/plugin.json, .claude-plugin/marketplace.json, CHANGELOG.md, README.md, docs/oneloop-todos/TODO.md)
+- [x] 16.3.1: MIT license and a listing icon for the plugin directory; the README says a second `opencode plugin add` keeps the cached copy (scope: LICENSE, tests/old-words.test.sh, .claude-plugin/icon.png, .claude-plugin/plugin.json, .claude-plugin/marketplace.json, package.json, CHANGELOG.md, README.md, CLAUDE.md, docs/oneloop-todos/TODO.md)

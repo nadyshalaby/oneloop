@@ -146,6 +146,10 @@ opencode plugin update git+https://github.com/nadyshalaby/oneloop.git   # the ne
 opencode plugin remove git+https://github.com/nadyshalaby/oneloop.git
 ```
 
+A second `add` keeps the copy OpenCode already cached; `update` is what fetches a new commit.
+Open sessions take it up after `opencode reload`, which rebuilds the background server's
+plugins and lets running sessions carry on.
+
 One thing stays Claude Code's: the read-only helper `oneloop:er-reader` (an OpenCode 2.x plugin
 cannot add an agent).
 
@@ -264,6 +268,8 @@ runs the status line setup in fake config folders only, never against the real `
 ```
 .claude-plugin/plugin.json      the plugin: name, version, description
 .claude-plugin/marketplace.json this repository as its own marketplace, listing the plugin at "."
+.claude-plugin/icon.png         the plugin's listing icon, 1024 px square
+LICENSE                         MIT
 law/engineering-law.md          the core law the session-start hook hands to every session, in two parts
 law/engineering-code.md         the code rules the code-rules hook hands in with the first code file
 settings/loop.json              the loop's defaults: the four checks, the discovery budget, the two regexes
